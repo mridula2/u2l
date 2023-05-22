@@ -1,0 +1,38 @@
+Rule Id	Deprecated Classes	Library to Search	Entity to Search	Remedy
+IC_STC_1.1.0_001	org.apache.struts.action.ActionBase	org.apache.struts.action	ActionBase	 Application action classes should now extend Action directly, rather than this class. 
+IC_STC_1.1.0_002	org.apache.struts.action.ActionMappingBase	org.apache.struts.action	ActionMappingBase	 Now that ActionMapping is a class, you should use it intead 
+IC_STC_1.1.0_003	org.apache.struts.util.BeanUtils	org.apache.struts.util	BeanUtils	At some point after Struts 1.0 final, will be replaced by an equivalent class in the Jakarta Commons Beanutils package. 
+IC_STC_1.1.0_004	org.apache.struts.util.ConvertUtils	org.apache.struts.util	ConvertUtils	At some point after Struts 1.0 final, will be replaced by an equivalent class in the Jakarta Commons Beanutils package. 
+IC_STC_1.1.0_005	org.apache.struts.util.ErrorMessages	org.apache.struts.util	ErrorMessages	org.apache.struts.action.ActionErrors instead 
+IC_STC_1.1.0_006	org.apache.struts.util.FastArrayList	org.apache.struts.util	FastArrayList	At some point after Struts 1.0 final, will be replaced by an equivalent class in the Jakarta Commons Collections package. 
+IC_STC_1.1.0_007	org.apache.struts.util.FastHashMap	org.apache.struts.util	FastHashMap	 At some point after Struts 1.0 final, will be replaced by an equivalent class in the Jakarta Commons Collections package. 
+IC_STC_1.1.0_008	org.apache.struts.util.FastTreeMap	org.apache.struts.util	FastTreeMap	 At some point after Struts 1.0 final, will be replaced by an equivalent class in the Jakarta Commons Collections package. 
+IC_STC_1.1.0_009	org.apache.struts.util.PropertyUtils	org.apache.struts.util	PropertyUtils	 At some point after Struts 1.0 final, will be replaced by an equivalent class in the Jakarta Commons Beanutils package. 
+IC_STC_1.1.0_010	org.apache.struts.action.ValidatingActionForm	org.apache.struts.action	ValidatingActionForm	 Application ActionForm beans should now extend ActionForm
+	Deprecated Fields 		Deprecated Fields 	
+IC_STF_1.1.0_001	org.apache.struts.upload.MultipartElement.data 	org.apache.struts.upload.MultipartElement	data 	Not to be used
+	Deprecated Methods 	#VALUE!	Deprecated Methods 	
+IC_STM_1.1.0_001	org.apache.struts.action.ActionMapping.createFormInstance() 	org.apache.struts.action.ActionMapping	createFormInstance() 	 Creation of ActionForm instances is now the responsibility of the controller servlet 
+IC_STM_1.1.0_002	org.apache.struts.action.ActionMapping.getActionClass() 	org.apache.struts.action.ActionMapping	getActionClass() 	 Use getType() instead 
+IC_STM_1.1.0_003	org.apache.struts.upload.MultipartElement.getData() 	org.apache.struts.upload.MultipartElement	getData() 	 Use the getFile method to get a File representing the data for this element 
+IC_STM_1.1.0_004	org.apache.struts.action.ActionMapping.getFormAttribute() 	org.apache.struts.action.ActionMapping	getFormAttribute() 	 Use getAttribute() instead 
+IC_STM_1.1.0_005	org.apache.struts.action.ActionMapping.getFormClass() 	org.apache.struts.action.ActionMapping	getFormClass() 	 Use the bean name to look up the corresponding ActionFormBean instead 
+IC_STM_1.1.0_006	org.apache.struts.action.ActionMapping.getFormPrefix() 	org.apache.struts.action.ActionMapping	getFormPrefix() 	 Use getPrefix() instead 
+IC_STM_1.1.0_007	org.apache.struts.action.ActionMapping.getFormScope() 	org.apache.struts.action.ActionMapping	getFormScope() 	 Use getScope() instead 
+IC_STM_1.1.0_008	org.apache.struts.action.ActionMapping.getFormSuffix() 	org.apache.struts.action.ActionMapping	getFormSuffix() 	 Use getSuffix() instead 
+IC_STM_1.1.0_009	org.apache.struts.action.ActionMapping.getInputForm() 	org.apache.struts.action.ActionMapping	getInputForm() 	 Use getInput() instead 
+IC_STM_1.1.0_010	org.apache.struts.action.Action.perform(ActionServlet, ActionMapping, ActionForm, HttpServletRequest, HttpServletResponse) 	org.apache.struts.action.Action	perform(ActionServlet, ActionMapping, ActionForm, HttpServletRequest, HttpServletResponse) 	 Use the new perform() method without a servlet argument 
+IC_STM_1.1.0_011	org.apache.struts.action.Action.perform(ActionServlet, ActionMapping, ActionForm, ServletRequest, ServletResponse) 	org.apache.struts.action.Action	perform(ActionServlet, ActionMapping, ActionForm, ServletRequest, ServletResponse) 	 Use the new perform() method without a servlet argument 
+IC_STM_1.1.0_012	org.apache.struts.action.ActionMapping.setActionClass(String) 	org.apache.struts.action.ActionMapping	setActionClass(String) 	 Use setType(String) instead 
+IC_STM_1.1.0_013	org.apache.struts.upload.MultipartElement.setData(byte[]) 	org.apache.struts.upload.MultipartElement	setData(byte[]) 	 Use the setFile method to set the file that represents the data of this element 
+IC_STM_1.1.0_014	org.apache.struts.action.ActionMapping.setFormAttribute(String) 	org.apache.struts.action.ActionMapping	setFormAttribute(String) 	 Use setAttribute(String) instead 
+IC_STM_1.1.0_015	org.apache.struts.action.ActionMapping.setFormClass(String) 	org.apache.struts.action.ActionMapping	setFormClass(String) 	 Modify the corresponding ActionFormBean instead 
+IC_STM_1.1.0_016	org.apache.struts.action.ActionMapping.setFormPrefix(String) 	org.apache.struts.action.ActionMapping	setFormPrefix(String) 	 Use setPrefix(String) instead 
+IC_STM_1.1.0_017	org.apache.struts.action.ActionMapping.setFormScope(String) 	org.apache.struts.action.ActionMapping	setFormScope(String) 	 Use setScope(String) instead 
+IC_STM_1.1.0_018	org.apache.struts.action.ActionMapping.setFormSuffix(String) 	org.apache.struts.action.ActionMapping	setFormSuffix(String) 	 Use setSuffix(String) instead 
+IC_STM_1.1.0_019	org.apache.struts.action.ActionMapping.setInputForm(String) 	org.apache.struts.action.ActionMapping	setInputForm(String) 	 Use setInput(String) instead 
+IC_STM_1.1.0_020	org.apache.struts.taglib.bean.IncludeTag.setName(String) 	org.apache.struts.taglib.bean.IncludeTag	setName(String) 	 use setPage(String) instead 
+IC_STM_1.1.0_021	org.apache.struts.action.ActionForm.validate() 	org.apache.struts.action.ActionForm	validate() 	 This is the Struts 0.5 version of validation -- use the validate(ActionMapping,HttpServletRequest) method instead 
+	Deprecated Constructors 		Deprecated Constructors 	
+IC_STM_1.1.0_022	org.apache.struts.upload.MultipartElement(String, String, String, byte[]) 	org.apache.struts.upload	MultipartElement(String, String, String, byte[]) 	 Use the constructor that takes an File as an argument as opposed to a byte array argument, which can cause memory problems 
+

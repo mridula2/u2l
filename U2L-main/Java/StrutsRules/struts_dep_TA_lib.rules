@@ -1,0 +1,27 @@
+Rule Id	Deprecated Classes 	Library to search	Entity to Search	Remedy
+IC_STC_2XTAPI_001	org.apache.struts.taglib.tiles.AttributeToScopeTag 	org.apache.struts.taglib.tiles	AttributeToScopeTag 	           Is it still in use ?  
+IC_STC_2XTAPI_002	org.apache.struts.tiles.DefinitionsUtil 	org.apache.struts.tiles	DefinitionsUtil 	           Use TilesUtil.createDefinitionsFactory(ServletContext, DefinitionsFactoryConfig)  
+IC_STC_2XTAPI_003	org.apache.struts.tiles.actions.NoOpAction 	org.apache.struts.tiles.actions	NoOpAction 	           Use o.a.s.a.ForwardAction instead  
+	Deprecated Interfaces 			
+IC_STI_2XTAPI_003	org.apache.struts.tiles.ComponentDefinitionsFactory 	org.apache.struts.tiles	ComponentDefinitionsFactory 	           Use DefinitionsFactory instead.  
+	Deprecated Fields 			
+IC_STF_2XTAPI_001	org.apache.struts.tiles.DefinitionsFactoryConfig.debugLevel 	org.apache.struts.tiles.DefinitionsFactoryConfig	debugLevel 	           Use commons-logging mechanism.  
+IC_STF_2XTAPI_002	org.apache.struts.tiles.xmlDefinition.I18nFactorySet.INSTANCES_CONFIG_PARAMETER_NAME 	org.apache.struts.tiles.xmlDefinition.I18nFactorySet	INSTANCES_CONFIG_PARAMETER_NAME 	           use DEFINITIONS_CONFIG_PARAMETER_NAME  
+IC_STF_2XTAPI_003	org.apache.struts.tiles.DefinitionsUtil.INSTANCES_CONFIG_USER_DEBUG_LEVEL 	org.apache.struts.tiles.DefinitionsUtil	INSTANCES_CONFIG_USER_DEBUG_LEVEL 	           use DEFINITIONS_CONFIG_USER_DEBUG_LEVEL instead.  
+IC_STF_2XTAPI_004	org.apache.struts.tiles.DefinitionsFactoryConfig.parserDebugLevel 	org.apache.struts.tiles.DefinitionsFactoryConfig	parserDebugLevel 	           Use commons-logging mechanism.  
+	Deprecated Methods 			
+IC_STM_2XTAPI_001	org.apache.struts.tiles.DefinitionsUtil.createDefinitionFactoryInstance(String) 	org.apache.struts.tiles.DefinitionsUtil	createDefinitionFactoryInstance(String) 	           No direct replacement. Use createDefinitionFactory.  
+IC_STM_2XTAPI_002	org.apache.struts.tiles.DefinitionsUtil.createDefinitionsFactory(ServletContext, Map, String) 	org.apache.struts.tiles.DefinitionsUtil	createDefinitionsFactory(ServletContext, Map, String) 	           Use createDefinitionsFactory(ServletContext servletContext, ServletConfig servletConfig)  
+IC_STM_2XTAPI_003	org.apache.struts.tiles.DefinitionsUtil.getDefinition(String, PageContext) 	org.apache.struts.tiles.DefinitionsUtil	getDefinition(String, PageContext) 	           Use TilesUtil.getDefinition(String, ServletRequest, ServletContext)  
+IC_STM_2XTAPI_004	org.apache.struts.tiles.DefinitionsUtil.getDefinitionsFactory(ServletContext) 	org.apache.struts.tiles.DefinitionsUtil	getDefinitionsFactory(ServletContext) 	           Use TilesUtil.getDefinitionsFactory(ServletRequest, ServletContext)  
+IC_STM_2XTAPI_005	org.apache.struts.tiles.DefinitionsUtil.initUserDebugLevel(ServletConfig) 	org.apache.struts.tiles.DefinitionsUtil	initUserDebugLevel(ServletConfig) 	           Use commons-logging package instead.  
+IC_STM_2XTAPI_006	org.apache.struts.tiles.DefinitionsUtil.makeDefinitionsFactoryAccessible(DefinitionsFactory, ServletContext) 	org.apache.struts.tiles.DefinitionsUtil	makeDefinitionsFactoryAccessible(DefinitionsFactory, ServletContext) 	           Use TilesUtil.createDefinitionsFactory(ServletContext, DefinitionsFactoryConfig)  
+IC_STM_2XTAPI_007	org.apache.struts.tiles.actions.TilesAction.perform(ComponentContext, ActionMapping, ActionForm, HttpServletRequest, HttpServletResponse) 	org.apache.struts.tiles.actions.TilesAction	perform(ComponentContext, ActionMapping, ActionForm, HttpServletRequest, HttpServletResponse) 	           Use the execute() method instead  
+IC_STM_2XTAPI_008	org.apache.struts.tiles.ActionComponentServlet.processForward(String, HttpServletRequest, HttpServletResponse) 	org.apache.struts.tiles.ActionComponentServlet	processForward(String, HttpServletRequest, HttpServletResponse) 	           use doForward instead  
+IC_STM_2XTAPI_009	org.apache.struts.tiles.ComponentDefinition.setAttributes(Map) 	org.apache.struts.tiles.ComponentDefinition	setAttributes(Map) 	           No replacement  
+IC_STM_2XTAPI_010	org.apache.struts.tiles.DefinitionsUtil.setDefinitionsFactory(ComponentDefinitionsFactory, ServletContext) 	org.apache.struts.tiles.DefinitionsUtil	setDefinitionsFactory(ComponentDefinitionsFactory, ServletContext) 	           since 20020708. Replaced by makeFactoryAccessible()  
+IC_STM_2XTAPI_011	org.apache.struts.taglib.tiles.InsertTag.setInstance(String) 	org.apache.struts.taglib.tiles.InsertTag	setInstance(String) 	           Use setDefinition() instead.  
+IC_STM_2XTAPI_012	org.apache.struts.tiles.DefinitionsUtil.setUserDebugLevel(int) 	org.apache.struts.tiles.DefinitionsUtil	setUserDebugLevel(int) 	           Use commons-logging package instead.  
+	Deprecated Constructors 			
+IC_STM_2XTAPI_013	org.apache.struts.tiles.ComponentContext(ComponentDefinition) 	org.apache.struts.tiles	ComponentContext(ComponentDefinition) 	           Use ComponentContext( Map attributes ) instead.  
+

@@ -1,0 +1,43 @@
+version: '3.4'
+services:
+### MySQL Container
+    mysql:
+        container_name: u2l_db
+        build:
+            context: ./mysql
+            
+            args:
+                - MYSQL_DATABASE=${MYSQL_DATABASE}
+                - MYSQL_USER=${MYSQL_USER}
+                - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+                - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+                - MYSQL_PORT=${MYSQL_PORT}
+        env_file: .env
+        environment:
+            MYSQL_DATABASE: ${MYSQL_DATABASE}
+            MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+            
+        ports:
+            - 3306:3306
+
+    u2l_backend:
+        container_name: u2l_backend
+        build: 
+            context: ./u2l_backend
+            
+        ports:
+            - 5000:5000
+        depends_on:
+          - mysql
+
+    u2l_frontend:
+        container_name: u2l_frontend
+        build:
+            context: ./u2l_frontend
+            
+        ports:
+            - 80:80
+        depends_on:
+          -  u2l_backend
+             
+             

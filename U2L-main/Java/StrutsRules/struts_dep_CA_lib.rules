@@ -1,0 +1,4 @@
+Rule Id	Deprecated Class	Library to Seacrh	Entity to Search	Remedy
+IC_STM_2XCore_001	org.apache.struts.validator.Resources.getActionMessage(HttpServletRequest, ValidatorAction, Field) 	org.apache.struts.validator.Resources	getActionMessage(HttpServletRequest, ValidatorAction, Field) 	           Use getActionMessage(Validator, HttpServletRequest, ValidatorAction, Field) method instead  
+IC_STM_2XCore_002	org.apache.struts.action.ActionServlet.parseModuleConfigFile(Digester, String) 	org.apache.struts.action.ActionServlet	parseModuleConfigFile(Digester, String) 	           use parseModuleConfigFile(Digester digester, URL url) instead  
+
