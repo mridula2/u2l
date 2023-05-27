@@ -28,7 +28,7 @@ db_password_encrypt = ''
 def authentication():
     json_data = request.get_json()
     print(json_data)
-    form_email = json_data['user_name']
+    form_email = json_data['email']
     form_password = json_data['password']
 
     if form_email and validate_email(form_email):
@@ -67,14 +67,22 @@ def upload():
             form_target_jsp = request.form['target_jsp']
             form_source_servlet = request.form['source_servlet']
             form_target_servlet = request.form['target_servlet']
-        elif(tool_analysis_type == 'C/C++/Pro*C'):
+        elif(tool_analysis_type == 'C'):
             tool_analysis_type = 'canalysis'
             form_source_compiler = request.form['source_compiler']
             form_target_compiler = request.form['target_compiler']
             form_source_compiler_version = request.form['source_compiler_version']
             form_target_compiler_version = request.form['target_compiler_version']
-            form_source_oracle_version = request.form['source_oracle_version']
-            form_target_oracle_version = request.form['target_oracle_version']
+            # form_source_oracle_version = request.form['source_oracle_version']
+            # form_target_oracle_version = request.form['target_oracle_version']
+        # elif(tool_analysis_type == 'C/C++/Pro*C'):
+        #     tool_analysis_type = 'canalysis'
+        #     form_source_compiler = request.form['source_compiler']
+        #     form_target_compiler = request.form['target_compiler']
+        #     form_source_compiler_version = request.form['source_compiler_version']
+        #     form_target_compiler_version = request.form['target_compiler_version']
+        #     form_source_oracle_version = request.form['source_oracle_version']
+        #     form_target_oracle_version = request.form['target_oracle_version']
         elif(tool_analysis_type == 'Shell'):  
             tool_analysis_type = 'shellanalysis'
             form_source_shell = request.form['source_shell']
