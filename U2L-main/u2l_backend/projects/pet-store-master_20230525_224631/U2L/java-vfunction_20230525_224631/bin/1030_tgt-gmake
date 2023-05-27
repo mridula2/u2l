@@ -1,0 +1,218 @@
+#!/usr/bin/perl
+#
+# $Header: /data/cvsrepo/assess-tools/bin/1030_tgt-gmake,v 1.5 2014/11/07 07:45:35 cho Exp $
+# $Name: rev_1_10 $
+#
+# ツール名 : 1030_tgt-gmake
+# 概要     : Makefile から実行ファイル、オブジェクトファイル、ライブラリを抽出
+# 実行方法 : 1030_tgt-gmake Makefile_list
+# 入力	   : Makefile_list : Makefile リスト
+# 出力     : 
+
+# Makefile で定義された変数を配列で返す
+sub list_vals {
+    my $str = $_[0];
+    my @v;
+
+    while ( $str =~ /\$\(([^\)]+)\)/ || $str =~ /\$\{([^\}]+)\}/ ) {
+	my $ss = $1;
+        push(@v, $ss);
+        $str =~ s/\$\($ss\)//;
+        $str =~ s/\$\{$ss\}//;
+    }
+
+   return @v;
+}
+
+# 変数をおきかえる
+sub replace_vals {
+    my ($str, %vv) = @_;
+    my @a;
+    my $rstr;
+
+   $rstr = $str;
+    @a = list_vals($str);
+    foreach(@a) {
+	my $rs = " ";
+        if ( /(\S+):(.*)/ ) {
+	   my $bv = $1;
+	   my $suf = $2;
+	   if ( defined($vv{$bv}) ) {
+	   	$rs = "$vv{$bv}";
+	   }
+        }
+	elsif ( defined($vv{$_})) {
+		$rs = $vv{$_};
+	}
+	if ( $rs ne " " ) {
+		$rstr =~ s/\$\($_\)/$rs/g;
+		$rstr =~ s/\$\{$_\}/$rs/g;
+	}
+	else {
+		print "UNDEF\t$_\n";
+	}
+    }
+   return $rstr;
+}
+1;
+
+#
+# Main
+#
+my @makefiles;
+my @targets;
+my @objs;
+my @srcs;
+my $bid = 0;
+my @today = localtime(time());
+my $pjhome = $ENV{PJHOME};
+my $apname = $ENV{APNAME};
+my $outdir = "$pjhome/log/$apname/build";
+my $yearmonthday = sprintf "%d-%02d%02d", $today[5]+1900, $today[4]+1, $today[3];
+my $logfile = sprintf "log-%d%02d%02d-%02d%02d.log", $today[5]+1900, $today[4]+1, $today[3], $today[2], $today[1];
+
+# 引数のチェック
+if ( ! defined($ARGV[0]) ) {
+    print STDERR "Usage: $0 makefile_list\n";
+    exit 1;
+}
+
+# ログを出力するディレクトリの確認
+if ( ! -d $outdir ) {
+	mkdir $outdir;
+}
+
+if ( ! -d "$outdir/$yearmonthday" ) {
+	mkdir "$outdir/$yearmonthday";
+}
+
+open(my $fh, "$ARGV[0]") || die("Can't open \"$ARGV[0]\"");
+# ログファイル
+open(STDOUT, "> $outdir/$yearmonthday/$logfile") || die("Can't open \"$logfile\"");
+
+while(<$fh>) {
+    chomp;
+    my $fname = $_;
+    my $print_ok = 0;
+    my $cmt;
+    my %vals;
+    my @outp;
+    my $target;
+    my $vname;
+    my $vvalue;
+    my $vcont = 0;
+    # skip comment
+    next if ( /^\#/ );
+    print "======================== $fname \n";
+    open(my $fh1, "$fname") || die("Can't open $fname");
+    $makefiles[$bid] = $fname;
+    while(<$fh1>) {
+        # skip comment
+        next if ( /^\#/ );
+        if ( /(\S+)\s*=\s*(.*)/ ) {
+            $vname = $1;
+            $vvalue = $2;
+	    $vname =~ s/\s+$//;
+	    $vvalue =~ s/\#.*//;
+	    $vvalue =~ s/\s+$//;
+	    $vcont = $.;
+	    if ( $_ =~ /\\$/ ) {
+	        $vvalue =~ s/\\/ /;
+		next;
+	    }
+        }
+        elsif ( /^\s+\$\(CC\)/ || /^\s+\$\(LINKER\)/ || /^\s+aCC/ || 
+                /^\s+\$\(LD\)/ || /^\s+\$\(AR\)/     || /^\s+ar/ ) {
+	    my $ar = 0;
+            $ar = 1 if ( /^\s+ar/ );
+            my $bname = replace_vals($target, %vals);
+            print "TARGET\t$fname\t$bname\t";
+	    $targets[$bid] = $bname if ( $bname !~ /.*\.o\s*$/ );
+            my @a = list_vals($_);
+            foreach (@a) {
+                push(@outp, $_);
+                next if ( /CC/ );    # skip compiler
+                next if ( /OBJS/ );  # skip object
+                next if ( /SRCS/ );  # skip source
+                if ( $vals{$_} ne "" ) {
+                    print "$_ :: $vals{$_}   ";
+                }
+		# ar コマンドの場合
+                if ( $ar == 1 && $vals{$_} =~ /\.a/ ) {
+		    $targets[$bid] = $vals{$_};
+		}
+            }
+	    s/^\s+//;
+            print "\t$.\t$_";
+        }
+        elsif ( /(.*):/ ) {
+            $target = $1;
+	    $target =~ s/\s+$//;
+        }
+	if ( $vcont > 0 ) { 
+		#print "CONT \"$vname\" \"$vvalue\" -> $_";
+	    if ( $vcont != $. ) {
+		    my $s = $_;
+		    chomp($s);
+		    $s =~ s/^\s+//;
+		    $s =~ s/\#.*//;
+		    $s =~ s/\t//;
+		    if ( $s =~ /(.*)\\/ ) {
+			$vvalue .= "$1 ";
+	#		print "VAL $vname $vvalue\n";
+			next;
+		    }
+		    $vvalue .= $s;
+	    }
+            $vals{$vname} = replace_vals($vvalue, %vals);
+		#print "RES $vname \"$vals{$vname}\"\n";
+	    $vcont = 0;
+	}
+    }
+    close($fh1);
+    #  print CC etc.
+    if ( ! ( defined($vals{CC}) || defined($vals{LINKER})) ) {
+        print "Not defined CC \n";
+#        exit 1;
+    }
+    foreach(@outp) {
+	next if ( /CC/ );    # skip compiler
+	if ( /OBJ/ ) {
+		$objs[$bid] .= "$vals{$_} ";
+	}
+	if ( /SRC/ ) {
+		$srcs[$bid] .= "$vals{$_} ";
+	}
+	#print "$_ $vals{$_}\n";
+    }
+    $bid++;
+}
+close($fh);
+
+#
+my $buildfile = sprintf "build_list-%d%02d%02d-%02d%02d.log", $today[5]+1900, $today[4]+1, $today[3], $today[2], $today[1];
+mkdir "$outdir";
+open(my $fhout, "> $outdir/$yearmonthday/$buildfile") || die "Can't open $outdir/$buildfile";
+
+foreach(@makefiles) {
+    print $fhout "$_\t";
+    print $fhout shift(@targets);
+    print $fhout "\n";
+}
+close($fhout);
+
+my $filelist = sprintf "file_list-%d%02d%02d-%02d%02d.log", $today[5]+1900, $today[4]+1, $today[3], $today[2], $today[1];
+open(my $fhout2, "> $outdir/$yearmonthday/$filelist") || die "Can't open $outdir/$filelist";
+foreach(@srcs) {
+    my @a = split(/\s+/, $_);
+    foreach my $i (@a) {
+	print $fhout2 "$i\n";
+    }
+}
+foreach(@objs) {
+    my @a = split(/\s+/, $_);
+    foreach my $i (@a) {
+	print $fhout2 "$i\n";
+    }
+}
+close($fhout2);

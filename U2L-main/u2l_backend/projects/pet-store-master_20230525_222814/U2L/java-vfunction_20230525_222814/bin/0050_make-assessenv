@@ -1,0 +1,45 @@
+#!/bin/sh
+#
+# $Header: /data/cvsrepo/assess-tools/bin/0050_make-assessenv,v 1.3 2013/07/31 05:34:38 kitayama Exp $
+# $Name: rev_1_10 $
+#
+# ToolName : 0050_make-assessenv
+# Summary  : make directory for assessment
+# Execute  : 0050_make-assessenv <directory>
+# Input    : make top NEW directory name(/JP3-CXXXX)
+# Output   : none
+
+if [ `whoami` != "root" ];
+then
+	echo "Not root user."
+	exit 1
+fi
+
+if [ $# -ne 1 ];
+then
+	echo "Usage : $0 <dirname>"
+	exit 1
+fi
+
+if [ -d $1 ];
+then
+	echo "$1 exists. Please check it."
+	exit 1
+else
+	NEWDIR=$1
+fi
+
+mkdir $NEWDIR
+
+mkdir $NEWDIR/src
+mkdir $NEWDIR/src/org
+mkdir $NEWDIR/src/master
+mkdir $NEWDIR/log
+mkdir $NEWDIR/bin
+mkdir $NEWDIR/tools
+mkdir $NEWDIR/work
+mkdir $NEWDIR/etc
+
+# Change group and permission
+chgrp -R assess $NEWDIR
+chmod -R g+w $NEWDIR

@@ -1,0 +1,45 @@
+#!/bin/sh
+#
+# $Header: /data/cvsrepo/assess-tools/bin/1023_gccerrcheck,v 1.6 2013/06/28 12:00:12 miya Exp $
+# $Name: rev_1_10 $
+#
+# ツール名 : 1023_gccerrcheck
+# 概要     : コンパイルエラー確認
+# 実行方法 : 1023_gccerrcheck log
+# 入力	   : log : コンパイルログファイル
+# 出力     : エラーがある場合は、ログ中のエラー発生した箇所を出力
+
+file=$1
+
+if [ ! -f $file ];
+then
+	echo "Not found log file : $1"
+	exit 1
+fi
+
+if [ `uname` = "Linux" ];
+then
+	alias echo='echo -e'
+fi
+
+echo "compile error "
+echo "--------------"
+grep -n 'error:' $file
+grep -n 'エラー' $file
+grep -n 'Stop' $file
+grep -n '中止' $file
+grep -n '^[a-zA-Z\/][a-zA-Z\/]*:' $file
+
+echo 
+echo "-Wall option check"
+echo "------------------"
+grep -n -e '^===' -e 'cc[ 	]' $1  | grep -v -e Wall -e warning -e note -e 'In function' -e '\-l'
+grep -n -e '^===' -e 'g++[ 	]' $1  | grep -v -e Wall -e warning -e note -e 'In function' -e '\-l'
+
+echo 
+echo "-w option check"
+echo "------------------"
+grep -n -e '[[:space:]]\-w[[:space:]]' -e '[[:space:]]\-w$' $1
+
+echo "Total makefile : \c"
+grep '^====' $file | wc -l

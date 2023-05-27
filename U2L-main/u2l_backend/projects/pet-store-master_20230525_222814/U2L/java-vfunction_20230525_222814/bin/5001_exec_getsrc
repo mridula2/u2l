@@ -1,0 +1,54 @@
+#!/bin/sh
+# $Header: /data/cvsrepo/assess-tools/bin/5001_exec_getsrc,v 1.3 2015/01/13 08:27:38 meguro Exp $
+# $Name: rev_1_10 $
+#
+# ツール名 : 5001_exec_getsrc
+# 概要     : exescandetailの実行結果を元に詳細レポートのフォーマットで出力する
+# 実行方法 : 5001_exec_getsrc file1 file2
+# 入力     : file1 : exescandetailの実行結果
+#          : file2 : パス・ファイル名使用箇所の抽出結果
+# 出力     : envdetail_lists : 詳細レポート形式のファイル
+#
+
+TMPFILE="sum_list"
+trap 'rm -f $TMPFILE;exit 1' 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15
+
+if [ -f $TMPFILE ];
+then
+	echo "Found $TMPFILE. Please remove $TMPFILE."
+fi
+
+case ${STK_TYPE:=STKSL} in
+
+STKSL )
+	echo "EX-01	system - unknown problem detected (NcCh1007)" > $TMPFILE
+	echo "EX-01	execv - unknown problem detected (NcCh1007)" >> $TMPFILE
+	echo "EX-01	execvp - unknown problem detected (NcCh1007)" >> $TMPFILE
+	echo "EX-01	execlp - unknown problem detected (NcCh1007)" >> $TMPFILE
+	echo "EX-02	getenv - unknown problem detected (NcCh1007)" >> $TMPFILE
+	echo "EX-02	putenv - unknown problem detected (NcCh1007)" >> $TMPFILE
+  ;;
+
+* )
+	echo "EX-01	system - not supported (NcCh1007)" > $TMPFILE
+	echo "EX-01	execv - not supported (NcCh1007)" >> $TMPFILE
+	echo "EX-01	execvp - not supported (NcCh1007)" >> $TMPFILE
+	echo "EX-01	execlp - not supported (NcCh1007)" >> $TMPFILE
+	echo "EX-02	getenv - not supported (NcCh1007)" >> $TMPFILE
+	echo "EX-02	putenv - not supported (NcCh1007)" >> $TMPFILE
+  ;;
+
+esac
+
+$PJHOME/bin/4001_scandetail_getsrc.pl $1  
+
+rm -f $TMPFILE
+
+if [ ! -f $2 ];
+then
+	echo "Not found $2"
+fi
+
+sed 's/	/ /g' $2 | sed 's/:/	/' | sed -e 's/:/	/' -e 's/^/EX-03	/' >> scandetail_check_lists
+
+sort -t '	' -k 1,1 -k 2,2 -k 3,3n scandetail_check_lists > envdetail_lists

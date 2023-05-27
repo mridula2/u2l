@@ -1,0 +1,153 @@
+#!/usr/bin/perl
+#
+# $Header: /data/cvsrepo/assess-tools/bin/8020_char-funccheck,v 1.2 2013/09/10 08:10:46 sodo Exp $
+# $Name: rev_1_10 $
+#
+# name : 8020_char-funccheck
+# desc : extract from source code, cppcheck output, STK output that are needed to be checked.
+# usage: 8020_char-funccheck <dir>
+# input: <dir>: directory of source codes (comment stripped)
+# output: print to stdout in the following format
+#         <filename>:<line#>:<source line>:<cppcheck message>
+
+use encoding 'shiftjis';
+
+# script log directory
+$logdir=$ENV{PJHOME} . "/log/" . $ENV{APNAME} . "/charinv";
+# STK log file
+$stklogdir=$ENV{PJHOME} . "/log/" . $ENV{APNAME} . "/stk";
+$stklogfile="allfunc_detail.txt";
+
+if ( $#ARGV != 0 ) {
+        print STDERR "Usage : $0 dir\n";
+        exit 1;
+}
+
+if ( ! -d $ARGV[0] ) {
+        print STDERR "Not found $ARGV[0]\n";
+        exit 1;
+}
+
+if ( -f "$stklogdir/$stklogfile" ) {
+        print STDERR "Using $stklogdir/$stklogfile\n";
+}
+else {
+        print STDERR "Not found $stklogdir/$stklogfile\n";
+        exit 1;
+}
+
+#chdir $ARGV[0];
+
+open(my $fh, "cat $stklogdir/$stklogfile | ") || die "Can't open $stklogdir/$stklogfile";
+open(my $fhext, "> $logdir/char-ext-func.out") || die "Can't open $logdir/char-ext-func.out";
+open(my $fhtmp, "> $logdir/char-ext-func-tmp.out") || die "Can't open $logdir/char-ext-func-tmp.out";
+
+while(<$fh>) {
+        my $fname, $num, $func, $cppmsg;
+	# extract filename, linenumber, functionname from STK logfile
+        if ( /(\S+):([0-9]+):  \(F\)(\S+)/ ) {
+                $fname = $1;
+                $num = $2;
+                $func = $3;
+        }
+	# check if the function name is memset, memcpy or strncpy
+        if ( ( $func eq "memset" || $func eq "memcpy" || $func eq "strncpy" ) && $fname ne "" ) {
+                open(my $fh2, "$ENV{PWD}/$fname") || die "Can't open $ENV{PWD}/$fname";
+                while(<$fh2>) {
+                        chomp;
+                        s/      / /g;
+                        if ( $. == $num ) {
+                        if ( /\s*memset\s*\(\s*([^,]+?)\s*,(\s*[^,]+),\s*sizeof\s*\(\s*(\S+?)\s*\)\s*\)/ ) {
+                                my ($a,$b,$c) = ($1,$2,$3);
+                                my $a = &stripstr($1);
+                                my $c = &stripstr($3);
+
+                                # detect: memset (A, NULL, sizeof(B))
+                                #   memset (&A, NULL, sizeof(A)) -> OK
+                                #   memset (&A, NULL, sizeof(B)) -> OK(if B is capital)
+                                if ( $a ne $c && $a ne "&".$c && $c !~ /[A-Z]/ ) {
+                                  print $fhext "$fname : $. : $_ : memset-A\n";
+                                  print $fhtmp "memset:\t$a\t\t$c\n";
+                                }
+
+                                # detect: memset (&A, NULL, sizeof(&A))
+                                if ( $a eq $c && index($a, "&") == 0) {
+                                  print $fhext "$fname : $. : $_ : memset-B\n";
+                                  print $fhtmp "memset:\t$a\t\t$c\n";
+                                }
+                        }
+                        elsif ( /\s*memcpy\s*\(\s*([^,]+?)\s*,(\s*[^,]+),\s*sizeof\s*\(\s*(\S+?)\s*\)\s*\)/ ) {
+                                my ($a,$b,$c) = ($1,$2,$3);
+                                my $a = &stripstr($1);
+                                my $c = &stripstr($3);
+
+                                # detect: memcpy (A, NULL, sizeof(B))
+                                #   memcpy (&A, NULL, sizeof(A)) -> OK
+                                #   memcpy (&A, NULL, sizeof(B)) -> OK(if B is capital)
+                                if ( $a ne $c && $a ne "&".$c && $c !~ /[A-Z]/ ) {
+                                  print $fhext "$fname : $. : $_ : memcpy-A\n";
+                                  print $fhtmp "memcpy:\t$a\t\t$c\n";
+                                }
+
+
+                                # detect: memcpy (&A, NULL, sizeof(&A))
+                                if ( $a eq $c && index($a, "&") == 0) {
+                                  print $fhext "$fname : $. : $_ : memcpy-B\n";
+                                  print $fhtmp "memcpy:\t$a\t\t$c\n";
+                                }
+                        }
+                        elsif ( /\s*strncpy\s*\(\s*([^,]+?)\s*,(\s*[^,]+),\s*sizeof\s*\(\s*(\S+?)\s*\)\s*\)/ ) {
+                                my ($a,$b,$c) = ($1,$2,$3);
+                                my $a = &stripstr($1);
+                                my $c = &stripstr($3);
+
+                                # detect: strncpy (A, NULL, sizeof(B))
+                                #   strncpy (&A, NULL, sizeof(A)) -> OK
+                                #   strncpy (&A, NULL, sizeof(B)) -> OK(if B is capital)
+                                if ( $a ne $c && $a ne "&".$c && $c !~ /[A-Z]/ ) {
+                                  print $fhext "$fname : $. : $_ : strncpy-A\n";
+                                  print $fhtmp "strncpy:\t$a\t\t$c\n";
+                                }
+
+                                # detect: strncpy (&A, NULL, sizeof(&A))
+                                if ( $a eq $c && index($a, "&") == 0) {
+                                  print $fhext "$fname : $. : $_ : strncpy-B\n";
+                                  print $fhtmp "strncpy:\t$a\t\t$c\n";
+                                }
+                        }
+                        else {
+                                # skip
+                                #print $fhext "$fname : $num : $_ : other\n";
+                        }
+                        }
+                }
+                close($fh2);
+        }
+}
+
+close($fh);
+close($findfh);
+close($fhext);
+close($fhtmp);
+
+print "sorting func calls output...";
+system "grep memset  $logdir/char-ext-func-tmp.out | sort | uniq -c | sort -rn >  $logdir/char-ext-func-ana.out";
+system "grep memcpy  $logdir/char-ext-func-tmp.out | sort | uniq -c | sort -rn >> $logdir/char-ext-func-ana.out";
+system "grep strncpy $logdir/char-ext-func-tmp.out | sort | uniq -c | sort -rn >> $logdir/char-ext-func-ana.out";
+print "finished.";
+unlink "$logdir/char-ext-func-tmp.out";
+
+exit 0;
+
+
+sub stripstr {
+        my ($x) = @_;
+
+        $x =~ s/\(char\s*\*\)//g;
+        $x =~ s/\(long\s*\*\)//g;
+        $x =~ s/\(void\s*\*\)//g;
+        $x =~ s/^\s+//g;
+
+        return $x;
+}
+

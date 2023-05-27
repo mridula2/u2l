@@ -1,0 +1,230 @@
+#!/usr/bin/perl
+#
+# $Header: /data/cvsrepo/assess-tools/bin/8021_char-funccheck,v 1.3 2014/04/01 02:27:26 morimoto Exp $
+# $Name: rev_1_10 $
+#
+# ツール名 : 8021_char-funccheck
+# 概要     : cppcheck, STKの出力結果からmemset,memcpy,strncpyで目視が必要な箇所を抽出
+# 実行方法 : 8021_char-funccheck  directory
+# 出力     : 以下のフォーマットでログに結果を出力
+#            <ファイル名><tab><行番号><tab><内容><tab><種別>
+
+$DATE=`date "+%Y-%m%d"`;
+chomp($DATE);
+# script log directory
+$logdir=$ENV{PJHOME} . "/log/" . $ENV{APNAME} . "/charinv/" . $DATE;
+# STK log file
+$stklogdir=$ENV{PJHOME} . "/log/" . $ENV{APNAME} . "/stk";
+$stklogfile="allfunc_detail.txt";
+
+if ( $ARGV != 0 ) {
+        print STDERR "Usage : $0\n";
+        exit 1;
+}
+
+if ( -f "$stklogdir/$stklogfile" ) {
+        print STDERR "Using $stklogdir/$stklogfile\n";
+}
+else {
+        print STDERR "Not found $stklogdir/$stklogfile\n";
+        exit 1;
+}
+
+if ( ! -d $logdir ) {
+        mkdir $logdir;
+}
+
+my %summary =();
+open(my $fh, "cat $stklogdir/$stklogfile | ") || die "Can't open $stklogdir/$stklogfile";
+## debug
+#open(my $fh, "cat ./debuglist | ") || die "Can't open debuglist";
+
+open(my $fhext, "> $logdir/char-funccheck.out") || die "Can't open $logdir/char-funccheck.out";
+
+while(<$fh>) {
+        my $fname, $num, $func, $cppmsg;
+        # STK のログフォーマットからファイル名、行番号、関数を取り出す
+        if ( /(\S+):([0-9]+):  \(F\)(\S+)/ ) {
+                $fname = $1;
+                $num = $2;
+                $func = $3;
+        }
+        # STK で memset, memcpy, strncpy に関するものであれば以下を処理
+        if ( ( $func eq "memset" || $func eq "memcpy" || $func eq "strncpy" ) && $fname ne "" ) {
+                open(my $fh2, "$ENV{PWD}/$fname") || die "Can't open $ENV{PWD}/$fname";
+                while(<$fh2>) {
+                        chomp;
+                        s/\t/ /g;
+                        if ( $. == $num ) {
+
+                        ### memset() function / arg2 is not NULL ###
+                        #if ( /\s*memset\s*\(\s*([^,]+?)\s*,(\s*[^,]+),\s*(\S+?)\s*/) {
+                        if ( $func eq "memset" && /\s*memset\s*\(\s*([^,]+?)\s*,(\s*[^,]+),\s*(.*)\)\s*;/) {
+                                my ($arg1_amp, $arg2_amp, $arg3_amp) = (&ampcheck($1), &ampcheck($2), &ampcheck($3));
+                                my ($arg1, $arg2, $arg3) = (&stripstr($1), &stripstr($2), &stripstr($3));
+                                ### check-memset-01
+                                ### memset(aaa, NULL, xxx): OK
+                                ### memset(aaa, ' ', xxx): CHECK (arg2 is not NULL)
+                                if ( $arg2 !~ /NULL|0x00|'\\0'|0|\(char\s*\*\)\s*0/ ) {
+                                        print $fhext "$fname\t$.\t$_\tmemset-01\n";
+                                        ### 2013/09/18 debug arg1,arg2,arg3
+                                        #print $fhext "$fname : $. : $_ : memset-01 : $arg1 : $arg2 : $arg3\n";
+					$summary{'memset-01'}++;
+                                }
+
+                        }
+
+                        ### memset() function / sizeof ###
+                        if ( $func eq "memset" && /\s*memset\s*\(\s*([^,]+?)\s*,(\s*[^,]+),\s*sizeof\s*\(\s*(\S+?)\s*\)\s*\)/) {
+                                my ($arg1_amp, $arg2_amp, $arg3_amp) = (&ampcheck($1), &ampcheck($2), &ampcheck($3));
+                                my ($arg1, $arg2, $arg3) = (&stripstr($1), &stripstr($2), &stripstr($3));
+
+                                ### check-memset-02
+###  sizeof(&aaa): NG
+                                if ( $arg3 =~ /^&/ ) {
+                                        print $fhext "$fname\t$.\t$_\tmemset-02\n";
+					$summary{'memset-02'}++;
+                                        next;
+                                }
+
+                                ### check-memset-03
+                                ###  sizeof(NULL): NG
+                                if ( $arg3 =~ /NULL/ ) {
+                                        print $fhext "$fname\t$.\t$_\tmemset-03\n";
+					$summary{'memset-03'}++;
+                                        next;
+                                }
+
+                                ### check-memset-04
+                                ###  memset(aaa, XXX, sizeof(bbb): may NG
+                                ###  memset(&aaa, XXX, sizeof(bbb): may NG
+                                ###  memset(aaa, XXX, sizeof(XXX): OK
+                                if ( ($arg1_amp == 0) && ($arg1 ne $arg3) ||
+                                        ($arg1_amp == 1) && ($arg1 ne "&".$arg3) ) {
+                                        if ($arg3 !~ /[A-Z]/) {
+                                                print $fhext "$fname\t$.\t$_\tmemset-04\n";
+						$summary{'memset-04'}++;
+                                                next;
+                                        }
+                                }
+                        }
+
+                        ### memcpy() function / sizeof ###
+                        if ( $func eq "memcpy" && /\s*memcpy\s*\(\s*([^,]+?)\s*,(\s*[^,]+),\s*sizeof\s*\(\s*(\S+?)\s*\)\s*\)/) {
+                                my ($arg1_amp, $arg2_amp, $arg3_amp) = (&ampcheck($1), &ampcheck($2), &ampcheck($3));
+                                my ($arg1, $arg2, $arg3) = (&stripstr($1), &stripstr($2), &stripstr($3));
+
+                                ### check-memcpy-01
+                                ###  sizeof(&aaa): NG
+                                if ( $arg3 =~ /^&/ ) {
+                                        print $fhext "$fname\t$.\t$_\tmemcpy-01\n";
+					$summary{'memcpy-01'}++;
+                                        next;
+                                }
+
+                                ### check-memcpy-02
+                                ###  sizeof(NULL): NG
+                                if ( $arg3 =~ /NULL/ ) {
+                                        print $fhext "$fname\t$.\t$_\tmemcpy-02\n";
+					$summary{'memcpy-02'}++;
+                                        next;
+                                }
+
+                                ### check-memcpy-03
+                                ###  memcpy(aaa, bbb, sizeof(bbb): OK
+                                ###  memcpy(aaa, bbb, sizeof(aaa): OK
+                                ###  memcpy(aaa, bbb, sizeof(xxx): may NG
+                                $arg1 =~ s/^&//g;
+                                $arg2 =~ s/^&//g;
+                                if ( ($arg1 ne $arg3) && ($arg2 ne $arg3) ) {
+                                        if ($arg3 !~ /[A-Z]/) {
+                                                print $fhext "$fname\t$.\t$_\tmemcpy-03\n";
+						$summary{'memcpy-03'}++;
+                                                next;
+                                        }
+                                }
+                        }
+
+                        ### strncpy() function / sizeof ###
+                        if ( $func eq "strncpy" && /\s*strncpy\s*\(\s*([^,]+?)\s*,(\s*[^,]+),\s*sizeof\s*\(\s*(\S+?)\s*\)\s*\)/) {
+                                my ($arg1_amp, $arg2_amp, $arg3_amp) = (&ampcheck($1), &ampcheck($2), &ampcheck($3));
+                                my ($arg1, $arg2, $arg3) = (&stripstr($1), &stripstr($2), &stripstr($3));
+
+                                ### check-strncpy-01
+                                ###  sizeof(&aaa): NG
+                                if ( $arg3 =~ /^&/ ) {
+                                        print $fhext "$fname\t$.\t$_\tstrncpy-01\n";
+					$summary{'strncpy-01'}++;
+                                        next;
+                                }
+
+                                ### check-strncpy-02
+                                ###  sizeof(NULL): NG
+                                if ( $arg3 =~ /NULL/ ) {
+                                        print $fhext "$fname\t$.\t$_\tstrncpy-02\n";
+					$summary{'strncpy-02'}++;
+                                        next;
+                                }
+
+                                ### check-strncpy-03
+                                ###  strncpy(aaa, bbb, sizeof(bbb): OK
+                                ###  strncpy(aaa, bbb, sizeof(aaa): OK
+                                ###  strncpy(aaa, bbb, sizeof(xxx): may NG
+                                $arg1 =~ s/^&//g;
+                                $arg2 =~ s/^&//g;
+                                if ( ($arg1 ne $arg3) && ($arg2 ne $arg3) ) {
+                                        if ($arg3 !~ /[A-Z]/) {
+                                                print $fhext "$fname\t$.\t$_\tstrncpy-03\n";
+						$summary{'strncpy-03'}++;
+                                                next;
+                                        }
+                                }
+                        }
+
+
+                        } # end of if($. == $num)
+                }
+                close($fh2);
+        }
+}
+
+close($fh);
+close($findfh);
+
+printf("output ot file:%s\n", "$logdir/char-funccheck.out");
+
+my $total;
+printf("## summary \n");
+foreach $type (sort keys %summary) {
+	printf("%s	%d\n", $type, $summary{$type});
+	$total+=$summary{$type};
+}
+printf("## total %d\n", $total);
+
+exit 0;
+
+
+sub stripstr {
+        my ($x) = @_;
+
+        $x =~ s/^\s+//g;
+        $x =~ s/\s+$//g;
+        $x =~ s/^\(.+\*\s*\)//g;
+        $x =~ s/^\(\s*[A-Z_-]+\s*\)//g;
+
+        return $x;
+}
+
+sub ampcheck {
+        my ($x) = @_;
+
+        $x =~ s/^\s+//g;
+        $x =~ s/^\(.+\*\s*\)//g;
+        $x =~ s/^\(\s*[A-Z_-]+\s*\)//g;
+
+        if ( $x =~ /^&/ ) {
+                return 1;
+        } else {
+                return 0;
+        }
+}

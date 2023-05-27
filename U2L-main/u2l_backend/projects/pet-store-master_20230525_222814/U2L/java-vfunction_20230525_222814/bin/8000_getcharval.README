@@ -1,0 +1,75 @@
+# $Header: /data/cvsrepo/assess-tools/bin/8000_getcharval.README,v 1.2 2014/03/06 05:02:06 morimoto Exp $
+# $Name: rev_1_10 $
+#
+ツール名　: 
+　8000_getcharval
+
+概要　　　: 
+　ソースコードのファイル名一覧から各ソースコードを読み込み
+　char配列、charポインタが初期化されている行を抽出
+
+実行方法 : 
+　# export PJHOME=/JP3-Cxxxx
+　# export APNAME=app1
+　# cd $srcdir
+　# find . -type f -name "*.c" -o -name "*.pc" -o -name "*.h" > /tmp/filelist
+　# 8000_getcharval /tmp/filelist
+
+　※注意：環境変数PJHOME,APNAMEをセットしてから実行してください
+　　　　　ソースコード格納ディレクトリへcdで移動してから本ツールを実行してください。
+　　　　　findコマンドで出力するファイルリストは8000_getcharval終了後は削除しても構いません。
+　　　　　ファイルリストとしてfindコマンドにより、作成したファイルを指定していますが、
+　　　　　以下のように、srccheckで作成したc_files.outを使用しても構いません。
+　# . /JP3-Cxxxx/etc/apname.env
+　# cd $PJHOME/work/charinv/$APNAME
+　# 8000_getcharval $PJHOME/etc/${APNAME}_c_files.out
+
+オプション：
+　<filelist> : ある拡張子を持つソースコードファイルの一覧(findコマンドで一覧を作成します)
+　（そのディレクトリへcdして実行してください）
+
+標準出力　：
+　 (1) サイズなしのchar配列の行数(ex. char aaa[]={'a','b'};)
+　 (2) サイズつきのchar配列の行数(ex. char bbb[20];)
+　 (3) charポインタ初期化の行数(ex. ptr = malloc( sizeof(LEN) );)
+
+戻り値：
+　0：正常終了
+　1：引数の数が不正
+　　 環境変数PJHOME,APNAMEがセットされていない
+
+エラー出力：
+　引数不正："Usage: $0 dir"
+　環境変数PJHOMEがセットされていない："Error : ${PJHOME} must be set."
+　環境変数APNAMEがセットされていない："Error : ${APNAME} must be set."
+
+入力ファイル：
+　/tmp/filelist：ある拡張子を持つソースコードファイルの一覧(ファイルパスは任意。findコマンドで一覧を作成します。)
+　
+出力ファイル：
+　$PJHOME/log/$APNAME/charinv/YYYY-MMDD/char-array.out：char配列が使用されているソースファイル、行番号、コード内容が記載されたファイル
+　$PJHOME/log/$APNAME/charinv/YYYY-MMDD/char-pointer.out：charポインタ初期化が使用されているソースファイル、行番号、コード内容が記載されたファイル
+　　出力フォーマット：
+　　<ファイル名><tab><行番号><tab><内容>
+
+仕様：
+　本スクリプトは、ソースコードディレクトリ以下から1行単位でファイル読み込みを行い、
+　char配列、charポインタの記載を検出し、以下のようなパターンの行を抽出する。
+
+　パターン判定は下記の記載順で行われる。
+
+　　サイズ指定なしのchar配列として抽出されるパターン：
+		char aaa[] = {'a','b','c'};
+
+　　サイズ指定ありのchar配列として抽出されるパターン：
+		char bbb[20];
+
+　　charポインタ初期化として抽出されるパターン：
+		ptr = malloc( sizeof(TBL_LEN) * count );
+		buff = (char*)malloc(file_size);
+		buf = (char *)malloc( 10 );
+		if((readbuf = (char *)malloc(recsz))==NULL){
+		上記の"malloc"が"calloc"または"alloca"の場合も抽出します
+
+
+

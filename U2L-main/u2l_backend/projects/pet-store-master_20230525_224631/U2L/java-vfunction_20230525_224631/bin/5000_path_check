@@ -1,0 +1,27 @@
+#!/bin/sh
+# $Header: /data/cvsrepo/assess-tools/bin/5000_path_check,v 1.1 2015/02/02 09:35:07 meguro Exp $
+# $Name: rev_1_10 $
+#
+# ツール名 : 5000_path_check
+# 概要     : ソースコードにOS固有のファイルパスの候補が含まれる行を抜き出す
+# 実行方法 : 5000_path_check file1
+# 入力     : file1 : 調査対象ファイルの一覧
+# 出力     : stdout : 該当箇所の一覧（ファイル名:行番号:ファイルの内容）
+#
+
+if [ $# -ne 1 ];
+then
+        echo "Usage : $0 <file>"
+        exit 1
+fi
+
+if [ -f $1 ];
+then
+        file=$1
+else
+        echo "Not found $1"
+        exit 1
+fi
+
+cat $file | xargs grep -ne '/opt' -ne '/usr' -ne '/etc' -ne '/dev'
+

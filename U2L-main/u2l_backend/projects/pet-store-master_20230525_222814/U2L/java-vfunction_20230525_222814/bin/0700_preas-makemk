@@ -1,0 +1,250 @@
+#!/bin/sh
+#
+# $Header: /data/cvsrepo/assess-tools/bin/0700_preas-makemk,v 1.7 2014/01/22 09:53:42 morimoto Exp $
+# $Name: rev_1_10 $
+#
+# ツール名 : 0700_preas-makemk
+# 概要     : 指定したディレクトリにある .c/.pc ファイルをコンパイルする Makefile を生成する
+# 実行方法 : 0700_preas_makmk dirname
+# 入力     : dirname : ソースコードがあるトップディレクトリ
+#		(必ずカレントディレクトリからの相対パスを指定する)
+# 出力     : MAKEIDR 変数で指定したディレクトリに生成した Makefile を保存
+#
+MAKEDIR=mak                  # 生成した Makefile を保存するディレクトリ名
+NOTFOUND="NOTFOUND.out"      # 存在しないヘッダファイルのリストを保存するファイル名
+
+# files でインクルードされたヘッダファイルがあるディレクトリを割り出す
+get_incdirlist()
+{
+	basedir=$1
+	shift
+        dname=$1
+	shift
+	files=$*
+
+	echo "Searching ... $dname $files"
+	#
+	# 以下のパターンからヘッダファイルを取り出す
+	#     #include "abc.h"           -> abc.h
+	#     EXEC SQL INCLUDE abc;      -> abc.h
+	#     EXEC SQL INCLUDE abc.h;    -> abc.h     
+	#     EXEC SQL INCLUDE "abc.h";  -> abc.h     
+	for i in `cd $dname ; sed -n -e '/^[ 	]*\#include[ 	]*"/p' -e '/EXEC[ 	][ 	]*SQL[ 	][ 	]*INCLUDE/p' $files | sed -e 's/\#include[ 	]*\"//'  -e 's/EXEC[ 	][ 	]*SQL[ 	][ 	]*INCLUDE//' | sed -e 's/".*//' -e 's/\.h[ 	]*;.*/\.h/' -e 's/[ 	]*;.*/\.h/'`
+	do
+		if [ "$i" ];
+		then
+			echo "include file -> $i "
+			regi=`echo $i | sed 's/\./\\\./g'`
+			tgt=$dname
+			while [ "$tgt" != "." ] && [ "$tgt" != "/" ];
+			do
+				a=`find $tgt | grep "\/$regi"`
+				if [ "$a" ];
+				then
+					dirname $a >> incdir.$$
+					echo "INCDIR $a" 
+					#get_incdirlist `dirname $a` $i
+					get_incdirlist $dname `dirname $a` $i
+					break
+				fi
+				tgt=`dirname $tgt`
+			done
+			if [ "$tgt" = "." ] || [ "$tgt" = "/" ];
+			then
+				echo "$dname : $i" >> $NOTFOUND
+			fi
+		fi
+	done
+}
+	
+# Makefile を生成
+create_mk()
+{
+        dname=$1
+	shift
+	files=$*
+
+	echo "FILES : $files"
+	c_files=""
+	pc_files=""
+	cxx_files=""
+	for i in $files
+	do
+		case "$i" in
+		  *\.c)
+			c_files="$c_files $i"
+			;;
+		  *\.pc) 
+			pc_files="$pc_files $i"
+			;;
+		  *\.cxx) 
+			cxx_files="$cxx_files $i"
+			;;
+		esac 
+	done
+	rm_files=""
+	if [ "$pc_files" ];
+	then
+		rm_files=`echo $pc_files | sed 's/\.pc/\.c/g'`
+	fi
+
+	# / -> \/ 
+	pc_files=`echo $pc_files | sed 's/\//\\\\\//g'`
+	c_files=`echo $c_files | sed 's/\//\\\\\//g'`
+	echo "pc_files : $pc_files\t\tc_files: $c_files"
+	# make directory
+	if [ ! -d "$AS_WORK/$MAKEDIR" ];
+	then
+		mkdir -p $AS_WORK/$MAKEDIR
+	fi
+	target=`echo $i | sed -e 's/^\.\///' -e 's/\//_/g' -e 's/\.p*c$//' -e 's/\.cpp$//'`
+	mkfile="$AS_WORK/$MAKEDIR/${target}.mk"
+	if [ ! -f $mkfile ];
+	then
+		touch $mkfile
+		echo "TARGET  = $target" >> $mkfile
+
+		echo "SRCDIR  = \$(AS_WORK)/$dname" >> $mkfile
+		get_incdirlist $dname $dname $c_files $pc_files
+		incfile="incdir.$$"
+		trap "rm -f $incfile ;exit 1" 2 3 9 15
+		inclist=""
+		num=0
+		if [ -f $incfile ];
+		then
+			for incdir in `cat $incfile | sort -u`
+			do
+				inclist="$inclist $incdir"
+				num=`expr $num + 1`
+				echo "INCDIR${num}  = \$(AS_WORK)/$incdir" >> $mkfile
+			done
+			rm -f $incfile
+		fi
+
+		if [ "$pc_files" ];
+		then
+			echo "PCSRC   = \\" >> $mkfile
+			for j in `echo $pc_files`
+			do
+				echo "\t\$(SRCDIR)/$j \\" >> $mkfile
+			done
+			echo  >> $mkfile
+		fi
+		if [ "$cxx_files" ];
+		then
+			echo >> $mkfile
+			echo "CXX   = g++" >> $mkfile
+			echo >> $mkfile
+			echo "CXXSRC   = \$(SRCDIR)/$cxx_files" >> $mkfile
+			echo >> $mkfile
+		fi
+		if [ "$c_files" ];
+		then
+			echo "CSRCS   = \\" >> $mkfile
+			for j in `echo $c_files`
+			do
+				echo "\t\$(SRCDIR)/$j \\" >> $mkfile
+			done
+			echo  >> $mkfile
+		fi
+
+		echo "CCINC = \\" >> $mkfile
+		count=0
+		while [ $count -lt $num ];
+		do
+			count=`expr $count + 1`
+			echo "		-I\$(INCDIR${count}) \\" >> $mkfile
+		done	
+		echo "	-I\$(ORACLE_HOME)/precomp/public \\" >> $mkfile
+		echo "	-I\$(ORACLE_HOME)/rdbms/public \\" >> $mkfile
+		echo "	-I\$(ORACLE_HOME)/plsql/public \\" >> $mkfile
+		echo "	-I\$(ORACLE_HOME)/network/public \\" >> $mkfile
+
+		echo '
+CPPOBJS = $(PCSRC:.pc=.c)
+
+OBJECTS = $(CSRCS:.c=.o) \
+	  $(CXXSRC:.cpp=.o) \
+	  $(CPPOBJS:.c=.o)
+
+CCLIB   = \
+                -L$(PHOME)/lib \
+                -L$(ORACLE_HOME)/lib \
+                -L$(ORACLE_HOME)/precomp/lib
+
+LDLIB   = \
+                -lclntsh \
+                `cat $(ORACLE_HOME)/lib/sysliblist`
+
+all : $(TARGET)
+
+$(TARGET) : $(OBJECTS) $(ARCS)
+	$(CC) $(CFLAGS) $(CCLIB) $(LDLIB) -o $@ $(OBJECTS) $(ARCS)
+
+.c.o : 
+	$(CC) $(CFLAGS) $(CCINC) -c $< -o $@
+
+.cpp.o : 
+	$(CXX) $(CFLAGS) $(CCINC) -c $< -o $@
+
+cproto :
+	@cproto $(CCINC) $(PCSRC:.pc=.c) $(CSRCS)' >> $mkfile
+
+		count=0
+		procinc=""
+		while [ $count -lt $num ];
+		do
+			count=`expr $count + 1`
+			procinc="$procinc include=\$(INCDIR${count})"
+		done	
+		echo >> $mkfile
+		if [ "$pc_files" ];
+		then
+			echo "\$(CPPOBJS) :" >> $mkfile
+			echo "	\$(PROC) \$(PROCFLAGS) $procinc iname=\$(@:.c=.pc) oname=\$@" >> $mkfile
+			echo >> $mkfile
+		fi
+
+		echo "clean :" >> $mkfile
+		if [ "$pc_files" ];
+		then
+			echo '	rm -f $(OBJECTS) $(TARGET) $(CPPOBJS) $(PCSRC:.pc=.lis) core ' >> $mkfile
+		else
+			echo '	rm -f $(OBJECTS) $(TARGET) core ' >> $mkfile
+		fi
+	fi
+}
+
+#
+#  Main
+#
+AS_WORK=`pwd`
+export AS_WORK
+
+# ディレクトリの確認
+if [ ! -d $1 ];
+then
+	echo "Not directory : $1"
+	exit 1
+fi
+
+for i in `find $1 -type d`
+do
+	# .c/.pc ファイルをリストアップ
+	c_files=$( 
+		cd $i
+		a=`ls *.pc 2> /dev/null | sed 's/\.pc/\.c/g'`
+		if [ "$a" ];
+		then
+			ls *.{pc,c} 2> /dev/null | grep -v "$a" 
+		else
+			ls *.c 2> /dev/null
+		fi
+	)
+	if [ "$c_files" ];
+	then
+		echo "Directory : $i"
+		echo "\t$c_files"
+		create_mk $i $c_files
+	fi
+done

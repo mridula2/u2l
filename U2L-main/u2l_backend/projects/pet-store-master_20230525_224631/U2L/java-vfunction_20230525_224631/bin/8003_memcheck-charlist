@@ -1,0 +1,71 @@
+#!/bin/sh
+#
+# $Header: /data/cvsrepo/assess-tools/bin/8003_memcheck-charlist,v 1.2 2014/04/01 02:25:52 morimoto Exp $
+# $Name: rev_1_10 $
+#
+# script name  : 8003_memcheck-charlist
+# description  : execute tools oder by 8001_char-memcheck, 8002_make-charlist
+# usage        : 8003_make-charlist file_list calogfile
+# input        : file_list : C assessment target file list.
+#              : calog     : Code Advisor detail log
+# output       : output format (8002_make-charlist)
+#                <file name>:<line num>:<context>:<cppcheck message>
+ 
+BIN_DIR=`(cd $(dirname $0);pwd)`
+
+if [ $# -ne 2 ];
+then
+	echo "Usage `basename $0` : file_list calogfile"
+	exit 1
+fi
+
+FILE_LIST=$1
+CALOG=$2
+
+DATE=`date +%Y-%m%d`
+OUTFILE_8001=$PJHOME/log/$APNAME/charinv/$DATE/char_memcheck.out
+OUTFILE_8002=$PJHOME/log/$APNAME/charinv/$DATE/memcheck-charlist.out
+OUTFILE_8003=$PJHOME/log/$APNAME/charinv/$DATE/memcheck-ca_dup.out
+
+# check file_list exists.
+if [ ! -r $FILE_LIST ];
+then
+	echo "Not found $FILE_LIST ."
+	exit 1
+fi
+
+# check calog file exists.
+if [ ! -r $CALOG ];
+then
+	echo "Not found $CALOG ."
+	exit 1
+fi
+
+echo "### 8001_char-memcheck start."
+$BIN_DIR/8001_char-memcheck $FILE_LIST
+echo "### 8001_char-memcheck finish."
+
+echo "### 8002_make-charlist start."
+$BIN_DIR/8002_make-charlist $OUTFILE_8001 $CALOG 1> $OUTFILE_8002 2> $OUTFILE_8003
+echo "### 8002_make-charlist finish."
+
+for filename in `echo $OUTFILE_8001 $OUTFILE_8002`
+do
+	echo $filename
+	echo "### tool check OK"
+	echo "memset-OK:"`grep "	memset-OK$" $filename | wc -l`
+	echo
+	echo "### detail check target"
+	echo "memset-sizeof:"`grep "	memset-sizeof$" $filename | wc -l`
+	echo "memset-other:"`grep "	memset-other$" $filename | wc -l`
+	echo "memcpy:"`grep "	memcpy.*$" $filename | wc -l`
+	echo
+	echo "### parameter struct"
+	echo "memset-struct:"`grep "	memset-struct$" $filename | wc -l`
+	echo "memcpy-struct:"`grep "	memcpy-struct$" $filename | wc -l`
+	echo
+	echo "### array assiment"
+	echo "array assign:"`grep "	assign$" $filename | wc -l`
+	echo
+done
+

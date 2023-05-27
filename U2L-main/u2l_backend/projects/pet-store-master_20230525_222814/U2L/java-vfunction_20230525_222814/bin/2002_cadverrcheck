@@ -1,0 +1,238 @@
+#!/usr/bin/perl
+#
+# $Header: /data/cvsrepo/assess-tools/bin/2002_cadverrcheck,v 1.4 2013/06/27 08:48:21 miya Exp $
+# $Name: rev_1_10 $
+#
+# ツール名 : 2002_cadverrcheck
+# 概要     : HP-UX コンパイルエラー確認
+# 実行方法 : 2002_cadverrcheck log
+# 入力	   : log : コンパイルログファイル
+# 出力     : コンパイル時にエラーがあると最後に "ERROR" とstdout出力
+
+my $file=$ARGV[0];
+@wids;
+%warns;
+@rids;
+%remarks;
+@eids;
+%errors;
+my $count = 0;
+my $total = 0;
+my $prog;
+my $msg;
+my @prgs_err;
+my @prgs_warn;
+my @cadv_chk;
+my $stime;
+my $ftime;
+my $makerr = 0;
+my $errnum = 0;
+my $linkerrnum = 0;
+my $linkerr = 0;
+my $makefilename;
+$cadv_chk[0] = 0;
+
+open(my $fh, $file) || die("Can't open $file");
+
+while(<$fh>) {
+	if ( /^=+ (.*)/ ) {
+		my $cmake= $1;
+		$total++;
+		if ( $makerr == 1 ) {
+			$errnum++;
+			print STDERR "NOTCOMPLETED MAKEFILE : $makefilename\n";
+		}
+		$makerr = 0;
+		$linkerrnum++ if ( $linkerr == 1 );
+		$linkerr = 0;
+		$makefilename = $cmake;
+	}
+	if ( /.*: error (.*):/ || /.*: catastrophic error (.*):/ ) {
+		my $eid = $1;
+		if ( defined($errors{$eid}) ) {
+			$errors{$eid}++;
+		}
+		else {
+			$errors{$eid} = 1;
+			push(@eids, $eid);
+		}
+		$makerr = 1;
+print"1 : $_";
+#		print "$eid  :  $errors{$eid}\n";
+	}
+#	if ( /.*: warning (.*):/ ) {
+	if ( /.*: warning (\#[0-9]+-D):/ ) {
+		my $wid = $1;
+		if ( defined($warns{$wid}) ) {
+			$warns{$wid}++;
+		}
+		else {
+			$warns{$wid} = 1;
+			push(@wids, $wid);
+		}
+#		print "$wid  :  $warns{$wid}\n";
+	}
+	if ( /.*: remark (\#[0-9]+-D):/ ) {
+		my $rid = $1;
+		if ( defined($remarks{$rid}) ) {
+			$remarks{$rid}++;
+		}
+		else {
+			$remarks{$rid} = 1;
+			push(@rids, $rid);
+		}
+#		print "$rid  :  $remarks{$rid}\n";
+	}
+	if ( /^(Pro\*C)/ || /(makedepend)/ || /^(cadvise)/ || /(mv)/ || /^(cp)/ 
+    	 || /^(PCC.*)/ || /^(rm)/ ) {
+		$prog = $1;
+		$count = 7;
+	}
+	# command error (Make, shell script etc.)
+	if ( /^([^\s,]+):/ ) {
+		$prog = $1;
+		$msg = $_;
+		chomp($msg);
+		if ( $prog =~ /ld/ ) {
+			if ( $msg =~ /(Warning)/ ) {
+				push(@prgs_warn, "$.\t$msg");
+			}
+			else {
+				$prog = "ld";
+				$msg = $_;
+				chomp($msg);
+				$count = 10;
+				$linkerr = 1;
+			}
+		}
+		elsif ( $prog =~ /awk/ ) {
+			$prog = "awk";
+			$msg = $_;
+			chomp($msg);
+			$count = 10;
+			$makerr = 1;
+#print"7 : $_";
+		}
+		elsif ( $prog !~ /aCC/ && $prog !~ /Pro\*C/ && $msg !~ /oracle/  && $msg !~ /ar:/ ) {
+			push(@prgs_err, "$.\t$msg");
+			$msg = "";
+			$count = 0;
+			if ( ! /warning/ ) {
+				$makerr = 1;
+#print"2 : $_";
+			}
+		}
+	}
+	if ( /^Signal/ ) {
+		$prog = "Compilation terminated.";
+		$count = 30;
+			$makerr = 1;
+#print"3 : $_";
+	}
+	if ( /^cc/ && (/errors* detected in the compilation/ || /Too many errors/ )) {
+		$prog = "cc";
+		$msg = $_;
+		chomp($msg);
+		$count = 10;
+		$makerr = 1;
+#print"4 : $_";
+    }
+	if ( /^Fatal error/ ) {
+		$prog = "ld";
+#		$msg = $_;
+#		chomp($msg);
+		$count = 10;
+			$makerr = 1;
+#print"5 : $_";
+	}
+	if ( /^\s+rm/ ) {
+		$prog = "rm?";
+		$count = 10;
+	}
+	if ( /^sh/ ) {
+		$prog = "sh";
+		$msg = $_;
+		chomp($msg);
+		$count = 10;
+		$makerr = 1;
+#print"6 : $_";
+	}
+	if ( /^\*\*\*[^\*]+$/  ) {
+		if ( $count ) {
+			push(@prgs_err, "$.\t$prog $msg");
+			$msg = "";
+		}
+		else {
+		#	die "Unknown prog err.";
+			print "Unknown prog err. : $_";
+			$makerr = 1;
+#print"8 : $_";
+		}
+	}
+	if ( $cadv_chk[0] && ( /^\s+cc/ || /^\s+ld/ )) {
+		push(@cadv_chk, "$. : $_");
+	}
+	if ( /^(Starti.*)/ ) {
+		$stime = $1;
+	}
+	if ( /^(Finished.*)/ ) {
+		$ftime = $1;
+	}
+	$count-- if ( $count );
+}
+
+close($fh);
+
+# Check last makefile
+if ( $makerr == 1 ) {
+	$errnum++;
+	print STDERR "NOTCOMPLETED MAKEFILE : $makefilename\n";
+}
+$linkerrnum++ if ( $linkerr == 1 );
+
+#print "Total:\n";
+if ($#prgs_err >= 0 ) {
+	print "\tProgram ERROR\n";
+	foreach (@prgs_err) {
+		print "$_\n";
+	}
+	print "\n";
+}
+if ($#prgs_warn >= 0 ) {
+	print "\tProgram WARNING\n";
+	foreach (@prgs_warn) {
+		print "$_\n";
+	}
+	print "\n";
+}
+if ($#eids >= 0 ) {
+	print "\tERROR\n";
+	foreach (@eids) {
+		print "$_\t:  $errors{$_}\n";
+	}
+}
+if ( $cadv_chk[1] ) {
+	print "\tCADV\n";
+	foreach (@cadv_chk) {
+		if ( ! /^[0-9]$/ ) {
+			print $_;
+		}
+	}
+}
+    	
+print "\tWarnings\n";
+foreach (@wids) {
+	print "$_\t:  $warns{$_}\n";
+}
+if ( $#rids >= 0 ) {
+	print "\tRemark\n";
+	foreach (@rids) {
+		print "$_\t:  $remarks{$_}\n";
+	}
+}
+print "Total $total Makefiles.\n";
+printf "Completed Makefile : %d\n", $total - $errnum;
+print "Complile Error Makefile : $errnum\n";
+print "Linking Error Makefile : $linkerrnum\n";
+print "$stime\n";
+print "$ftime\n";

@@ -1,0 +1,167 @@
+#!/bin/sh
+#
+# $Header: /data/cvsrepo/assess-tools/bin/0006_srccheck,v 1.10 2016/01/29 02:23:44 kozeni Exp $
+# $Name: rev_1_10 $
+#
+# Tool name: 0006_srccheck
+# Summary  : Script to call comment removal tool
+# Execution Method : 0006_srccheck Dir
+# Input	   : Dir: Save directory name
+# Output : Files excluding code conversion / ^ M below Dir directory
+
+TMPFILE=/tmp/__`basename $0`.$$
+trap 'rm -f $TMPFILE;exit 1' 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15
+if [ $# -lt 1 ]
+then 
+    echo "ERROR: Not found $1"
+                        echo "Usage : $0 Destination_dir"
+                        exit 1
+fi
+while [ $# -ge 1 ]
+do
+	case "$1" in
+	-v | -verbose )
+		DEBUG=1
+		;;
+	* )
+		if [ -d $1 ];
+		then
+			DEST=$1
+		else
+			echo "ERROR: Not found $1"
+			echo "Usage : $0 Destination_dir"
+			exit 1
+		fi
+	;;
+	esac
+	shift;
+done
+euc="euc"
+sjis="sjis"
+utf8="utf8"
+jis="jis"
+dos2ux="dos2unix"
+
+if [ "$LANG" = "ja_JP.eucJP" ];
+then
+	to=$euc
+elif [ "$LANG" = "ja_JP.SJIS" ];
+then
+	to=$sjis
+elif [ "$LANG" = "ja_JP.utf8" ];
+then
+	to=$utf8
+elif [ "$LANG" = "ja_JP.ISO2022JP" ];
+then
+	to=$jis
+fi
+echo "TO : $to"
+
+codecheck()
+{
+
+	# 文字コードの確認
+	#code=`kcc -c $i | cut -d'	  ' -f2`
+
+	ret="";
+	code_check="";
+	code_check=`$PJHOME/bin/0007_code-check $1`
+	case $code_check in
+	"euc" ) ret=$euc ;;
+	"sjis" ) ret=$sjis ;;
+	"utf8" ) ret=$utf8 ;;
+	"jis" ) ret=$jis ;;
+	"sjis euc" ) ret=$code_check ;;
+	"sjis utf8" ) ret=$code_check ;;
+	"euc utf8" ) ret=$code_check ;;
+	"euc sjis utf8" ) ret=$code_check ;;
+	"sjis jis" ) ret=$code_check ;;
+	"euc jis" ) ret=$code_check ;;
+	"euc sjis jis" ) ret=$code_check ;;
+	"utf8 jis" ) ret=$code_check ;;
+	"sjis utf8 jis" ) ret=$code_check ;;
+	"euc utf8 jis" ) ret=$code_check ;;
+	"sjis euc utf8 jis" ) ret=$code_check ;;
+	"ascii" ) ret="ascii" ;;
+	* )
+		echo "ERROR : code: $code_check : bad code from ($PJHOME/bin/0007_code-check $1)" >&2
+		;;
+	esac
+
+	echo "$ret";
+}
+
+if [[  -d $PJHOME/work/$APNAME/new/ ]];
+then
+echo "This is for re-run the 0006_srcchek"
+rm -rf $PJHOME/work/$APNAME/new
+echo "after deleting the new folder"
+fi
+
+for i in `find . -type f`
+do	
+	bname=`basename $i`
+	newdir=`dirname $i | sed 's/^[^/]*/.\/new/'`
+	mkdir -p $DEST/$newdir
+
+	from=`codecheck $i`;
+	code_cnt=`echo "$from" | awk -F ' ' '{print NF}'`
+	if [ "$code_cnt" -gt 1 ]; then
+		echo "WARN : Multi Character Code Found : $from : $i"
+	fi
+
+	if [ -n "$DEBUG" ]; then echo "$newdir/$bname : ( $from -> $to )"; fi
+
+	if [ "$from" != "" ] && [ "$from" != "$to" ];
+	then
+		# lv と dos2unix で文字コードと改行コードを変換
+		#$dos2ux < $i | lv > $DEST/$newdir/$bname
+		$dos2ux < $i > $DEST/$newdir/$bname
+
+		if [ $? -ne 0 ];
+		then
+			echo "ERROR: lv : $i"
+			continue
+		fi
+	else
+		# 文字コード不明または同じ場合は dos2ux のみ実行
+		$dos2ux < $i > $DEST/$newdir/$bname
+	fi
+
+	# 変換が正しく行われたか確認
+	cnt=1
+	nloop=3 # $dos2ux の最大実行回数
+	grep -q "
+" $DEST/$newdir/$bname
+	while [ $? -ne 1 ]
+	do
+		if [ "$cnt" -gt "$nloop" ]
+		then
+			break;
+		fi
+		$dos2ux < $DEST/$newdir/$bname >$TMPFILE
+		cp $TMPFILE $DEST/$newdir/$bname
+
+		cnt=`expr $cnt + 1`
+		grep -q "
+" $DEST/$newdir/$bname
+	done
+
+	code=`codecheck $DEST/$newdir/$bname`;
+
+	if [ "$cnt" -gt "$nloop" ]; then
+		echo "INFO : conversion : ^M exists or code change : $from -> $code : $DEST/$newdir/$bname"
+	else if [ "$code" != "ascii" ] && [ "$code" != "$to" ]; then
+		echo "ERROR: conversion : BAD code : $from -> $code : $DEST/$newdir/$bname"
+	fi
+fi
+done
+mkdir -p $DEST/$newdir/tmp
+for i in `ls $DEST/$newdir/` 
+do 
+if [ -f $i ]; then
+cat $i | perl -pe 's/[^[:ascii:]]+/ /g' > $DEST/$newdir/tmp/$i
+fi
+done
+mv $DEST/$newdir/tmp/* $DEST/$newdir/
+rm -rf $DEST/$newdir/tmp/

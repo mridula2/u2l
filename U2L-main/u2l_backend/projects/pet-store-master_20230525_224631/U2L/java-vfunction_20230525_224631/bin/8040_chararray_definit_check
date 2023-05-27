@@ -1,0 +1,89 @@
+#!/bin/sh
+#
+# $Header: /data/cvsrepo/assess-tools/bin/8040_chararray_definit_check,v 1.6 2014/04/01 02:28:57 morimoto Exp $
+# $Name: rev_1_10 $
+#
+# name     : 8040_chararray_definit_check
+# desc     : counts source lines which contains char array initilization
+# usage    : 8040_chararray_definit_check <dir>
+# input    : <file_list> C assessment target file list.
+# output   : $PJHOME/log/$APNAME/charinv/YYYY-MMDD/char-array-definit.out
+# stdout   : print to stdout in the following format
+#            detect: <number of lines which contains char array initilization>
+#            initOK: <number of lines which have no problem with initilization>
+#            initNG: <detect> - <initOK>
+# examples :
+#           $ 8040_chararray_definit_check .
+#           detect:190
+#           initOK:120
+#           initNG:70
+
+if [  $# -ne 1 ];
+then
+        echo "Usage : $0 file_list"
+        exit 1
+else
+        file_list=$1
+fi
+
+if [ "${PJHOME}" = "" ];
+then
+        echo "Error : \${PJHOME} must be set."
+        exit 1
+fi
+if [ "${APNAME}" = "" ];
+then
+        echo "Error : \${APNAME} must be set."
+        exit 1
+fi
+
+logdir="${PJHOME}/log/${APNAME}/charinv/`date +%Y-%m%d`";
+logfile="$logdir/char-array-definit.out";
+tmpfile="$logdir/char-array-definit-tmp.out";
+tmpsortfile="$logdir/char-array-definit-tmpsort.out";
+
+if [ ! -d $logdir ];
+then
+	mkdir -p $logdir
+fi
+
+if [ -f $logfile ];
+then
+        mv $logfile "${logfile}.bak_`date +%Y%m%d_%H%M`"
+fi
+
+echo "### 8040_chararray_definit_check start:"
+echo "### curdir: $PWD"
+echo "### file_list: $file_list"
+echo "### logfile: $logfile"
+echo "### num of files: `cat $file_list | wc -l`"
+echo
+
+# detect
+cat $file_list | xargs perl -nle "print \$ARGV if /^\s*char\s+([^\*\[]+)\s*\[[^\]]*\]\s*=/" > $tmpfile
+detect=`cat $tmpfile | wc -l`
+echo "detect: $detect"
+
+sort $tmpfile | uniq > $tmpsortfile
+mv $tmpsortfile $tmpfile
+
+# initOK / initNG
+# detects whether ends with '\0' or NULL or "" or 0x00 in {}
+for i in `cat $tmpfile`
+do
+	perl -nle "\$_=~s/\t/ /g; print \"\$ARGV\t\$.\t\$_\tchar-array-initOK\" if /^\s*char\s+([^\*\[]+)\s*\[[^\]]*\]\s*=\s*({[^}]+?(\'\\\0\'|NULL|\"\"|0x00)\s*}|\".*\")\s*;/" $i >> $logfile
+	perl -nle "\$_=~s/\t/ /g; print \"\$ARGV\t\$.\t\$_\tchar-array-initNG\" if /^\s*char\s+([^\*\[]+)\s*\[[^\]]*\]\s*=/ && ! /^\s*char\s+([^\*\[]+)\s*\[[^\]]*\]\s*=\s*({[^}]+?(\'\\\0\'|NULL|\"\"|0x00)\s*}|\".*\")\s*;/" $i >> $logfile
+done
+
+initok=`grep "char-array-initOK$" $logfile | wc -l`
+echo "initOK: $initok"
+
+initng=`grep "char-array-initNG$" $logfile | wc -l`
+echo "initNG: $initng"
+
+echo
+echo "### 8040_chararray_definit_check finished."
+
+rm $tmpfile
+exit 0
+

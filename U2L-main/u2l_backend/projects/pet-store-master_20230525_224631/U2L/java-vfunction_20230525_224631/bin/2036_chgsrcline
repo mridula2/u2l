@@ -1,0 +1,199 @@
+#!/usr/bin/perl
+#
+# $Header: /data/cvsrepo/assess-tools/bin/2036_chgsrcline,v 1.3 2014/01/22 09:48:48 morimoto Exp $
+# $Name: rev_1_10 $
+#
+# ツール名 : 2036_chgsrcline
+# 概要     : プロトタイプ宣言ログ行数差異埋めツール
+# 実行方法 : 2036_chgsrcline log predir postdir
+# 入力	   : log : ログファイル
+#	   : predir : 追加前ソースディレクトリ
+#	   : postdir : 追加後ソースディレクトリ
+# 出力     : 行番号変換後ログファイル
+
+use Text::Diff 'diff';
+
+my $pre;
+my $flg;
+my $post;
+my $output_num;
+my $total = 0;
+my $calog_fname;
+my $ptlog_fname;
+my @prelist;
+my @postlist;
+my $lineoutput = 0;
+my $predir;
+my $postdir;
+
+#
+# check file difference if change line exists return -1
+#
+sub filediff() {
+	my ($fname) = @_;
+	$cafname = $fname;
+	$cafname =~ s/$postdir/$predir/;
+#	print "fname  :$fname\n";
+#	print "cafname:$cafname\n";
+	my $diff = diff($cafname, $fname, { STYLE => "OldStyle" });
+
+	@fdiff = split(/\n/,$diff);
+	my $type = 0;
+	my $difcount = 0;
+	foreach my $context (@fdiff) {
+		if ( $context =~ /^[0-9]+([acd])[0-9]+/ ) {
+			$type = $1;
+			next;
+		}
+		if ( $type eq "a") {
+			$difcount += 1 if ( $context =~ /^>/ ) ;
+		} elsif ( $type eq "d") {
+		} elsif ( $type eq "c") {
+			if ( $context =~ /^>/ ) {
+				next if ( $context =~ /HP_MOD : PT-XX : PT_COMPILE/ );
+				$difcount = -1;
+				last;
+			}
+		}
+	}
+#	print "fname : $fname :: $difcount \n";
+	return $difcount;
+}
+
+#
+# $predir にあるファイルの行に対し
+# $postdir にあるファイルの対応行を探す
+#
+sub getsrcline() {
+	my ($fname, $line, $search_direct) = @_;
+	my $cafname;
+	my $ptfname;
+	my $lastpos = 0;
+	my $ptdiff=0;
+	my $dhead = 0;
+	my @a, @b;
+
+	$ptfname = $fname;
+	$cafname = $fname;
+	$cafname =~ s/$postdir/$predir/;
+#	print "PTFILE $ptfname LINE $line DIR $search_direct\n";
+#	print "CAFILE $cafname LINE $line DIR $search_direct\n";
+
+#	open(my $fh, "$ptfname") || die("Can't open $ptfname");
+	open(my $fh, "$ptfname") || return -1;
+	@a = <$fh>;
+	close($fh);
+
+#	open(my $fh, "$cafname") || die("Can't open $cafname");
+	open(my $fh, "$cafname") || return -1;
+	@b = <$fh>;
+	close($fh);
+
+	$ptdiff=0;
+	$dhead = 0;
+	$totalLineNum=$#a;
+	for(my $i=0;$i<$totalLineNum;$i++) {
+		if ( $dhead > 0 ) {
+			if ( $a[$i] eq $b[$dhead]) {
+				$ptdiff = $i - $dhead;
+				last;
+			}
+		}
+		elsif ( $a[$i] ne $b[$i] ) {
+			$dhead = $i;
+			next;
+		}
+		elsif ( $i > $line ) {
+			last;
+		}
+	}
+#	for(my $i=0;i<$totalLineNum;$i++) {
+#		last if ( $i > $line );
+#		$ptdiff -=2 if ( /HP_MOD/ );
+#	}
+	my $tgtline = $line - 1;
+	my $bcont = $a[$tgtline];
+	# 修正箇所が対象の場合
+#	if ( $a[$tgtline-2] =~ /HP_MOD/ ) {
+#		$tgtline = $line - 2;
+#		$bcont = $a[$tgtline];
+#		$bcont =~ s/\/\* //;
+#		$bcont =~ s/ \*\///;
+#	}
+#	print "PT $dhead DIFF $ptdiff\n";
+	if ( $search_direct > 0 ) {
+		for(my $i=$line-$ptdiff;$i<$#a;$i++) {
+			if ( $bcont eq $b[$i-1] ) {
+				return $i;
+			}
+		}
+	}
+	else {
+		$ptdiff -= 2;
+		$bcont =~ s/^\s+//;
+#		print "Searching $line $bcont\n";
+		for(my $i=$line-$ptdiff;$i>0;$i--) {
+			$b[$i-1] =~ s/^\s+//;
+#		print "LINE $i $b[$i-1]\n";
+			if ( $bcont eq $b[$i-1] ) {
+				return $i;
+			}
+		}
+	}
+	return -1;
+}
+1;
+
+#
+#  Main
+#
+if ( $#ARGV != 2 ) {
+	die "Usage : $0 log predir postdir\n";
+}	
+else {
+	$ptlog_fname = $ARGV[0];
+	$predir = $ARGV[1];
+	$postdir = $ARGV[2];
+#	$predir =~ s/\/\//\//g;
+#	$postdir =~ s/\/\//\//g;
+}
+
+( -f $ptlog_fname ) || die "Not found $ptlog_fname";
+
+open(my $fh, "$ptlog_fname") || die "Can't optn $ptlog_fname.";
+
+while(<$fh>) {
+	# output
+	my $tgt = $_;
+	chomp($tgt);
+	if ( /^"(.*)", line ([0-9]+)[:,]/ ) {
+		my $filename = $1;
+		my $lno = $2;
+
+		my $pcfilename = $filename;
+		$pcfilename =~ s/\.c/\.pc/;
+		if ( $filename =~ /\.pc/ || ! -f $pcfilename ) {
+			my $result = &filediff($filename);
+			if ( $result eq -1 ) {
+				print "ERROR:CHANGE LINE EXIST $tgt\n";
+				print STDERR "ERROR:CHANGE LINE EXIST $tgt\n";
+				next;
+			}
+		}
+		my $newln = &getsrcline($filename, $lno, -1);
+		if ( $newln > 0 ) {
+			$tgt =~ s/line $lno/line $newln/;
+			if ( $lineoutput ) {
+				print "$tgt\t$lno\t$newln\n";
+			}
+			else {
+				print "$tgt\n";
+			}
+		}
+		else {
+			print "ERROR:NOT MATCH $tgt\n";
+			print STDERR "ERROR:NOT MATCH $tgt\n";
+		}
+	}
+}
+close($fh);

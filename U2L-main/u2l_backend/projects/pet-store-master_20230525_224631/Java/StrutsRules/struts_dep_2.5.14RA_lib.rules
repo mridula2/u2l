@@ -1,0 +1,8 @@
+Rule Id	Deprecated Class	Library to Seacrh	Entity to Search	Remedy
+IC_STC_2.5.14RA_001	org.apache.struts2.rest.handler.JsonLibHandler 	org.apache.struts2.rest.handler	JsonLibHandler 	Use JacksonLibHandler instead
+	Deprecated Methods			
+IC_STM_2.5.14RA_001	org.apache.struts2.rest.handler.XStreamHandler.createXStream() 	org.apache.struts2.rest.handler.XStreamHandler	createXStream() 	use version with ActionInvocation
+IC_STM_2.5.14RA_002	org.apache.struts2.rest.handler.ContentTypeHandler.fromObject(Object, String, Writer) 	org.apache.struts2.rest.handler.ContentTypeHandler	fromObject(Object, String, Writer) 	use version which requires ActionInvocation
+IC_STM_2.5.14RA_003	org.apache.struts2.rest.ContentTypeHandlerManager.handleResult(ActionConfig, Object, Object) 	org.apache.struts2.rest.ContentTypeHandlerManager	handleResult(ActionConfig, Object, Object) 	use version which requires ActionInvocation
+IC_STM_2.5.14RA_004	org.apache.struts2.rest.handler.ContentTypeHandler.toObject(Reader, Object) 	org.apache.struts2.rest.handler.ContentTypeHandler	toObject(Reader, Object) 	use version which requires ActionInvocation 
+

@@ -1,0 +1,80 @@
+# $Header: /data/cvsrepo/assess-tools/bin/8020_char-funccheck.README,v 1.1 2013/09/10 07:55:17 sodo Exp $
+# $Name: rev_1_10 $
+#
+ツール名　: 
+　8020_char-funccheck
+
+概要　　　: 
+　ソースコードからmemset,memcpy,strncpy関数で問題が発生する可能性が高い箇所を抽出する。
+
+　STKの実行結果ログを元に、memset,memcpy,strncpy関数が利用されている個所をチェックして
+　問題が発生する可能性の高いパターンを検知した場合に該当行を出力する。
+
+
+実行方法 : 
+　# cd $srcdir
+　# 8020_char-funccheck .
+　
+　※注意：入力ファイル「STK実行結果ログファイル」にはソースコードのファイルパス情報が含まれており
+　　　　　本ツールはその情報をもとにソースコードを読み込みますが、
+　　　　　パスはソースコード格納ディレクトリからの相対パスで記載されています。
+　　　　　このため、ソースコード格納ディレクトリへcdで移動してから本ツールを実行してください。
+
+オプション：
+　<directory> : コメント除去されたソースコードがあるディレクトリパス
+　（そのディレクトリへcdして.を引数にしてください）
+
+標準出力　：
+　なし
+
+戻り値：
+　0：正常終了
+　1：引数の数が不正
+　　 入力となるソースコードディレクトリが存在しない
+　　 入力となるSTK実行結果ログファイルが存在しない
+　　 入力となるSTK実行結果ログファイルが読み込めない
+　　 出力ファイルのオープンに失敗
+
+
+エラー出力：
+　引数不正："Usage: $0 dir"
+　入力ソースコードがない："Not found <dir>"
+　入力となるSTKログが存在しない："Not found <STKlogfile>"
+　入力となるSTKログが読み込めない："Can't open <STKlogfile>"
+　出力ファイルのオープンに失敗："Cant open <outputfile>"
+　
+入力ファイル：
+　$PJHOME/log/$APNAME/stk/allfunc_detail.txt：STK実行結果ログファイル
+　
+出力ファイル：
+　$PJHOME/log/$APNAME/charinv/char-ext-func.out：目視が必要なソースコード、行番号、および関数の種別が記載されたファイル
+　　出力フォーマット：
+　　<ファイル名>:<行番号>:<内容>:<cppcheckメッセージ>
+
+　$PJHOME/log/$APNAME/charinv/char-ext-func-ana.out：上記について、各関数の第一引数、第三引数のパターンごとに数を集計したファイル
+　　出力フォーマット：
+　　<抽出数>:<関数名>:<第一引数>:<第三引数（sizeofは除く）>
+
+
+仕様：
+　本スクリプトは、ソースコードディレクトリ以下から以下のようなパターンの行を抽出する。
+　（memset以外にmemcpy, strncpyについても同様のパターンを抽出する）
+
+　抽出されるパターン：
+	パターンAとして抽出
+		memset( aaa, XXXX, sizeof( bbb ) );			# 第一引数と第三引数が異なり、かつ、第三引数が小文字
+		memset( aaa.str, XXXX, sizeof( aaa ) );		# 第一引数と第三引数が異なる（構造体も考慮する）
+
+	パターンBとして抽出
+		memset( &aaa, XXXX, sizeof( &aaa ) );		# 第一引数と第三引数が同じで、両方とも＆がついている（コーディングミス）
+
+　抽出されないパターン：
+	memset( aaa, XXXX, sizeof( aaa ) );				# 第一引数と第三引数が同じ
+	memset( &aaa, XXXX, sizeof( aaa ) );			# 第一引数と第三引数が同じ（aaaはポインタ変数）
+	memset( (char *)aaa, XXXX, sizeof( aaa ) );		# 第一引数と第三引数が同じ（キャストも考慮する）
+	memset( (void *)aaa, XXXX, sizeof( aaa ) );		# 第一引数と第三引数が同じ（キャストも考慮する）
+	memset( aaa, XXXX, sizeof( BBB ) );				# 第一引数と第三引数が異なり、かつ、第三引数が大文字（構造体のケースと推測するため除外）
+	memset( aaa, XXXX, sizeof( bbb ) * 10 );		# 第三引数のsizeofに演算子が付加するパターン
+
+
+

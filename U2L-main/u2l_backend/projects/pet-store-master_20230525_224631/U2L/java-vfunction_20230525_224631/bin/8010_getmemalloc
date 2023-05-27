@@ -1,0 +1,32 @@
+#!/bin/sh
+#
+# $Header: /data/cvsrepo/assess-tools/bin/8010_getmemalloc,v 1.2 2013/09/04 12:27:09 kitayama Exp $
+# $Name: rev_1_10 $
+#
+# Tool Name : 8010_getmemalloc
+# Overview     : malloc,calloc,allocaが使用されているソースコードを抽出
+# Usage : 8010_getmemalloc filelist
+# Input     : filelist : Comment removed source code file name list
+# Output     : Standard Output
+
+if [  $# -ne 1 ];
+then
+        echo "Usage : $0 filelist"
+        exit 1
+else
+        filelist=$1
+fi
+
+for i in `cat $filelist`
+do
+        outname=`echo  $i | sed 's/\//\\\\\\//g'`
+
+        grep -n -e '\=.*char.*malloc' \
+                -e '\=.*char.*calloc' \
+                -e '\=.*char.*alloca' \
+                -e '[^")][[:blank:]]*malloc' \
+                -e '[^")][[:blank:]]*calloc' \
+                -e '[^")][[:blank:]]*alloca' $i | \
+        grep -v ":#include" | \
+        sed "s/^/$outname:/"
+done

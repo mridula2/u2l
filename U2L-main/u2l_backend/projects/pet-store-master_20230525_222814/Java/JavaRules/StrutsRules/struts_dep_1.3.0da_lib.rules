@@ -1,0 +1,23 @@
+Rule Id	Deprecated Fields 	Libraries to search	Entity To Search	Remedy
+IC_STF_1.3.0DA_001	org.apache.struts.taglib.html.ImgTag.contextRelative 	org.apache.struts.taglib.html.ImgTag	contextRelative 	           Use module property instead; will be removed in a release after 1.2.0.  
+IC_STF_1.3.0DA_002	org.apache.struts.taglib.bean.MessageTag.defaultLocale 	org.apache.struts.taglib.bean.MessageTag	defaultLocale 	           This will be removed after Struts 1.2.  
+IC_STF_1.3.0DA_003	org.apache.struts.taglib.html.OptionTag.defaultLocale 	org.apache.struts.taglib.html.OptionTag	defaultLocale 	           Use Locale.getDefault() directly.  
+IC_STF_1.3.0DA_004	org.apache.struts.taglib.html.JavascriptValidatorTag.defaultLocale 	org.apache.struts.taglib.html.JavascriptValidatorTag	defaultLocale 	           This variable is no longer used.  
+IC_STF_1.3.0DA_005	org.apache.struts.taglib.html.ErrorsTag.defaultLocale 	org.apache.struts.taglib.html.ErrorsTag	defaultLocale 	           Use Locale.getDefault() directly.  
+IC_STF_1.3.0DA_006	org.apache.struts.taglib.html.BaseHandlerTag.defaultLocale 	org.apache.struts.taglib.html.BaseHandlerTag	defaultLocale 	           Use Locale.getDefault() directly.  
+IC_STF_1.3.0DA_007	org.apache.struts.taglib.html.ErrorsTag.lineEnd 	org.apache.struts.taglib.html.ErrorsTag	lineEnd 	           No longer used.  
+IC_STF_1.3.0DA_008	org.apache.struts.taglib.html.HtmlTag.locale 	org.apache.struts.taglib.html.HtmlTag	locale 	           This will be removed after Struts 1.2.  
+IC_STF_1.3.0DA_009	org.apache.struts.taglib.html.ImgTag.lowsrc 	org.apache.struts.taglib.html.ImgTag	lowsrc 	           This is not defined in the HTML 4.01 spec and will be removed in a future version of Struts.  
+	Deprecated Methods 			
+IC_STM_1.3.0DA_001	org.apache.struts.taglib.TagUtils.getActionErrors(PageContext, String) 	org.apache.struts.taglib.TagUtils	getActionErrors(PageContext, String) 	           Use getActionMessages() instead. This will be removed after Struts 1.2.  
+IC_STM_1.3.0DA_002	org.apache.struts.taglib.html.ImageTag.getAlign() 	org.apache.struts.taglib.html.ImageTag	getAlign() 	           Align attribute is deprecated in HTML 4.x.  
+IC_STM_1.3.0DA_003	org.apache.struts.taglib.html.ImgTag.getContextRelative() 	org.apache.struts.taglib.html.ImgTag	getContextRelative() 	           Use module property instead; will be removed in a release after 1.2.0.  
+IC_STM_1.3.0DA_004	org.apache.struts.taglib.html.HtmlTag.getCurrentLocale() 	org.apache.struts.taglib.html.HtmlTag	getCurrentLocale() 	           This will be removed after Struts 1.2.  
+IC_STM_1.3.0DA_005	org.apache.struts.taglib.html.HtmlTag.getLocale() 	org.apache.struts.taglib.html.HtmlTag	getLocale() 	           This will be removed after Struts 1.2.  
+IC_STM_1.3.0DA_006	org.apache.struts.taglib.html.ImgTag.getLowsrc() 	org.apache.struts.taglib.html.ImgTag	getLowsrc() 	           This is not defined in the HTML 4.01 spec and will be removed in a future version of Struts.  
+IC_STM_1.3.0DA_007	org.apache.struts.taglib.html.ImgTag.isContextRelativeSet() 	org.apache.struts.taglib.html.ImgTag	isContextRelativeSet() 	           Use module property instead; will be removed in a release after 1.2.0.  
+IC_STM_1.3.0DA_008	org.apache.struts.taglib.html.ImageTag.setAlign(String) 	org.apache.struts.taglib.html.ImageTag	setAlign(String) 	           Align attribute is deprecated in HTML 4.x.  
+IC_STM_1.3.0DA_009	org.apache.struts.taglib.html.ImgTag.setContextRelative(String) 	org.apache.struts.taglib.html.ImgTag	setContextRelative(String) 	           Use module property instead; will be removed in a release after 1.2.0.  
+IC_STM_1.3.0DA_010	org.apache.struts.taglib.html.HtmlTag.setLocale(boolean) 	org.apache.struts.taglib.html.HtmlTag	setLocale(boolean) 	           This will be removed after Struts 1.2.  
+IC_STM_1.3.0DA_011	org.apache.struts.taglib.bean.IncludeTag.setName(String) 	org.apache.struts.taglib.bean.IncludeTag	setName(String) 	           use setPage(String) instead  
+

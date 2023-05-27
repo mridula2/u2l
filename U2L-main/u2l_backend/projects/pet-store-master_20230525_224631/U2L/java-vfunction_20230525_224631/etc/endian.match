@@ -1,0 +1,34 @@
+# $Header: /data/cvsrepo/assess-tools/etc/endian.match,v 1.3 2013/07/10 06:10:27 miya Exp $
+# $Name: rev_1_10 $
+## bit operator
+<<
+>>
+(^|\s|\W)[\&](\s|\W|$)
+(^|[^\|])[\|]
+[\^]
+(^|\s|\W)[\~]
+## union
+(^|\s|\W)union(\s|\W|$)
+## network I/O
+(^|\s|\W)socket\s*[\(]
+(^|\s|\W)accept\s*[\(]
+(^|\s|\W)bind\s*[\(]
+(^|\s|\W)connect\s*[\(]
+(^|\s|\W)fcntl\s*[\(]
+(^|\s|\W)getpeername\s*[\(]
+(^|\s|\W)getsockname\s*[\(]
+(^|\s|\W)getsockopt\s*[\(]
+(^|\s|\W)ioctl\s*[\(]
+(^|\s|\W)recv\s*[\(]
+(^|\s|\W)select\s*[\(]
+(^|\s|\W)send\s*[\(]
+(^|\s|\W)getprotoent\s*[\(]
+(^|\s|\W)listen\s*[\(]
+(^|\s|\W)setsockopt\s*[\(]
+## file I/O
+(^|\s|\W)open\s*[\(]
+(^|\s|\W)read\s*[\(]
+(^|\s|\W)write\s*[\(]
+(^|\s|\W)fopen\s*[\(]
+(^|\s|\W)fread\s*[\(]
+(^|\s|\W)fwrite\s*[\(]

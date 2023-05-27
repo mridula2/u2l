@@ -1,0 +1,516 @@
+
+ Starting Preparatory tasks execution
+checking PATH of src_work: /usr/u2l/u2l_backend/projects/pet-store-master_20230525_222814/U2L/java-vfunction_20230525_222814/work/javaanalysis
+###########  Executing 0012_phpManagePharFiles Starts ###########
+###########  Executing 0012_phpManagePharFiles ends ###########
+###########  Executing 0006_srccheck Starts ###########
+TO : 
+INFO : conversion : ^M exists or code change : ascii -> ascii : ././new/pet-store-master/.classpath
+INFO : conversion : ^M exists or code change : ascii -> ascii : ././new/pet-store-master/.gitattributes
+INFO : conversion : ^M exists or code change : ascii -> ascii : ././new/pet-store-master/.gitignore
+ERROR : code: sjis euc
+ascii : bad code from (/usr/u2l/u2l_backend/projects/pet-store-master_20230525_222814/U2L/java-vfunction_20230525_222814/bin/0007_code-check ./pet-store-master/.mvn/wrapper/maven-wrapper.jar)
+dos2unix: Binary symbol 0x03 found at line 1
+dos2unix: Skipping binary file stdin
+INFO : conversion : ^M exists or code change :  -> ascii : ././new/pet-store-master/.mvn/wrapper/maven-wrapper.jar
+INFO : conversion : ^M exists or code change : ascii -> ascii : ././new/pet-store-master/.mvn/wrapper/maven-wrapper.properties
+INFO : conversion : ^M exists or code change : ascii -> ascii : ././new/pet-store-master/.travis.yml
+INFO : conversion : ^M exists or code change : ascii -> ascii : ././new/pet-store-master/src/main/java/me/zhulin/shopapi/api/CartController.java
+INFO : conversion : ^M exists or code change : ascii -> ascii : ././new/pet-store-master/src/main/java/me/zhulin/shopapi/api/CategoryController.java
+INFO : conversion : ^M exists or code change : ascii -> ascii : ././new/pet-store-master/src/main/java/me/zhulin/shopapi/api/OrderController.java
+INFO : conversion : ^M exists or code change : ascii -> ascii : ././new/pet-store-master/src/main/java/me/zhulin/shopapi/api/ProductController.java
+INFO : conversion : ^M exists or code change : ascii -> ascii : ././new/pet-store-master/src/main/java/me/zhulin/shopapi/api/rest-client.env.json
+INFO : conversion : ^M exists or code change : ascii -> ascii : ././new/pet-store-master/src/main/java/me/zhulin/shopapi/api/test.http
+INFO : conversion : ^M exists or code change : ascii -> ascii : ././new/pet-store-master/src/main/java/me/zhulin/shopapi/api/UserController.java
+INFO : conversion : ^M exists or code change : ascii -> ascii : ././new/pet-store-master/src/main/java/me/zhulin/shopapi/entity/Cart.java
+INFO : conversion : ^M exists or code change : ascii -> ascii : ././new/pet-store-master/src/main/java/me/zhulin/shopapi/entity/OrderMain.java
+INFO : conversion : ^M exists or code change : ascii -> ascii : ././new/pet-store-master/src/main/java/me/zhulin/shopapi/entity/ProductCategory.java
+ERROR : code: utf8
+;ascii : bad code from (/usr/u2l/u2l_backend/projects/pet-store-master_20230525_222814/U2L/java-vfunction_20230525_222814/bin/0007_code-check ./pet-store-master/src/main/java/me/zhulin/shopapi/entity/ProductInfo.java)
+ERROR : code: utf8
+;ascii : bad code from (/usr/u2l/u2l_backend/projects/pet-store-master_20230525_222814/U2L/java-vfunction_20230525_222814/bin/0007_code-check ././new/pet-store-master/src/main/java/me/zhulin/shopapi/entity/ProductInfo.java)
+INFO : conversion : ^M exists or code change :  ->  : ././new/pet-store-master/src/main/java/me/zhulin/shopapi/entity/ProductInfo.java
+ERROR : code: utf8
+;ascii : bad code from (/usr/u2l/u2l_backend/projects/pet-store-master_20230525_222814/U2L/java-vfunction_20230525_222814/bin/0007_code-check ./pet-store-master/src/main/java/me/zhulin/shopapi/entity/ProductInOrder.java)
+ERROR : code: utf8
+;ascii : bad code from (/usr/u2l/u2l_backend/projects/pet-store-master_20230525_222814/U2L/java-vfunction_20230525_222814/bin/0007_code-check ././new/pet-store-master/src/main/java/me/zhulin/shopapi/entity/ProductInOrder.java)
+INFO : conversion : ^M exists or code change :  ->  : ././new/pet-store-master/src/main/java/me/zhulin/shopapi/entity/ProductInOrder.java
+INFO : conversion : ^M exists or code change : ascii -> ascii : ././new/pet-store-master/src/main/java/me/zhulin/shopapi/entity/User.java
+INFO : conversion : ^M exists or code change : ascii -> ascii : ././new/pet-store-master/src/main/java/me/zhulin/shopapi/enums/CodeEnum.java
+INFO : conversion : ^M exists or code change : ascii -> ascii : ././new/pet-store-master/src/main/java/me/zhulin/shopapi/enums/OrderStatusEnum.java
+INFO : conversion : ^M exists or code change : ascii -> ascii : ././new/pet-store-master/src/main/java/me/zhulin/shopapi/enums/ProductStatusEnum.java
+INFO : conversion : ^M exists or code change : ascii -> ascii : ././new/pet-store-master/src/main/java/me/zhulin/shopapi/enums/ResultEnum.java
+INFO : conversion : ^M exists or code change : ascii -> ascii : ././new/pet-store-master/src/main/java/me/zhulin/shopapi/exception/MyException.java
+INFO : conversion : ^M exists or code change : ascii -> ascii : ././new/pet-store-master/src/main/java/me/zhulin/shopapi/form/ItemForm.java
+INFO : conversion : ^M exists or code change : ascii -> ascii : ././new/pet-store-master/src/main/java/me/zhulin/shopapi/repository/CartRepository.java
+INFO : conversion : ^M exists or code change : ascii -> ascii : ././new/pet-store-master/src/main/java/me/zhulin/shopapi/repository/OrderRepository.java
+INFO : conversion : ^M exists or code change : ascii -> ascii : ././new/pet-store-master/src/main/java/me/zhulin/shopapi/repository/ProductCategoryRepository.java
+INFO : conversion : ^M exists or code change : ascii -> ascii : ././new/pet-store-master/src/main/java/me/zhulin/shopapi/repository/ProductInfoRepository.java
+INFO : conversion : ^M exists or code change : ascii -> ascii : ././new/pet-store-master/src/main/java/me/zhulin/shopapi/repository/ProductInOrderRepository.java
+INFO : conversion : ^M exists or code change : ascii -> ascii : ././new/pet-store-master/src/main/java/me/zhulin/shopapi/repository/UserRepository.java
+INFO : conversion : ^M exists or code change : ascii -> ascii : ././new/pet-store-master/src/main/java/me/zhulin/shopapi/security/JWT/JwtEntryPoint.java
+INFO : conversion : ^M exists or code change : ascii -> ascii : ././new/pet-store-master/src/main/java/me/zhulin/shopapi/security/JWT/JwtFilter.java
+INFO : conversion : ^M exists or code change : ascii -> ascii : ././new/pet-store-master/src/main/java/me/zhulin/shopapi/security/JWT/JwtProvider.java
+INFO : conversion : ^M exists or code change : ascii -> ascii : ././new/pet-store-master/src/main/java/me/zhulin/shopapi/security/SpringSecurityConfig.java
+INFO : conversion : ^M exists or code change : ascii -> ascii : ././new/pet-store-master/src/main/java/me/zhulin/shopapi/service/CartService.java
+INFO : conversion : ^M exists or code change : ascii -> ascii : ././new/pet-store-master/src/main/java/me/zhulin/shopapi/service/CategoryService.java
+INFO : conversion : ^M exists or code change : ascii -> ascii : ././new/pet-store-master/src/main/java/me/zhulin/shopapi/service/impl/CartServiceImpl.java
+INFO : conversion : ^M exists or code change : ascii -> ascii : ././new/pet-store-master/src/main/java/me/zhulin/shopapi/service/impl/CategoryServiceImpl.java
+INFO : conversion : ^M exists or code change : ascii -> ascii : ././new/pet-store-master/src/main/java/me/zhulin/shopapi/service/impl/OrderServiceImpl.java
+INFO : conversion : ^M exists or code change : ascii -> ascii : ././new/pet-store-master/src/main/java/me/zhulin/shopapi/service/impl/ProductInOrderServiceImpl.java
+ERROR : code: utf8
+;ascii : bad code from (/usr/u2l/u2l_backend/projects/pet-store-master_20230525_222814/U2L/java-vfunction_20230525_222814/bin/0007_code-check ./pet-store-master/src/main/java/me/zhulin/shopapi/service/impl/ProductServiceImpl.java)
+ERROR : code: utf8
+;ascii : bad code from (/usr/u2l/u2l_backend/projects/pet-store-master_20230525_222814/U2L/java-vfunction_20230525_222814/bin/0007_code-check ././new/pet-store-master/src/main/java/me/zhulin/shopapi/service/impl/ProductServiceImpl.java)
+INFO : conversion : ^M exists or code change :  ->  : ././new/pet-store-master/src/main/java/me/zhulin/shopapi/service/impl/ProductServiceImpl.java
+INFO : conversion : ^M exists or code change : ascii -> ascii : ././new/pet-store-master/src/main/java/me/zhulin/shopapi/service/impl/UserServiceImpl.java
+INFO : conversion : ^M exists or code change : ascii -> ascii : ././new/pet-store-master/src/main/java/me/zhulin/shopapi/service/OrderService.java
+INFO : conversion : ^M exists or code change : ascii -> ascii : ././new/pet-store-master/src/main/java/me/zhulin/shopapi/service/ProductInOrderService.java
+INFO : conversion : ^M exists or code change : ascii -> ascii : ././new/pet-store-master/src/main/java/me/zhulin/shopapi/service/ProductService.java
+INFO : conversion : ^M exists or code change : ascii -> ascii : ././new/pet-store-master/src/main/java/me/zhulin/shopapi/service/UserService.java
+INFO : conversion : ^M exists or code change : ascii -> ascii : ././new/pet-store-master/src/main/java/me/zhulin/shopapi/ShopApiApplication.java
+INFO : conversion : ^M exists or code change : ascii -> ascii : ././new/pet-store-master/src/main/java/me/zhulin/shopapi/vo/request/LoginForm.java
+INFO : conversion : ^M exists or code change : ascii -> ascii : ././new/pet-store-master/src/main/java/me/zhulin/shopapi/vo/response/CategoryPage.java
+INFO : conversion : ^M exists or code change : ascii -> ascii : ././new/pet-store-master/src/main/java/me/zhulin/shopapi/vo/response/JwtResponse.java
+INFO : conversion : ^M exists or code change : ascii -> ascii : ././new/pet-store-master/src/main/resources/application.yml
+INFO : conversion : ^M exists or code change : ascii -> ascii : ././new/pet-store-master/src/main/resources/application-docker.yml
+ERROR : code: utf8
+;ascii : bad code from (/usr/u2l/u2l_backend/projects/pet-store-master_20230525_222814/U2L/java-vfunction_20230525_222814/bin/0007_code-check ./pet-store-master/src/main/resources/import.sql)
+ERROR : code: utf8
+;ascii : bad code from (/usr/u2l/u2l_backend/projects/pet-store-master_20230525_222814/U2L/java-vfunction_20230525_222814/bin/0007_code-check ././new/pet-store-master/src/main/resources/import.sql)
+INFO : conversion : ^M exists or code change :  ->  : ././new/pet-store-master/src/main/resources/import.sql
+INFO : conversion : ^M exists or code change : ascii -> ascii : ././new/pet-store-master/src/test/java/me/zhulin/shopapi/api/CartControllerTest.java
+INFO : conversion : ^M exists or code change : ascii -> ascii : ././new/pet-store-master/src/test/java/me/zhulin/shopapi/service/impl/CartServiceImplTest.java
+INFO : conversion : ^M exists or code change : ascii -> ascii : ././new/pet-store-master/src/test/java/me/zhulin/shopapi/service/impl/CategoryServiceImplTest.java
+INFO : conversion : ^M exists or code change : ascii -> ascii : ././new/pet-store-master/src/test/java/me/zhulin/shopapi/service/impl/OrderServiceImplTest.java
+INFO : conversion : ^M exists or code change : ascii -> ascii : ././new/pet-store-master/src/test/java/me/zhulin/shopapi/service/impl/ProductInOrderServiceImplTest.java
+INFO : conversion : ^M exists or code change : ascii -> ascii : ././new/pet-store-master/src/test/java/me/zhulin/shopapi/service/impl/ProductServiceImplTest.java
+INFO : conversion : ^M exists or code change : ascii -> ascii : ././new/pet-store-master/src/test/java/me/zhulin/shopapi/service/impl/UserServiceImplTest.java
+INFO : conversion : ^M exists or code change : ascii -> ascii : ././new/pet-store-master/src/test/java/me/zhulin/shopapi/ShopApiApplicationTests.java
+INFO : conversion : ^M exists or code change : ascii -> ascii : ././new/pet-store-master/target/classes/application.yml
+INFO : conversion : ^M exists or code change : ascii -> ascii : ././new/pet-store-master/target/classes/application-docker.yml
+ERROR : code: utf8
+;ascii : bad code from (/usr/u2l/u2l_backend/projects/pet-store-master_20230525_222814/U2L/java-vfunction_20230525_222814/bin/0007_code-check ./pet-store-master/target/classes/import.sql)
+ERROR : code: utf8
+;ascii : bad code from (/usr/u2l/u2l_backend/projects/pet-store-master_20230525_222814/U2L/java-vfunction_20230525_222814/bin/0007_code-check ././new/pet-store-master/target/classes/import.sql)
+INFO : conversion : ^M exists or code change :  ->  : ././new/pet-store-master/target/classes/import.sql
+dos2unix: Binary symbol 0x00 found at line 1
+dos2unix: Skipping binary file stdin
+ERROR: lv : ./pet-store-master/target/classes/me/zhulin/shopapi/api/CartController.class
+dos2unix: Binary symbol 0x00 found at line 1
+dos2unix: Skipping binary file stdin
+ERROR: lv : ./pet-store-master/target/classes/me/zhulin/shopapi/api/CategoryController.class
+dos2unix: Binary symbol 0x00 found at line 1
+dos2unix: Skipping binary file stdin
+ERROR: lv : ./pet-store-master/target/classes/me/zhulin/shopapi/api/OrderController.class
+dos2unix: Binary symbol 0x00 found at line 1
+dos2unix: Skipping binary file stdin
+ERROR: lv : ./pet-store-master/target/classes/me/zhulin/shopapi/api/ProductController.class
+INFO : conversion : ^M exists or code change : ascii -> ascii : ././new/pet-store-master/target/classes/me/zhulin/shopapi/api/rest-client.env.json
+INFO : conversion : ^M exists or code change : ascii -> ascii : ././new/pet-store-master/target/classes/me/zhulin/shopapi/api/test.http
+dos2unix: Binary symbol 0x00 found at line 1
+dos2unix: Skipping binary file stdin
+ERROR: lv : ./pet-store-master/target/classes/me/zhulin/shopapi/api/UserController.class
+dos2unix: Binary symbol 0x00 found at line 1
+dos2unix: Skipping binary file stdin
+ERROR: lv : ./pet-store-master/target/classes/me/zhulin/shopapi/entity/Cart.class
+dos2unix: Binary symbol 0x00 found at line 1
+dos2unix: Skipping binary file stdin
+ERROR: lv : ./pet-store-master/target/classes/me/zhulin/shopapi/entity/OrderMain.class
+dos2unix: Binary symbol 0x00 found at line 1
+dos2unix: Skipping binary file stdin
+ERROR: lv : ./pet-store-master/target/classes/me/zhulin/shopapi/entity/ProductCategory.class
+dos2unix: Binary symbol 0x00 found at line 1
+dos2unix: Skipping binary file stdin
+ERROR: lv : ./pet-store-master/target/classes/me/zhulin/shopapi/entity/ProductInfo.class
+dos2unix: Binary symbol 0x00 found at line 1
+dos2unix: Skipping binary file stdin
+ERROR: lv : ./pet-store-master/target/classes/me/zhulin/shopapi/entity/ProductInOrder.class
+dos2unix: Binary symbol 0x00 found at line 1
+dos2unix: Skipping binary file stdin
+ERROR: lv : ./pet-store-master/target/classes/me/zhulin/shopapi/entity/User.class
+dos2unix: Binary symbol 0x00 found at line 1
+dos2unix: Skipping binary file stdin
+ERROR: lv : ./pet-store-master/target/classes/me/zhulin/shopapi/enums/CodeEnum.class
+dos2unix: Binary symbol 0x00 found at line 1
+dos2unix: Skipping binary file stdin
+ERROR: lv : ./pet-store-master/target/classes/me/zhulin/shopapi/enums/OrderStatusEnum.class
+dos2unix: Binary symbol 0x00 found at line 1
+dos2unix: Skipping binary file stdin
+ERROR: lv : ./pet-store-master/target/classes/me/zhulin/shopapi/enums/ProductStatusEnum.class
+dos2unix: Binary symbol 0x00 found at line 1
+dos2unix: Skipping binary file stdin
+ERROR: lv : ./pet-store-master/target/classes/me/zhulin/shopapi/enums/ResultEnum.class
+dos2unix: Binary symbol 0x00 found at line 1
+dos2unix: Skipping binary file stdin
+ERROR: lv : ./pet-store-master/target/classes/me/zhulin/shopapi/exception/MyException.class
+dos2unix: Binary symbol 0x00 found at line 1
+dos2unix: Skipping binary file stdin
+ERROR: lv : ./pet-store-master/target/classes/me/zhulin/shopapi/form/ItemForm.class
+dos2unix: Binary symbol 0x00 found at line 1
+dos2unix: Skipping binary file stdin
+ERROR: lv : ./pet-store-master/target/classes/me/zhulin/shopapi/repository/CartRepository.class
+dos2unix: Binary symbol 0x00 found at line 1
+dos2unix: Skipping binary file stdin
+ERROR: lv : ./pet-store-master/target/classes/me/zhulin/shopapi/repository/OrderRepository.class
+dos2unix: Binary symbol 0x00 found at line 1
+dos2unix: Skipping binary file stdin
+ERROR: lv : ./pet-store-master/target/classes/me/zhulin/shopapi/repository/ProductCategoryRepository.class
+dos2unix: Binary symbol 0x00 found at line 1
+dos2unix: Skipping binary file stdin
+ERROR: lv : ./pet-store-master/target/classes/me/zhulin/shopapi/repository/ProductInfoRepository.class
+dos2unix: Binary symbol 0x00 found at line 1
+dos2unix: Skipping binary file stdin
+ERROR: lv : ./pet-store-master/target/classes/me/zhulin/shopapi/repository/ProductInOrderRepository.class
+dos2unix: Binary symbol 0x00 found at line 1
+dos2unix: Skipping binary file stdin
+ERROR: lv : ./pet-store-master/target/classes/me/zhulin/shopapi/repository/UserRepository.class
+dos2unix: Binary symbol 0x00 found at line 1
+dos2unix: Skipping binary file stdin
+ERROR: lv : ./pet-store-master/target/classes/me/zhulin/shopapi/security/JWT/JwtEntryPoint.class
+dos2unix: Binary symbol 0x00 found at line 1
+dos2unix: Skipping binary file stdin
+ERROR: lv : ./pet-store-master/target/classes/me/zhulin/shopapi/security/JWT/JwtFilter.class
+dos2unix: Binary symbol 0x00 found at line 1
+dos2unix: Skipping binary file stdin
+ERROR: lv : ./pet-store-master/target/classes/me/zhulin/shopapi/security/JWT/JwtProvider.class
+dos2unix: Binary symbol 0x00 found at line 1
+dos2unix: Skipping binary file stdin
+ERROR: lv : ./pet-store-master/target/classes/me/zhulin/shopapi/security/SpringSecurityConfig.class
+dos2unix: Binary symbol 0x00 found at line 1
+dos2unix: Skipping binary file stdin
+ERROR: lv : ./pet-store-master/target/classes/me/zhulin/shopapi/service/CartService.class
+dos2unix: Binary symbol 0x00 found at line 1
+dos2unix: Skipping binary file stdin
+ERROR: lv : ./pet-store-master/target/classes/me/zhulin/shopapi/service/CategoryService.class
+dos2unix: Binary symbol 0x00 found at line 1
+dos2unix: Skipping binary file stdin
+ERROR: lv : ./pet-store-master/target/classes/me/zhulin/shopapi/service/impl/CartServiceImpl.class
+dos2unix: Binary symbol 0x00 found at line 1
+dos2unix: Skipping binary file stdin
+ERROR: lv : ./pet-store-master/target/classes/me/zhulin/shopapi/service/impl/CategoryServiceImpl.class
+dos2unix: Binary symbol 0x00 found at line 1
+dos2unix: Skipping binary file stdin
+ERROR: lv : ./pet-store-master/target/classes/me/zhulin/shopapi/service/impl/OrderServiceImpl.class
+dos2unix: Binary symbol 0x00 found at line 1
+dos2unix: Skipping binary file stdin
+ERROR: lv : ./pet-store-master/target/classes/me/zhulin/shopapi/service/impl/ProductInOrderServiceImpl.class
+dos2unix: Binary symbol 0x00 found at line 1
+dos2unix: Skipping binary file stdin
+ERROR: lv : ./pet-store-master/target/classes/me/zhulin/shopapi/service/impl/ProductServiceImpl.class
+dos2unix: Binary symbol 0x00 found at line 1
+dos2unix: Skipping binary file stdin
+ERROR: lv : ./pet-store-master/target/classes/me/zhulin/shopapi/service/impl/UserServiceImpl.class
+dos2unix: Binary symbol 0x00 found at line 1
+dos2unix: Skipping binary file stdin
+ERROR: lv : ./pet-store-master/target/classes/me/zhulin/shopapi/service/OrderService.class
+dos2unix: Binary symbol 0x00 found at line 1
+dos2unix: Skipping binary file stdin
+ERROR: lv : ./pet-store-master/target/classes/me/zhulin/shopapi/service/ProductInOrderService.class
+dos2unix: Binary symbol 0x00 found at line 1
+dos2unix: Skipping binary file stdin
+ERROR: lv : ./pet-store-master/target/classes/me/zhulin/shopapi/service/ProductService.class
+dos2unix: Binary symbol 0x00 found at line 1
+dos2unix: Skipping binary file stdin
+ERROR: lv : ./pet-store-master/target/classes/me/zhulin/shopapi/service/UserService.class
+dos2unix: Binary symbol 0x00 found at line 1
+dos2unix: Skipping binary file stdin
+ERROR: lv : ./pet-store-master/target/classes/me/zhulin/shopapi/ShopApiApplication$1.class
+dos2unix: Binary symbol 0x00 found at line 1
+dos2unix: Skipping binary file stdin
+ERROR: lv : ./pet-store-master/target/classes/me/zhulin/shopapi/ShopApiApplication.class
+dos2unix: Binary symbol 0x00 found at line 1
+dos2unix: Skipping binary file stdin
+ERROR: lv : ./pet-store-master/target/classes/me/zhulin/shopapi/vo/request/LoginForm.class
+dos2unix: Binary symbol 0x00 found at line 1
+dos2unix: Skipping binary file stdin
+ERROR: lv : ./pet-store-master/target/classes/me/zhulin/shopapi/vo/response/CategoryPage.class
+dos2unix: Binary symbol 0x00 found at line 1
+dos2unix: Skipping binary file stdin
+ERROR: lv : ./pet-store-master/target/classes/me/zhulin/shopapi/vo/response/JwtResponse.class
+INFO : conversion : ^M exists or code change : ascii -> ascii : ././new/pet-store-master/target/classes/META-INF/MANIFEST.MF
+INFO : conversion : ^M exists or code change : ascii -> ascii : ././new/pet-store-master/target/classes/META-INF/maven/me.zhulin/shop-api/pom.properties
+INFO : conversion : ^M exists or code change : ascii -> ascii : ././new/pet-store-master/target/classes/META-INF/maven/me.zhulin/shop-api/pom.xml
+dos2unix: Binary symbol 0x00 found at line 1
+dos2unix: Skipping binary file stdin
+ERROR: lv : ./pet-store-master/target/test-classes/me/zhulin/shopapi/api/CartControllerTest.class
+dos2unix: Binary symbol 0x00 found at line 1
+dos2unix: Skipping binary file stdin
+ERROR: lv : ./pet-store-master/target/test-classes/me/zhulin/shopapi/service/impl/CartServiceImplTest.class
+dos2unix: Binary symbol 0x00 found at line 1
+dos2unix: Skipping binary file stdin
+ERROR: lv : ./pet-store-master/target/test-classes/me/zhulin/shopapi/service/impl/CategoryServiceImplTest.class
+dos2unix: Binary symbol 0x00 found at line 1
+dos2unix: Skipping binary file stdin
+ERROR: lv : ./pet-store-master/target/test-classes/me/zhulin/shopapi/service/impl/OrderServiceImplTest.class
+dos2unix: Binary symbol 0x00 found at line 1
+dos2unix: Skipping binary file stdin
+ERROR: lv : ./pet-store-master/target/test-classes/me/zhulin/shopapi/service/impl/ProductInOrderServiceImplTest.class
+dos2unix: Binary symbol 0x00 found at line 1
+dos2unix: Skipping binary file stdin
+ERROR: lv : ./pet-store-master/target/test-classes/me/zhulin/shopapi/service/impl/ProductServiceImplTest.class
+dos2unix: Binary symbol 0x00 found at line 1
+dos2unix: Skipping binary file stdin
+ERROR: lv : ./pet-store-master/target/test-classes/me/zhulin/shopapi/service/impl/UserServiceImplTest.class
+dos2unix: Binary symbol 0x00 found at line 1
+dos2unix: Skipping binary file stdin
+ERROR: lv : ./pet-store-master/target/test-classes/me/zhulin/shopapi/ShopApiApplicationTests.class
+mv: cannot stat '././new/pet-store-master/target/test-classes/me/zhulin/shopapi/tmp/*': No such file or directory
+checking the new folder after src_work : /usr/u2l/u2l_backend/projects/pet-store-master_20230525_222814/U2L/java-vfunction_20230525_222814/work/javaanalysis/new
+###########  Execution 0006_srccheck Ends ###########
+
+
+###########  Executing 0000_classify_files Starts  ###########
+chk : ./pet-store-master/.classpath 
+chk : ./pet-store-master/.gitattributes 
+chk : ./pet-store-master/.gitignore 
+chk : ./pet-store-master/.mvn/wrapper/maven-wrapper.jar 
+chk : ./pet-store-master/.mvn/wrapper/maven-wrapper.properties 
+chk : ./pet-store-master/.travis.yml 
+java : ./pet-store-master/src/main/java/me/zhulin/shopapi/api/CartController.java
+java : ./pet-store-master/src/main/java/me/zhulin/shopapi/api/CategoryController.java
+java : ./pet-store-master/src/main/java/me/zhulin/shopapi/api/OrderController.java
+java : ./pet-store-master/src/main/java/me/zhulin/shopapi/api/ProductController.java
+chk : ./pet-store-master/src/main/java/me/zhulin/shopapi/api/rest-client.env.json 
+chk : ./pet-store-master/src/main/java/me/zhulin/shopapi/api/test.http 
+java : ./pet-store-master/src/main/java/me/zhulin/shopapi/api/UserController.java
+java : ./pet-store-master/src/main/java/me/zhulin/shopapi/entity/Cart.java
+java : ./pet-store-master/src/main/java/me/zhulin/shopapi/entity/OrderMain.java
+java : ./pet-store-master/src/main/java/me/zhulin/shopapi/entity/ProductCategory.java
+java : ./pet-store-master/src/main/java/me/zhulin/shopapi/entity/ProductInfo.java
+java : ./pet-store-master/src/main/java/me/zhulin/shopapi/entity/ProductInOrder.java
+java : ./pet-store-master/src/main/java/me/zhulin/shopapi/entity/User.java
+java : ./pet-store-master/src/main/java/me/zhulin/shopapi/enums/CodeEnum.java
+java : ./pet-store-master/src/main/java/me/zhulin/shopapi/enums/OrderStatusEnum.java
+java : ./pet-store-master/src/main/java/me/zhulin/shopapi/enums/ProductStatusEnum.java
+java : ./pet-store-master/src/main/java/me/zhulin/shopapi/enums/ResultEnum.java
+java : ./pet-store-master/src/main/java/me/zhulin/shopapi/exception/MyException.java
+java : ./pet-store-master/src/main/java/me/zhulin/shopapi/form/ItemForm.java
+java : ./pet-store-master/src/main/java/me/zhulin/shopapi/repository/CartRepository.java
+java : ./pet-store-master/src/main/java/me/zhulin/shopapi/repository/OrderRepository.java
+java : ./pet-store-master/src/main/java/me/zhulin/shopapi/repository/ProductCategoryRepository.java
+java : ./pet-store-master/src/main/java/me/zhulin/shopapi/repository/ProductInfoRepository.java
+java : ./pet-store-master/src/main/java/me/zhulin/shopapi/repository/ProductInOrderRepository.java
+java : ./pet-store-master/src/main/java/me/zhulin/shopapi/repository/UserRepository.java
+java : ./pet-store-master/src/main/java/me/zhulin/shopapi/security/JWT/JwtEntryPoint.java
+java : ./pet-store-master/src/main/java/me/zhulin/shopapi/security/JWT/JwtFilter.java
+java : ./pet-store-master/src/main/java/me/zhulin/shopapi/security/JWT/JwtProvider.java
+java : ./pet-store-master/src/main/java/me/zhulin/shopapi/security/SpringSecurityConfig.java
+java : ./pet-store-master/src/main/java/me/zhulin/shopapi/service/CartService.java
+java : ./pet-store-master/src/main/java/me/zhulin/shopapi/service/CategoryService.java
+java : ./pet-store-master/src/main/java/me/zhulin/shopapi/service/impl/CartServiceImpl.java
+java : ./pet-store-master/src/main/java/me/zhulin/shopapi/service/impl/CategoryServiceImpl.java
+java : ./pet-store-master/src/main/java/me/zhulin/shopapi/service/impl/OrderServiceImpl.java
+java : ./pet-store-master/src/main/java/me/zhulin/shopapi/service/impl/ProductInOrderServiceImpl.java
+java : ./pet-store-master/src/main/java/me/zhulin/shopapi/service/impl/ProductServiceImpl.java
+java : ./pet-store-master/src/main/java/me/zhulin/shopapi/service/impl/UserServiceImpl.java
+java : ./pet-store-master/src/main/java/me/zhulin/shopapi/service/OrderService.java
+java : ./pet-store-master/src/main/java/me/zhulin/shopapi/service/ProductInOrderService.java
+java : ./pet-store-master/src/main/java/me/zhulin/shopapi/service/ProductService.java
+java : ./pet-store-master/src/main/java/me/zhulin/shopapi/service/UserService.java
+java : ./pet-store-master/src/main/java/me/zhulin/shopapi/ShopApiApplication.java
+java : ./pet-store-master/src/main/java/me/zhulin/shopapi/vo/request/LoginForm.java
+java : ./pet-store-master/src/main/java/me/zhulin/shopapi/vo/response/CategoryPage.java
+java : ./pet-store-master/src/main/java/me/zhulin/shopapi/vo/response/JwtResponse.java
+chk : ./pet-store-master/src/main/resources/application.yml 
+chk : ./pet-store-master/src/main/resources/application-docker.yml 
+java : ./pet-store-master/src/test/java/me/zhulin/shopapi/api/CartControllerTest.java
+java : ./pet-store-master/src/test/java/me/zhulin/shopapi/service/impl/CartServiceImplTest.java
+java : ./pet-store-master/src/test/java/me/zhulin/shopapi/service/impl/CategoryServiceImplTest.java
+java : ./pet-store-master/src/test/java/me/zhulin/shopapi/service/impl/OrderServiceImplTest.java
+java : ./pet-store-master/src/test/java/me/zhulin/shopapi/service/impl/ProductInOrderServiceImplTest.java
+java : ./pet-store-master/src/test/java/me/zhulin/shopapi/service/impl/ProductServiceImplTest.java
+java : ./pet-store-master/src/test/java/me/zhulin/shopapi/service/impl/UserServiceImplTest.java
+java : ./pet-store-master/src/test/java/me/zhulin/shopapi/ShopApiApplicationTests.java
+chk : ./pet-store-master/target/classes/application.yml 
+chk : ./pet-store-master/target/classes/application-docker.yml 
+chk : ./pet-store-master/target/classes/me/zhulin/shopapi/api/CartController.class 
+chk : ./pet-store-master/target/classes/me/zhulin/shopapi/api/CategoryController.class 
+chk : ./pet-store-master/target/classes/me/zhulin/shopapi/api/OrderController.class 
+chk : ./pet-store-master/target/classes/me/zhulin/shopapi/api/ProductController.class 
+chk : ./pet-store-master/target/classes/me/zhulin/shopapi/api/rest-client.env.json 
+chk : ./pet-store-master/target/classes/me/zhulin/shopapi/api/test.http 
+chk : ./pet-store-master/target/classes/me/zhulin/shopapi/api/UserController.class 
+chk : ./pet-store-master/target/classes/me/zhulin/shopapi/entity/Cart.class 
+chk : ./pet-store-master/target/classes/me/zhulin/shopapi/entity/OrderMain.class 
+chk : ./pet-store-master/target/classes/me/zhulin/shopapi/entity/ProductCategory.class 
+chk : ./pet-store-master/target/classes/me/zhulin/shopapi/entity/ProductInfo.class 
+chk : ./pet-store-master/target/classes/me/zhulin/shopapi/entity/ProductInOrder.class 
+chk : ./pet-store-master/target/classes/me/zhulin/shopapi/entity/User.class 
+chk : ./pet-store-master/target/classes/me/zhulin/shopapi/enums/CodeEnum.class 
+chk : ./pet-store-master/target/classes/me/zhulin/shopapi/enums/OrderStatusEnum.class 
+chk : ./pet-store-master/target/classes/me/zhulin/shopapi/enums/ProductStatusEnum.class 
+chk : ./pet-store-master/target/classes/me/zhulin/shopapi/enums/ResultEnum.class 
+chk : ./pet-store-master/target/classes/me/zhulin/shopapi/exception/MyException.class 
+chk : ./pet-store-master/target/classes/me/zhulin/shopapi/form/ItemForm.class 
+chk : ./pet-store-master/target/classes/me/zhulin/shopapi/repository/CartRepository.class 
+chk : ./pet-store-master/target/classes/me/zhulin/shopapi/repository/OrderRepository.class 
+chk : ./pet-store-master/target/classes/me/zhulin/shopapi/repository/ProductCategoryRepository.class 
+chk : ./pet-store-master/target/classes/me/zhulin/shopapi/repository/ProductInfoRepository.class 
+chk : ./pet-store-master/target/classes/me/zhulin/shopapi/repository/ProductInOrderRepository.class 
+chk : ./pet-store-master/target/classes/me/zhulin/shopapi/repository/UserRepository.class 
+chk : ./pet-store-master/target/classes/me/zhulin/shopapi/security/JWT/JwtEntryPoint.class 
+chk : ./pet-store-master/target/classes/me/zhulin/shopapi/security/JWT/JwtFilter.class 
+chk : ./pet-store-master/target/classes/me/zhulin/shopapi/security/JWT/JwtProvider.class 
+chk : ./pet-store-master/target/classes/me/zhulin/shopapi/security/SpringSecurityConfig.class 
+chk : ./pet-store-master/target/classes/me/zhulin/shopapi/service/CartService.class 
+chk : ./pet-store-master/target/classes/me/zhulin/shopapi/service/CategoryService.class 
+chk : ./pet-store-master/target/classes/me/zhulin/shopapi/service/impl/CartServiceImpl.class 
+chk : ./pet-store-master/target/classes/me/zhulin/shopapi/service/impl/CategoryServiceImpl.class 
+chk : ./pet-store-master/target/classes/me/zhulin/shopapi/service/impl/OrderServiceImpl.class 
+chk : ./pet-store-master/target/classes/me/zhulin/shopapi/service/impl/ProductInOrderServiceImpl.class 
+chk : ./pet-store-master/target/classes/me/zhulin/shopapi/service/impl/ProductServiceImpl.class 
+chk : ./pet-store-master/target/classes/me/zhulin/shopapi/service/impl/UserServiceImpl.class 
+chk : ./pet-store-master/target/classes/me/zhulin/shopapi/service/OrderService.class 
+chk : ./pet-store-master/target/classes/me/zhulin/shopapi/service/ProductInOrderService.class 
+chk : ./pet-store-master/target/classes/me/zhulin/shopapi/service/ProductService.class 
+chk : ./pet-store-master/target/classes/me/zhulin/shopapi/service/UserService.class 
+chk : ./pet-store-master/target/classes/me/zhulin/shopapi/ShopApiApplication$1.class 
+chk : ./pet-store-master/target/classes/me/zhulin/shopapi/ShopApiApplication.class 
+chk : ./pet-store-master/target/classes/me/zhulin/shopapi/vo/request/LoginForm.class 
+chk : ./pet-store-master/target/classes/me/zhulin/shopapi/vo/response/CategoryPage.class 
+chk : ./pet-store-master/target/classes/me/zhulin/shopapi/vo/response/JwtResponse.class 
+chk : ./pet-store-master/target/classes/META-INF/MANIFEST.MF 
+chk : ./pet-store-master/target/classes/META-INF/maven/me.zhulin/shop-api/pom.properties 
+chk : ./pet-store-master/target/classes/META-INF/maven/me.zhulin/shop-api/pom.xml 
+chk : ./pet-store-master/target/test-classes/me/zhulin/shopapi/api/CartControllerTest.class 
+chk : ./pet-store-master/target/test-classes/me/zhulin/shopapi/service/impl/CartServiceImplTest.class 
+chk : ./pet-store-master/target/test-classes/me/zhulin/shopapi/service/impl/CategoryServiceImplTest.class 
+chk : ./pet-store-master/target/test-classes/me/zhulin/shopapi/service/impl/OrderServiceImplTest.class 
+chk : ./pet-store-master/target/test-classes/me/zhulin/shopapi/service/impl/ProductInOrderServiceImplTest.class 
+chk : ./pet-store-master/target/test-classes/me/zhulin/shopapi/service/impl/ProductServiceImplTest.class 
+chk : ./pet-store-master/target/test-classes/me/zhulin/shopapi/service/impl/UserServiceImplTest.class 
+chk : ./pet-store-master/target/test-classes/me/zhulin/shopapi/ShopApiApplicationTests.class 
+Creating exclude_files.out ...in /usr/u2l/u2l_backend/projects/pet-store-master_20230525_222814/U2L/java-vfunction_20230525_222814/log/javaanalysis/srccheck/2023-0525
+Creating java_files.out ...in /usr/u2l/u2l_backend/projects/pet-store-master_20230525_222814/U2L/java-vfunction_20230525_222814/log/javaanalysis/srccheck/2023-0525
+Creating check_files.out ...in /usr/u2l/u2l_backend/projects/pet-store-master_20230525_222814/U2L/java-vfunction_20230525_222814/log/javaanalysis/srccheck/2023-0525
+
+
+###########  Execution 0000_classify_files Ends ###########
+
+
+###########  Execution 0001_stepcounter Starts  ###########
+Linux
+File is not 0000_classify_files output.
+Linux
+./pet-store-master/src/main/resources/import.sql,未対応,,,,,
+./pet-store-master/target/classes/import.sql,未対応,,,,,
+Linux
+./pet-store-master/src/main/java/me/zhulin/shopapi/api/CartController.java,Java,,74,14,4,92
+./pet-store-master/src/main/java/me/zhulin/shopapi/api/CategoryController.java,Java,,36,6,11,53
+./pet-store-master/src/main/java/me/zhulin/shopapi/api/OrderController.java,Java,,60,11,3,74
+./pet-store-master/src/main/java/me/zhulin/shopapi/api/ProductController.java,Java,,61,14,10,85
+./pet-store-master/src/main/java/me/zhulin/shopapi/api/UserController.java,Java,,66,15,4,85
+./pet-store-master/src/main/java/me/zhulin/shopapi/entity/Cart.java,Java,,36,8,4,48
+./pet-store-master/src/main/java/me/zhulin/shopapi/entity/OrderMain.java,Java,,61,15,8,84
+./pet-store-master/src/main/java/me/zhulin/shopapi/entity/ProductCategory.java,Java,,28,10,3,41
+./pet-store-master/src/main/java/me/zhulin/shopapi/entity/ProductInfo.java,Java,,39,14,10,63
+./pet-store-master/src/main/java/me/zhulin/shopapi/entity/ProductInOrder.java,Java,,82,20,22,124
+./pet-store-master/src/main/java/me/zhulin/shopapi/entity/User.java,Java,,52,12,3,67
+./pet-store-master/src/main/java/me/zhulin/shopapi/enums/CodeEnum.java,Java,,4,2,3,9
+./pet-store-master/src/main/java/me/zhulin/shopapi/enums/OrderStatusEnum.java,Java,,17,4,3,24
+./pet-store-master/src/main/java/me/zhulin/shopapi/enums/ProductStatusEnum.java,Java,,23,6,3,32
+./pet-store-master/src/main/java/me/zhulin/shopapi/enums/ResultEnum.java,Java,,24,11,3,38
+./pet-store-master/src/main/java/me/zhulin/shopapi/exception/MyException.java,Java,,13,7,3,23
+./pet-store-master/src/main/java/me/zhulin/shopapi/form/ItemForm.java,Java,,11,3,3,17
+./pet-store-master/src/main/java/me/zhulin/shopapi/repository/CartRepository.java,Java,,6,3,3,12
+./pet-store-master/src/main/java/me/zhulin/shopapi/repository/OrderRepository.java,Java,,12,9,3,24
+./pet-store-master/src/main/java/me/zhulin/shopapi/repository/ProductCategoryRepository.java,Java,,9,3,6,18
+./pet-store-master/src/main/java/me/zhulin/shopapi/repository/ProductInfoRepository.java,Java,,11,5,5,21
+./pet-store-master/src/main/java/me/zhulin/shopapi/repository/ProductInOrderRepository.java,Java,,5,3,3,11
+./pet-store-master/src/main/java/me/zhulin/shopapi/repository/UserRepository.java,Java,,8,6,3,17
+./pet-store-master/src/main/java/me/zhulin/shopapi/security/JWT/JwtEntryPoint.java,Java,,22,7,4,33
+./pet-store-master/src/main/java/me/zhulin/shopapi/security/JWT/JwtFilter.java,Java,,48,8,5,61
+./pet-store-master/src/main/java/me/zhulin/shopapi/security/JWT/JwtProvider.java,Java,,40,9,3,52
+./pet-store-master/src/main/java/me/zhulin/shopapi/security/SpringSecurityConfig.java,Java,,53,11,22,86
+./pet-store-master/src/main/java/me/zhulin/shopapi/service/CartService.java,Java,,11,6,3,20
+./pet-store-master/src/main/java/me/zhulin/shopapi/service/CategoryService.java,Java,,9,9,3,21
+./pet-store-master/src/main/java/me/zhulin/shopapi/service/impl/CartServiceImpl.java,Java,,83,13,5,101
+./pet-store-master/src/main/java/me/zhulin/shopapi/service/impl/CategoryServiceImpl.java,Java,,36,13,5,54
+./pet-store-master/src/main/java/me/zhulin/shopapi/service/impl/OrderServiceImpl.java,Java,,84,14,4,102
+./pet-store-master/src/main/java/me/zhulin/shopapi/service/impl/ProductInOrderServiceImpl.java,Java,,30,7,3,40
+./pet-store-master/src/main/java/me/zhulin/shopapi/service/impl/ProductServiceImpl.java,Java,,96,30,6,132
+./pet-store-master/src/main/java/me/zhulin/shopapi/service/impl/UserServiceImpl.java,Java,,55,12,5,72
+./pet-store-master/src/main/java/me/zhulin/shopapi/service/OrderService.java,Java,,13,12,3,28
+./pet-store-master/src/main/java/me/zhulin/shopapi/service/ProductInOrderService.java,Java,,7,2,3,12
+./pet-store-master/src/main/java/me/zhulin/shopapi/service/ProductService.java,Java,,17,13,8,38
+./pet-store-master/src/main/java/me/zhulin/shopapi/service/UserService.java,Java,,9,7,3,19
+./pet-store-master/src/main/java/me/zhulin/shopapi/ShopApiApplication.java,Java,,21,3,11,35
+./pet-store-master/src/main/java/me/zhulin/shopapi/vo/request/LoginForm.java,Java,,11,3,3,17
+./pet-store-master/src/main/java/me/zhulin/shopapi/vo/response/CategoryPage.java,Java,,23,7,3,33
+./pet-store-master/src/main/java/me/zhulin/shopapi/vo/response/JwtResponse.java,Java,,16,3,3,22
+./pet-store-master/src/test/java/me/zhulin/shopapi/api/CartControllerTest.java,Java,,8,4,3,15
+./pet-store-master/src/test/java/me/zhulin/shopapi/service/impl/CartServiceImplTest.java,Java,,95,33,0,128
+./pet-store-master/src/test/java/me/zhulin/shopapi/service/impl/CategoryServiceImplTest.java,Java,,32,11,0,43
+./pet-store-master/src/test/java/me/zhulin/shopapi/service/impl/OrderServiceImplTest.java,Java,,99,38,0,137
+./pet-store-master/src/test/java/me/zhulin/shopapi/service/impl/ProductInOrderServiceImplTest.java,Java,,47,17,0,64
+./pet-store-master/src/test/java/me/zhulin/shopapi/service/impl/ProductServiceImplTest.java,Java,,112,44,0,156
+./pet-store-master/src/test/java/me/zhulin/shopapi/service/impl/UserServiceImplTest.java,Java,,56,17,0,73
+./pet-store-master/src/test/java/me/zhulin/shopapi/ShopApiApplicationTests.java,Java,,15,4,0,19
+
+
+###########  Execution 0001_stepcounter Ends ###########
+
+
+###########  Execution 0004_comment-erase-all Starts  ###########
+
+
+###########  Execution Ends 0004_comment-erase-all  ###########
+	
+	echo -e nn########### Execution Starts 0008_incfilecheck
+All files are exist.
+All files are exist.
+All files are exist.
+
+
+###########  Execution Ends 0008_incfilecheck  ###########
+
+ Completed Preparatory Tasks Successfully
+
+ Preparatory tasks already completed. Proceeding for CodeAnalysis.
+i am here javaanalysis
+
+ getting the 2nd Comamnd line arg from user is :javaanalysis 
+
+ getting the 2nd parameter after comparing :java
+
+============  Performing JAVA Sourcecode Analysis  ============
+Inside JavaAnalysis cehcking PATH of src_work: /usr/u2l/u2l_backend/projects/pet-store-master_20230525_222814/U2L/java-vfunction_20230525_222814/work/javaanalysis
+###########  Executing 00010_javacwarning  Starts ###########
+Java Compilations warnings and errors are in  /usr/u2l/u2l_backend/projects/pet-store-master_20230525_222814/U2L/java-vfunction_20230525_222814/log/javaanalysis/java/javacLog/2023-0525/javacIssue.log
+ Java Compilation Warning list is in  /usr/u2l/u2l_backend/projects/pet-store-master_20230525_222814/U2L/java-vfunction_20230525_222814/log/javaanalysis/java/javacLog/2023-0525/javacWarnings.list
+ Java Compilation Errors list is in /usr/u2l/u2l_backend/projects/pet-store-master_20230525_222814/U2L/java-vfunction_20230525_222814/log/javaanalysis/java/javacLog/2023-0525/javacErrors.list
+checking the new folder after src_work : /usr/u2l/u2l_backend/projects/pet-store-master_20230525_222814/U2L/java-vfunction_20230525_222814/work/javaanalysis/new
+###########  Execution 00010_javacwarning  Ends ###########
+
+--------Collecting Imported packages--------
+
+Output of Imported packages is present at /usr/u2l/u2l_backend/projects/pet-store-master_20230525_222814/U2L/java-vfunction_20230525_222814/log/javaanalysis/java/import/2023-0525/
+	Java	: import_lines.out
+	JSP	: import_lines_jsp.out
+
+--------Executing Import Summary Report--------
+next_version is Required.
+usage: createImportSummaryReportData.pl -b base_version -n next_version extract_import_file source_dir
+available version : 1.2, 1.3, 1.4.0, 1.4.1, 1.4.2, 5, 6, 7, 8
+
+Output of createImportSummaryReportData.pl present at /usr/u2l/u2l_backend/projects/pet-store-master_20230525_222814/U2L/java-vfunction_20230525_222814/log/javaanalysis/java/import/2023-0525/import_summary_report_data.out
+
+--------Creating Target Java Filelist--------
+
+Executing Analysis for JDK differences....
+base_version can use [0-9.]
+usage: grep_keywords.pl [-b base_version] [-n next_version] source_dir (JDK|JSP|Servlet|OS)
+JDK JSP Servlet requires option -b, -n, OS don't need option.
+
+Executing Analysis for SERVLET differences....
+base_version can use [0-9.]
+usage: grep_keywords.pl [-b base_version] [-n next_version] source_dir (JDK|JSP|Servlet|OS)
+JDK JSP Servlet requires option -b, -n, OS don't need option.
+
+Executing Analysis for OS differences....
+
+Version differences output is placed under /usr/u2l/u2l_backend/projects/pet-store-master_20230525_222814/U2L/java-vfunction_20230525_222814/log/javaanalysis/java/versiondiff/2023-0525
+
+============  Performing JAVA Sourcecode Analysis completed  ============
+for JavaAnalysis It took 10 seconds
