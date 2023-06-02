@@ -12,6 +12,7 @@ import image3 from "../../assets/Images/U2LMigrationEffort.png";
 // import { Chart, LinearScale, registerables } from "chart.js";
 import HPELogo from "../../assets/Images/HPELogo.png";
 import { Chart } from "react-google-charts";
+import PdfUtils from "../../utils/PdfUtils";
 // Chart.register(LinearScale);
 // Chart.register(...registerables);
 
@@ -237,8 +238,7 @@ const PdfPreview = () => {
   //generate image from chart and send it to PdfViewer
   const openPDF = async () => {
     // //generate image
-    console.log(document.getElementById("piechart1"))
-    console.log(document.getElementById("piechart2"))
+
     //{============================================= uncomment start ====================================================}
     const element1 = document.getElementById("piechart1"),
       canvas1 = await html2canvas(element1),
@@ -256,7 +256,6 @@ const PdfPreview = () => {
     //   },
     // });
     //{============================================= uncomment start ====================================================}
-    console.log(data3)
     navigate("/pdfview", {
       state: {
         pieChart1DataURL: data3,
@@ -267,42 +266,6 @@ const PdfPreview = () => {
     //{============================================= uncomment end ======================================================}
   };
 
-  const getTodaysDate = () => {
-    const date = new Date();
-    return date.toLocaleDateString();
-  };
-
-  const getAnalysisType = (anaysis) => {
-    if (anaysis === "javaanalysis") {
-      return "Java Analysis";
-    } else if (anaysis === "canalysis") {
-      return "C Analysis";
-    } else if (anaysis === "shellanalysis") {
-      return "Shell Analysis";
-    }
-  };
-
-  const getTotalArtefacts = (array) => {
-    let sum = 0;
-    for (let i = 0; i < array.length; i++) {
-      sum += array[i].number;
-    }
-    return sum;
-  };
-
-  const getEffort = (percent) => {
-    if (0 <= percent <= 19) {
-      return "Low Effort(It belongs to category 1 from below chart).";
-    } else if (20 <= percent <= 39) {
-      return "Medium Effort(It belongs to category 2 from below chart).";
-    } else if (40 <= percent <= 59) {
-      return "Average Effort(It belongs to category 3 from below chart).";
-    } else if (60 <= percent <= 79) {
-      return "High Effort(It belongs to category 4 from below chart).";
-    } else if (80 <= percent <= 100) {
-      return "Very High Effort(It belongs to category 5 from below chart).";
-    }
-  };
 
   return (
     <div className="App">
@@ -394,7 +357,7 @@ const PdfPreview = () => {
         </p>
         <p style={styles.infoText}>
           Type of Code Assessment:{" "}
-          {getAnalysisType(
+          {PdfUtils.getAnalysisType(
             location.state.projectDetails.analysis_type[0].analysis_type
           )}
         </p>
@@ -424,7 +387,7 @@ const PdfPreview = () => {
         </div>
         <div>
           <span style={{ fontSize: "18px", width: "70%" }}>
-            {getTodaysDate()}
+            {PdfUtils.getTodaysDate()}
           </span>
         </div>
       </div>
@@ -487,7 +450,7 @@ const PdfPreview = () => {
         </div>
         <div>
           <span style={{ fontSize: "18px", width: "70%" }}>
-            {getTodaysDate()}
+            {PdfUtils.getTodaysDate()}
           </span>
         </div>
       </div>
@@ -536,7 +499,7 @@ const PdfPreview = () => {
         </div>
         <div>
           <span style={{ fontSize: "18px", width: "70%" }}>
-            {getTodaysDate()}
+            {PdfUtils.getTodaysDate()}
           </span>
         </div>
       </div>
@@ -557,19 +520,19 @@ const PdfPreview = () => {
       {/* ============================= Body Page 4 ========================== */}
       <div style={{ textAlign: "left", margin: "o auto" }}>
         <p style={{ fontSize: "20px", fontWeight: "bold", marginLeft: "15%" }}>
-          {`Total Artefacts : ${getTotalArtefacts(
+          {`Total Artefacts : ${PdfUtils.getTotalArtefacts(
             location.state.projectDetails.chart2
           )}`}
         </p>
       </div>
-      <div id="piechart1" style={{ width: "70%", marginLeft: "15%"}}>
+      <div id="piechart1" style={{ width: "70%", marginLeft: "15%", maxHeight:'500px'}}>
       <Chart
           graphID="piechart1"
           data={chartData1}
           options={chartOptions1}
           chartType="PieChart"
           width={"100%"}
-          height={"500px"}
+          height={"400px"}
         />
       </div>
       <div style={{ textAlign: "left", margin: "o auto" }}>
@@ -577,14 +540,14 @@ const PdfPreview = () => {
           {`Total Number of Lines : ${location.state.projectDetails.chart1["Total Nr LoC"]}`}
         </p>
       </div>
-      <div id="piechart2" style={{ width: "70%", marginLeft: "15%"}}>
+      <div id="piechart2" style={{ width: "70%", marginLeft: "15%", maxHeight:'500px'}}>
         <Chart
           id={"piechart2"}
           data={chartData2}
           options={chartOptions2}
           chartType="PieChart"
           width={"100%"}
-          height={"500px"}
+          height={'400px'}
         />
       </div>
       {/* <div style={styles.imageDiv}>
@@ -619,7 +582,7 @@ const PdfPreview = () => {
         </div>
         <div>
           <span style={{ fontSize: "18px", width: "70%" }}>
-            {getTodaysDate()}
+            {PdfUtils.getTodaysDate()}
           </span>
         </div>
       </div>
@@ -666,7 +629,7 @@ const PdfPreview = () => {
               location.state.projectDetails.project_details[0].project_name
             } is ${
               location.state.projectDetails.percent
-            }%. So your project requires ${getEffort(
+            }%. So your project requires ${PdfUtils.getEffort(
               location.state.projectDetails.percent
             )}`}
           </p>
@@ -707,7 +670,7 @@ const PdfPreview = () => {
         </div>
         <div>
           <span style={{ fontSize: "18px", width: "70%" }}>
-            {getTodaysDate()}
+            {PdfUtils.getTodaysDate()}
           </span>
         </div>
       </div>
