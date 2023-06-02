@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { ThemeContext } from 'styled-components';
 import {
@@ -29,40 +29,74 @@ import StepFooter from './StepFooter';
 import StepContent from './StepContent';
 import WizardContext from './WizardContext';
 import WizardHeader from './WizardHeader';
-import { FormNextLink, FormPreviousLink, FormPrevious } from 'grommet-icons';
+import { FormNext, FormPreviousLink, FormPrevious } from 'grommet-icons';
 // import BannerNotificationInfo from '../GlobalBannerNotification';
 import { getWidth } from './Utils';
 import ProjectService from '../../api/ProjectService';
 
-export const defaultFormValues = {
-  project_name: '',
-  project_client: '',
-  project_manager: '',
-  application_name: '',
-  source_os: '',
-  source_os_version: '',
-  target_os: '',
-  target_os_version: '',
-  analysis_type: '',
-  source_jdk: '',
-  target_jdk: '',
-  source_jsp: '',
-  target_jsp: '',
-  source_servlet: '',
-  target_servlet: '',
-  source_compiler: '',
-  source_compiler_version: '',
-  target_compiler: '',
-  target_compiler_version: '',
-  source_oracle_version: '',
-  target_oracle_version: '',
-  source_shell: '',
-  source_shell_version: '',
-  target_shell: '',
-  target_shell_version: '',
-};
-
 const WizardValidationExample = ({ containerRef }) => {
+  const location = useLocation();
+  const defaultFormValues = () => {
+    console.log(location);
+    if (!location.state) {
+      return ({
+        project_name: '',
+        project_client: '',
+        project_manager: '',
+        application_name: '',
+        source_os: '',
+        source_os_version: '',
+        target_os: '',
+        target_os_version: '',
+        analysis_type: '',
+        source_jdk: '',
+        target_jdk: '',
+        source_jsp: '',
+        target_jsp: '',
+        source_servlet: '',
+        target_servlet: '',
+        source_compiler: '',
+        source_compiler_version: '',
+        target_compiler: '',
+        target_compiler_version: '',
+        source_oracle_version: '',
+        target_oracle_version: '',
+        source_shell: '',
+        source_shell_version: '',
+        target_shell: '',
+        target_shell_version: '',
+      })
+    } else {
+      return ({
+        project_name: location.state.formValues.project_name,
+        project_client: location.state.formValues.project_client,
+        project_manager: location.state.formValues.project_manager,
+        application_name: location.state.formValues.application_name,
+        source_os: location.state.formValues.source_os,
+        source_os_version: location.state.formValues.source_os_version,
+        target_os: location.state.formValues.target_os,
+        target_os_version: location.state.formValues.target_os_version,
+        analysis_type: location.state.formValues.analysis_type,
+        source_jdk: location.state.formValues.source_jdk,
+        target_jdk: location.state.formValues.target_jdk,
+        source_jsp: location.state.formValues.source_jsp,
+        target_jsp: location.state.formValues.target_jsp,
+        source_servlet: location.state.formValues.source_servlet,
+        target_servlet: location.state.formValues.target_servlet,
+        source_compiler: location.state.formValues.source_compiler,
+        source_compiler_version: location.state.formValues.source_compiler_version,
+        target_compiler: location.state.formValues.target_compiler,
+        target_compiler_version: location.state.formValues.target_compiler_version,
+        source_oracle_version: location.state.formValues.source_oracle_version,
+        target_oracle_version: location.state.formValues.target_oracle_version,
+        source_shell: location.state.formValues.source_shell,
+        source_shell_version: location.state.formValues.source_shell_version,
+        target_shell: location.state.formValues.target_shell,
+        target_shell_version: location.state.formValues.target_shell_version,
+      })
+    }
+  };
+
   const size = useContext(ResponsiveContext);
   const theme = useContext(ThemeContext);
   const [activeIndex, setActiveIndex] = useState(0);
@@ -78,26 +112,20 @@ const WizardValidationExample = ({ containerRef }) => {
   const [showOSDetails, setShowOSDetails] = useState(false);
   const [showAnalysisType, setShowAnalysisType] = useState(false);
 
-  const handleTabs = (event,nextId) => {
+
+  const handleTabs = (event, nextId) => {
     event.preventDefault();
     console.log(event.currentTarget.id);
     const id = event.currentTarget.id;
 
-    if (id === "project_details") {
-      <StepOne/>
-      // setShowProjectDetails(true);
-      // setShowOSDetails(false);
-      // setShowAnalysisType(false);
-    } else if (id === "os_details") {
-      <StepTwo/>
-      // setShowProjectDetails(false);
-      // setShowOSDetails(true);
-      // setShowAnalysisType(false);
-    } else if (id === "analysis_type") {
-      <StepThree/>
-      // setShowProjectDetails(false);
-      // setShowOSDetails(false);
-      // setShowAnalysisType(true);
+
+    if (id === 'project_details') {
+      console.log("project details");
+      <StepOne />;
+    } else if (id === 'os_details') {
+      <StepTwo />;
+    } else if (id === 'analysis_type') {
+      <StepThree />;
     }
   };
 
@@ -157,6 +185,7 @@ const WizardValidationExample = ({ containerRef }) => {
     data.append('target_os_version', formValues.target_os_version);
 
     data.append('analysis_type', formValues.analysis_type);
+    // --------------------------------Java------------------------------------------ //
     if (formValues.analysis_type === 'Java') {
       data.append('source_jdk', formValues.source_jdk);
       data.append('target_jdk', formValues.target_jdk);
@@ -164,20 +193,36 @@ const WizardValidationExample = ({ containerRef }) => {
       data.append('target_jsp', formValues.target_jsp);
       data.append('source_servlet', formValues.source_servlet);
       data.append('target_servlet', formValues.target_servlet);
+      // --------------------------------C/C++/Pro*C------------------------------------------ //
     } else if (formValues.analysis_type === 'C/C++/Pro*C') {
       data.append('source_compiler', formValues.source_compiler);
-      data.append(
-        'source_compiler_version',
-        formValues.source_compiler_version
-      );
+      data.append('source_compiler_version', formValues.source_compiler_version);
       data.append('target_compiler', formValues.target_compiler);
-      data.append(
-        'target_compiler_version',
-        formValues.target_compiler_version
-      );
-      data.append('source_oracle_version', formValues.source_oracle_version);
-      data.append('target_oracle_version', formValues.target_oracle_version);
-    } else if (formValues.analysis_type === 'Shell') {
+      data.append('target_compiler_version', formValues.target_compiler_version);
+      data.append('target_compiler', formValues.source_pre_compiler);
+      data.append('target_compiler', formValues.source_pre_compiler_version);
+      data.append('target_compiler', formValues.target_pre_compiler);
+      data.append('target_compiler', formValues.target_pre_compiler_version);
+      // --------------------------------Pro*C------------------------------------------ //
+    } else if (formValues.analysis_type === 'Pro*C') {
+      data.append('target_compiler', formValues.source_pre_compiler);
+      data.append('target_compiler', formValues.source_pre_compiler_version);
+      data.append('target_compiler', formValues.target_pre_compiler);
+      data.append('target_compiler', formValues.target_pre_compiler_version);
+      // --------------------------------C------------------------------------------ //
+    } else if (formValues.analysis_type === 'C') {
+      data.append('source_compiler', formValues.source_compiler);
+      data.append('source_compiler_version', formValues.source_compiler_version);
+      data.append('target_compiler', formValues.target_compiler);
+      data.append('target_compiler_version', formValues.target_compiler_version);
+      // --------------------------------C------------------------------------------ //
+    } else if (formValues.analysis_type === 'C++') {
+      data.append('source_compiler', formValues.source_compiler);
+      data.append('source_compiler_version', formValues.source_compiler_version);
+      data.append('target_compiler', formValues.target_compiler);
+      data.append('target_compiler_version', formValues.target_compiler_version);
+    }
+    else if (formValues.analysis_type === 'Shell') {
       data.append('source_shell', formValues.source_shell);
       data.append('source_shell_version', formValues.source_shell_version);
       data.append('target_shell', formValues.target_shell);
@@ -202,20 +247,11 @@ const WizardValidationExample = ({ containerRef }) => {
         setNotificationMessage(error.response.data.message);
         setNotificationVisible(true);
       });
-
-
-      
   }
 
-  const handleNavigate = ()=>{
-    navigate('/review',{state:{formValues:formValues}})
-  }
-
-  //   useEffect(() => {
-  //     if (!localStorage.getItem("auth-token")) {
-  //       navigate("/");
-  //     }
-  //   }, []);
+  const handleNavigate = () => {
+    navigate('/review', { state: { formValues: formValues } });
+  };
 
   return (
     <WizardContext.Provider value={contextValue}>
@@ -236,27 +272,63 @@ const WizardValidationExample = ({ containerRef }) => {
           <Button
             label="Code Assessment"
             href="/dashboard"
-            style={styles.btn}
+            style={styles.sideBarbtn}
           />
-          <Button
-            label="Project Details"
-            onClick={(event) => handleTabs(event)}
-            style={styles.btn}
-          />
-          <Button
-            label="OS Details"
-            id="os_details"
-            onClick={(event) => handleTabs(event)}
-            style={styles.btn}
-          />
-          <Button
-            label="Analysis Type"
-            id="analysis_type"
-            onClick={(event) => handleTabs(event)}
-            style={styles.btn}
-          />
-          <Button label="Review" style={styles.btn} />
-          <Button margin={{left:"small"}} label="Review and Create" href="/review" style={styles.btn} />
+
+          {activeIndex === 0 ?
+            (<Button
+              label="Project Details"
+              onClick={(event) => handleTabs(event)}
+              style={styles.sideBarbtnonselect}
+
+            />) : ((<Button
+              disabled={true}
+              label="Project Details"
+              onClick={(event) => handleTabs(event)}
+              style={styles.btndisable}
+
+            />))
+          }
+
+          {activeIndex === 1 ?
+            (<Button
+              label="OS Details"
+              id="os_details"
+              onClick={(event) => handleTabs(event)}
+              style={styles.sideBarbtnonselect}
+            />) : (<Button
+              disabled={true}
+              label="OS Details"
+              id="os_details"
+              onClick={(event) => handleTabs(event)}
+              style={styles.btndisable}
+            />)
+
+          }
+
+          {activeIndex === 2 ? (
+            <Button
+              label="Analysis Type"
+              id="analysis_type"
+              onClick={(event) => handleTabs(event)}
+              style={styles.sideBarbtnonselect}
+            />) :
+            (<Button
+              label="Analysis Type"
+              id="analysis_type"
+              disabled={true}
+              onClick={(event) => handleTabs(event)}
+              style={styles.sideBarbtn}
+            />)
+          }
+          <Button label="Review" style={styles.sideBarbtn} />
+          {activeIndex === 2 && (<Button
+            margin={{ left: 'small' }}
+            label="Review and Create"
+            href="/review"
+            disabled={true}
+            style={styles.btndisable}
+          />)}
         </Box>
         <StepContent
           onSubmit={({ value }) => {
@@ -264,7 +336,7 @@ const WizardValidationExample = ({ containerRef }) => {
           }}
         />
       </Box>
-      <StepFooter onNavigate={handleNavigate}/>
+      <StepFooter onNavigate={handleNavigate} />
 
       {open && (
         <CancellationLayer
@@ -277,7 +349,26 @@ const WizardValidationExample = ({ containerRef }) => {
 };
 
 const styles = {
-  btn: { width: '100%', textAlign: 'left', marginTop: '10px', height: '7%' },
+  btn: { width: '100%', textAlign: 'left' },
+  sideBarbtn: {
+    display: 'flex', height: '6vh',
+    alignItems: 'center', borderRadius: '0',
+    borderBottom: '0.1px solid white', fontWeight: 'normal'
+  },
+  sideBarbtnonselect: {
+    display: 'flex', height: '6vh',
+    alignItems: 'center', borderRadius: '0',
+    borderBottom: '0.1px solid white', fontWeight: 'bold',
+    background: '#0000000A 0% 0% no-repeat padding-box',
+
+  },
+  btndisable: {
+    display: 'flex', height: '6vh',
+    alignItems: 'center', borderRadius: '0',
+    borderBottom: '0.1px solid white', fontWeight: 'normal',
+    background: " #F7F7F7 0% 0% no-repeat padding-box",
+    width: '100%', textAlign: 'left'
+  },
 };
 
 export const StepOne = (nextId) => {
@@ -304,6 +395,7 @@ export const StepOne = (nextId) => {
               placeholder="Enter Value"
               id="project_name"
               name="project_name"
+              type='text'
             />
           </FormField>
 
@@ -357,50 +449,61 @@ export const StepOne = (nextId) => {
 export const StepTwo = (nextId) => {
   return (
     <Box align="center">
-    <Box width={{ max: 'medium' }}>
-      <h3>OS details</h3>
-      <FormField
-        label="Source OS"
-        htmlFor="source_os"
-        name="source_os"
-        required={true}
-      >
-        <TextInput placeholder="Enter Value" id="source_os" name="source_os" />
-      </FormField>
-      <FormField
-        label="Source OS version"
-        htmlFor="source_os_version"
-        name="source_os_version"
-      >
-        <TextInput
-          placeholder="Enter Value"
-          id="source_os_version"
+      <Box width={{ max: 'medium' }}>
+        <h3>OS details</h3>
+        <FormField
+          label="Source OS"
+          htmlFor="source_os"
+          name="source_os"
+          required={true}
+        >
+          <TextInput
+            placeholder="Enter Value"
+            id="source_os"
+            name="source_os"
+          />
+        </FormField>
+        <FormField
+          label="Source OS version"
+          htmlFor="source_os_version"
           name="source_os_version"
-        />
-      </FormField>
-      <FormField
-        label="Target OS"
-        htmlFor="target_os"
-        name="target_os"
-        required={true}
-      >
-        <TextInput placeholder="Enter Value" id="target_os" name="target_os" />
-      </FormField>
-      <FormField
-        label="Target OS version"
-        htmlFor="target_os_version"
-        name="target_os_version"
-        required={true}
-      >
-        <TextInput
-          placeholder="Enter Value"
-          id="target_os_version"
+        >
+          <TextInput
+            placeholder="Enter Value"
+            id="source_os_version"
+            name="source_os_version"
+            type="number"
+            min={0}
+          />
+        </FormField>
+        <FormField
+          label="Target OS"
+          htmlFor="target_os"
+          name="target_os"
+          required={true}
+        >
+          <TextInput
+            placeholder="Enter Value"
+            id="target_os"
+            name="target_os"
+          />
+        </FormField>
+        <FormField
+          label="Target OS version"
+          htmlFor="target_os_version"
           name="target_os_version"
-        />
-      </FormField>
+          required={true}
 
-    
-    </Box>
+        >
+          <TextInput
+            placeholder="Enter Value"
+            id="target_os_version"
+            name="target_os_version"
+            type='number'
+            min={0}
+          />
+        </FormField>
+      </Box>
     </Box>
   );
 };
@@ -473,666 +576,432 @@ export const StepThree = (nextId) => {
   // );
 
   return (
-    // <Box margin="0 auto" width="30%">
-    //   <Heading level={4} size="small" marginTop="0">
-    //     {/* margin="2"  for heading if needed*/}
-    //     Select Your Preference
-    //   </Heading>
+    <Box align="center">
+      <Box width={{ max: 'medium' }}>
+        <Heading level={2} size="small" marginTop="0">
+          {/* margin="2"  for heading if needed*/}
+          Analysis Type
+        </Heading>
 
-    //   <FormField
-    //     htmlFor="analysis_type"
-    //     name="analysis_type"
-    //     label="Type of analysis"
-    //   >
-    //     <Select
-    //       placeholder="Analysis Type"
-    //       id="analysis_type"
-    //       name="analysis_type"
-    //       options={['Java', 'C/C++/Pro*C', 'Shell']}
-    //       onChange={(e) => handleshowhide(e)}
-    //     />
-    //   </FormField>
-    //   {/* Div after Java Slelected */}
-    //   {showhide === 'Java' && (
-    //     <Box>
-    //       <FormField
-    //         label="Enter Source JDK"
-    //         htmlFor="source_jdk"
-    //         name="source_jdk"
-    //       >
-    //         <TextInput
-    //           placeholder="Enter Value"
-    //           id="source_jdk"
-    //           name="source_jdk"
-    //         />
-    //       </FormField>
-    //       <FormField
-    //         label="Enter Target JDK"
-    //         htmlFor="target_jdk"
-    //         name="target_jdk"
-    //       >
-    //         <TextInput
-    //           placeholder="Enter Value"
-    //           id="target_jdk"
-    //           name="target_jdk"
-    //         />
-    //       </FormField>
-
-    //       <FormField
-    //         label="Enter Source JSP"
-    //         htmlFor="source_jsp"
-    //         name="source_jsp"
-    //       >
-    //         <TextInput
-    //           placeholder="Enter Value"
-    //           id="source_jsp"
-    //           name="source_jsp"
-    //         />
-    //       </FormField>
-    //       <FormField
-    //         label="Enter Target JSP"
-    //         htmlFor="target_jsp"
-    //         name="target_jsp"
-    //       >
-    //         <TextInput
-    //           placeholder="Enter Value"
-    //           id="target_jsp"
-    //           name="target_jsp"
-    //         />
-    //       </FormField>
-
-    //       <FormField
-    //         label="Enter Source Servlet"
-    //         htmlFor="source_servlet"
-    //         name="source_servlet"
-    //       >
-    //         <TextInput
-    //           placeholder="Enter Value"
-    //           id="source_servlet"
-    //           name="source_servlet"
-    //         />
-    //       </FormField>
-    //       <FormField
-    //         label="Enter Target Servlet"
-    //         htmlFor="target_servlet"
-    //         name="target_servlet"
-    //       >
-    //         <TextInput
-    //           placeholder="Enter Value"
-    //           id="target_servlet"
-    //           name="target_servlet"
-    //         />
-    //       </FormField>
-    //     </Box>
-    //   )}
-
-    //   {/* Div after c/c++ selected */}
-    //   {showhide === 'C/C++/Pro*C' && (
-    //     <Box>
-    //       <FormField
-    //         label="Source Compiler"
-    //         htmlFor="source_compiler"
-    //         name="source_compiler"
-    //       >
-    //         <TextInput
-    //           placeholder="Enter Value"
-    //           id="source_compiler"
-    //           name="source_compiler"
-    //         />
-    //       </FormField>
-    //       <FormField
-    //         label="Source Compiler version"
-    //         htmlFor="source_compiler_version"
-    //         name="source_compiler_version"
-    //       >
-    //         <TextInput
-    //           placeholder="Enter Value"
-    //           id="source_compiler_version"
-    //           name="source_compiler_version"
-    //         />
-    //       </FormField>
-    //       <FormField
-    //         label="Target Compiler"
-    //         htmlFor="target_compiler"
-    //         name="target_compiler"
-    //       >
-    //         <TextInput
-    //           placeholder="Enter Value"
-    //           id="target_compiler"
-    //           name="target_compiler"
-    //         />
-    //       </FormField>
-    //       <FormField
-    //         label="Target Compiler version"
-    //         htmlFor="target_compiler_version"
-    //         name="target_compiler_version"
-    //       >
-    //         <TextInput
-    //           placeholder="Enter Value"
-    //           id="target_compiler_version"
-    //           name="target_compiler_version"
-    //         />
-    //       </FormField>
-    //       <FormField
-    //         label="Source Oracle version (Pro *c)"
-    //         htmlFor="source_oracle_version"
-    //         name="source_oracle_version"
-    //       >
-    //         <TextInput
-    //           placeholder="Enter Value"
-    //           id="source_oracle_version"
-    //           name="source_oracle_version"
-    //         />
-    //       </FormField>
-    //       <FormField
-    //         label="Target Oracle version (Pro *c)"
-    //         htmlFor="target_oracle_version"
-    //         name="target_oracle_version"
-    //       >
-    //         <TextInput
-    //           placeholder="Enter Value"
-    //           id="target_oracle_version"
-    //           name="target_oracle_version"
-    //         />
-    //       </FormField>
-    //     </Box>
-    //   )}
-
-    //   {/* Div after shell selected */}
-    //   {showhide === 'Shell' && (
-    //     <Box>
-    //       <FormField
-    //         label="Source Shell"
-    //         htmlFor="source_shell"
-    //         name="source_shell"
-    //       >
-    //         <TextInput
-    //           placeholder="Enter Value"
-    //           id="source_shell"
-    //           name="source_shell"
-    //         />
-    //       </FormField>
-    //       <FormField
-    //         label="Source Shell Version"
-    //         htmlFor="source_shell_version"
-    //         name="source_shell_version"
-    //       >
-    //         <TextInput
-    //           placeholder="Enter Value"
-    //           id="source_shell_version"
-    //           name="source_shell_version"
-    //         />
-    //       </FormField>
-    //       <FormField
-    //         label="Target Shell"
-    //         htmlFor="target_shell"
-    //         name="target_shell"
-    //       >
-    //         <TextInput
-    //           placeholder="Enter Value"
-    //           id="target_shell"
-    //           name="target_shell"
-    //         />
-    //       </FormField>
-    //       <FormField
-    //         label="Target Shell Version"
-    //         htmlFor="target_shell_version"
-    //         name="target_shell_version"
-    //       >
-    //         <TextInput
-    //           placeholder="Enter Value"
-    //           id="target_shell_version"
-    //           name="target_shell_version"
-    //         />
-    //       </FormField>
-    //     </Box>
-    //   )}
-
-    //   <Box data-testid="test-4" width="medium" margin="0" pad="small">
-    //     <FileInput
-    //       id="file_name"
-    //       name="file_name"
-    //       label="Source code"
-    //       accept=".zip"
-    //       messages={{
-    //         browse: numFiles > 0 ? 'Replace file' : 'Select file',
-    //       }}
-    //       disabled={fileInputDisabled}
-    //       required={true}
-    //       onChange={(event, { files }) => {
-    //         setNumFiles(files.length);
-    //         setProceedButtonDisabled(false);
-    //       }}
-    //     />
-    //   </Box>
-    // </Box>
-
-<Box align='center'>
-    <Box width={{ max: 'medium' }} >
-    <Heading level={2} size="small" marginTop="0">
-      {/* margin="2"  for heading if needed*/}
-      Analysis Type
-    </Heading>
-
-    <FormField
-      htmlFor="analysis_type"
-      name="analysis_type"
-      label="Type of analysis"
-    >
-      <Select
-        placeholder="Analysis Type"
-        id="analysis_type"
-        name="analysis_type"
-        options={[
-          "Java",
-          "Shell",
-          "C",
-          "C++",
-          "Pro*C",
-          "C/Pro*C",
-          "C++/Pro*C",
-        ]}
-        onChange={(e) => handleshowhide(e)}
-      />
-    </FormField>
-
-    {/* Div after Java Slelected */}
-    {showhide === "Java" && (
-      <Box width="medium">
         <FormField
-          label="Source JDK"
-          htmlFor="source_jdk"
-          name="source_jdk"
+          htmlFor="analysis_type"
+          name="analysis_type"
+          label="Type of analysis"
         >
-          <TextInput
-            placeholder="Enter Value"
-            id="source_jdk"
-            name="source_jdk"
-          />
-        </FormField>
-        <FormField
-          label="Target JDK"
-          htmlFor="target_jdk"
-          name="target_jdk"
-        >
-          <TextInput
-            placeholder="Enter Value"
-            id="target_jdk"
-            name="target_jdk"
+          <Select
+            placeholder="Analysis Type"
+            id="analysis_type"
+            name="analysis_type"
+            options={[
+              'Java',
+              'Shell',
+              'C',
+              'C++',
+              'Pro*C',
+              'C/Pro*C',
+              'C++/Pro*C',
+            ]}
+            onChange={(e) => handleshowhide(e)}
           />
         </FormField>
 
-        <FormField
-          label="Source JSP"
-          htmlFor="source_jsp"
-          name="source_jsp"
-        >
-          <TextInput
-            placeholder="Enter Value"
-            id="source_jsp"
-            name="source_jsp"
-          />
-        </FormField>
-        <FormField
-          label="Target JSP"
-          htmlFor="target_jsp"
-          name="target_jsp"
-        >
-          <TextInput
-            placeholder="Enter Value"
-            id="target_jsp"
-            name="target_jsp"
-          />
-        </FormField>
+        {/* Div after Java Slelected */}
+        {showhide === 'Java' && (
+          <Box width="medium">
+            <FormField
+              label="Source JDK"
+              htmlFor="source_jdk"
+              name="source_jdk"
+            >
+              <TextInput
+                placeholder="Enter Value"
+                id="source_jdk"
+                name="source_jdk"
+              />
+            </FormField>
+            <FormField
+              label="Target JDK"
+              htmlFor="target_jdk"
+              name="target_jdk"
+            >
+              <TextInput
+                placeholder="Enter Value"
+                id="target_jdk"
+                name="target_jdk"
+              />
+            </FormField>
 
-        <FormField
-          label="Source Servlet"
-          htmlFor="source_servlet"
-          name="source_servlet"
-        >
-          <TextInput
-            placeholder="Enter Value"
-            id="source_servlet"
-            name="source_servlet"
-          />
-        </FormField>
-        <FormField
-          label="Target Servlet"
-          htmlFor="target_servlet"
-          name="target_servlet"
-        >
-          <TextInput
-            placeholder="Enter Value"
-            id="target_servlet"
-            name="target_servlet"
-          />
-        </FormField>
-      </Box>
-    )}
+            <FormField
+              label="Source JSP"
+              htmlFor="source_jsp"
+              name="source_jsp"
+            >
+              <TextInput
+                placeholder="Enter Value"
+                id="source_jsp"
+                name="source_jsp"
+              />
+            </FormField>
+            <FormField
+              label="Target JSP"
+              htmlFor="target_jsp"
+              name="target_jsp"
+            >
+              <TextInput
+                placeholder="Enter Value"
+                id="target_jsp"
+                name="target_jsp"
+              />
+            </FormField>
 
-    {/* Div After C selected */}
-    {showhide === "C" && (
-      <Box>
-        <FormField
-          label="Source Compiler"
-          htmlFor="source_compiler"
-          name="source_compiler"
-        >
-          <TextInput
-            placeholder="Enter Value"
-            id="source_compiler"
-            name="source_compiler"
-          />
-        </FormField>
-        <FormField
-          label="Source Compiler version"
-          htmlFor="source_compiler_version"
-          name="source_compiler_version"
-        >
-          <TextInput
-            placeholder="Enter Value"
-            id="source_compiler_version"
-            name="source_compiler_version"
-          />
-        </FormField>
-        <FormField
-          label="Target Compiler"
-          htmlFor="target_compiler"
-          name="target_compiler"
-        >
-          <TextInput
-            placeholder="Enter Value"
-            id="target_compiler"
-            name="target_compiler"
-          />
-        </FormField>
-        <FormField
-          label="Target Compiler version"
-          htmlFor="target_compiler_version"
-          name="target_compiler_version"
-        >
-          <TextInput
-            placeholder="Enter Value"
-            id="target_compiler_version"
-            name="target_compiler_version"
-          />
-        </FormField>
-      </Box>
-    )}
+            <FormField
+              label="Source Servlet"
+              htmlFor="source_servlet"
+              name="source_servlet"
+            >
+              <TextInput
+                placeholder="Enter Value"
+                id="source_servlet"
+                name="source_servlet"
+              />
+            </FormField>
+            <FormField
+              label="Target Servlet"
+              htmlFor="target_servlet"
+              name="target_servlet"
+            >
+              <TextInput
+                placeholder="Enter Value"
+                id="target_servlet"
+                name="target_servlet"
+              />
+            </FormField>
+          </Box>
+        )}
 
-    {/* Div After C++ selected */}
-    {showhide === "C++" && (
-      <Box>
-        <FormField
-          label="Source Compiler"
-          htmlFor="source_compiler"
-          name="source_compiler"
-        >
-          <TextInput
-            placeholder="Enter Value"
-            id="source_compiler"
-            name="source_compiler"
-          />
-        </FormField>
-        <FormField
-          label="Source Compiler version"
-          htmlFor="source_compiler_version"
-          name="source_compiler_version"
-        >
-          <TextInput
-            placeholder="Enter Value"
-            id="source_compiler_version"
-            name="source_compiler_version"
-          />
-        </FormField>
-        <FormField
-          label="Target Compiler"
-          htmlFor="target_compiler"
-          name="target_compiler"
-        >
-          <TextInput
-            placeholder="Enter Value"
-            id="target_compiler"
-            name="target_compiler"
-          />
-        </FormField>
-        <FormField
-          label="Target Compiler version"
-          htmlFor="target_compiler_version"
-          name="target_compiler_version"
-        >
-          <TextInput
-            placeholder="Enter Value"
-            id="target_compiler_version"
-            name="target_compiler_version"
-          />
-        </FormField>
-      </Box>
-    )}
+        {/* Div After C selected */}
+        {showhide === 'C' && (
+          <Box>
+            <FormField
+              label="Source Compiler"
+              htmlFor="source_compiler"
+              name="source_compiler"
+            >
+              <TextInput
+                placeholder="Enter Value"
+                id="source_compiler"
+                name="source_compiler"
+              />
+            </FormField>
+            <FormField
+              label="Source Compiler version"
+              htmlFor="source_compiler_version"
+              name="source_compiler_version"
+            >
+              <TextInput
+                placeholder="Enter Value"
+                id="source_compiler_version"
+                name="source_compiler_version"
+              />
+            </FormField>
+            <FormField
+              label="Target Compiler"
+              htmlFor="target_compiler"
+              name="target_compiler"
+            >
+              <TextInput
+                placeholder="Enter Value"
+                id="target_compiler"
+                name="target_compiler"
+              />
+            </FormField>
+            <FormField
+              label="Target Compiler version"
+              htmlFor="target_compiler_version"
+              name="target_compiler_version"
+            >
+              <TextInput
+                placeholder="Enter Value"
+                id="target_compiler_version"
+                name="target_compiler_version"
+              />
+            </FormField>
+          </Box>
+        )}
 
-    {/* Div after Pro*C selected */}
-    {showhide === "Pro*C" && (
-      <Box>
-        <FormField
-          label="Source pre-compiler"
-          htmlFor="source_pre_compiler"
-          name="source_pre_compiler"
-        >
-          <TextInput
-            disabled={true}
-            placeholder="Oracle"
-            id="source_pre_compiler"
-            name="source_pre_compiler"
-          />
-        </FormField>
+        {/* Div After C++ selected */}
+        {showhide === 'C++' && (
+          <Box>
+            <FormField
+              label="Source Compiler"
+              htmlFor="source_compiler"
+              name="source_compiler"
+            >
+              <TextInput
+                placeholder="Enter Value"
+                id="source_compiler"
+                name="source_compiler"
+              />
+            </FormField>
+            <FormField
+              label="Source Compiler version"
+              htmlFor="source_compiler_version"
+              name="source_compiler_version"
+            >
+              <TextInput
+                placeholder="Enter Value"
+                id="source_compiler_version"
+                name="source_compiler_version"
+              />
+            </FormField>
+            <FormField
+              label="Target Compiler"
+              htmlFor="target_compiler"
+              name="target_compiler"
+            >
+              <TextInput
+                placeholder="Enter Value"
+                id="target_compiler"
+                name="target_compiler"
+              />
+            </FormField>
+            <FormField
+              label="Target Compiler version"
+              htmlFor="target_compiler_version"
+              name="target_compiler_version"
+            >
+              <TextInput
+                placeholder="Enter Value"
+                id="target_compiler_version"
+                name="target_compiler_version"
+              />
+            </FormField>
+          </Box>
+        )}
 
-        <FormField
-          label="Source pre-compiler version"
-          htmlFor="source_pre_compiler_version"
-          name="source_pre_compiler_version"
-        >
-          <TextInput
-            // disabled={true}
-            placeholder="Enter value"
-            id="source_pre_compiler_version"
-            name="source_pre_compiler_version"
-          />
-        </FormField>
+        {/* Div after Pro*C selected */}
+        {showhide === 'Pro*C' && (
+          <Box>
+            <FormField
+              label="Source pre-compiler"
+              htmlFor="source_pre_compiler"
+              name="source_pre_compiler"
+            >
+              <TextInput
+                disabled={true}
+                placeholder="Oracle"
+                id="source_pre_compiler"
+                name="source_pre_compiler"
+              />
+            </FormField>
 
-        <FormField
-          label="Target pre-compiler"
-          htmlFor="target_pre_compiler"
-          name="Target_pre_compiler"
-        >
-          <TextInput
-            placeholder="Enter value"
-            id="target_pre_compiler"
-            name="target_pre_compiler"
-          />
-        </FormField>
+            <FormField
+              label="Source pre-compiler version"
+              htmlFor="source_pre_compiler_version"
+              name="source_pre_compiler_version"
+            >
+              <TextInput
+                // disabled={true}
+                placeholder="Enter value"
+                id="source_pre_compiler_version"
+                name="source_pre_compiler_version"
+              />
+            </FormField>
 
-        <FormField
-          label="Target pre-compiler version"
-          htmlFor="taget_pre_compiler_version"
-          name="target_pre_compiler_version"
-        >
-          <TextInput
-            placeholder="Enter value"
-            id="target_pre_compiler_version"
-            name="target_pre_compiler_version"
-          />
-        </FormField>
-      </Box>
-    )}
+            <FormField
+              label="Target pre-compiler"
+              htmlFor="target_pre_compiler"
+              name="Target_pre_compiler"
+            >
+              <TextInput
+                placeholder="Enter value"
+                id="target_pre_compiler"
+                name="target_pre_compiler"
+              />
+            </FormField>
 
-    {/* Div after c/c++ selected */}
-    {showhide === "C/C++/Pro*C" && (
-      <Box>
-        <FormField
-          label="Source Compiler"
-          htmlFor="source_compiler"
-          name="source_compiler"
-        >
-          <TextInput
-            placeholder="Enter Value"
-            id="source_compiler"
-            name="source_compiler"
-          />
-        </FormField>
-        <FormField
-          label="Source Compiler version"
-          htmlFor="source_compiler_version"
-          name="source_compiler_version"
-        >
-          <TextInput
-            placeholder="Enter Value"
-            id="source_compiler_version"
-            name="source_compiler_version"
-          />
-        </FormField>
-        <FormField
-          label="Target Compiler"
-          htmlFor="target_compiler"
-          name="target_compiler"
-        >
-          <TextInput
-            placeholder="Enter Value"
-            id="target_compiler"
-            name="target_compiler"
-          />
-        </FormField>
-        <FormField
-          label="Target Compiler version"
-          htmlFor="target_compiler_version"
-          name="target_compiler_version"
-        >
-          <TextInput
-            placeholder="Enter Value"
-            id="target_compiler_version"
-            name="target_compiler_version"
-          />
-        </FormField>
-        <FormField
-          label="Source pre-compiler"
-          htmlFor="source_pre_compiler"
-          name="source_pre_compiler"
-        >
-          <TextInput
-            disabled={true}
-            placeholder="Oracle"
-            id="source_pre_compiler"
-            name="source_pre_compiler"
-          />
-        </FormField>
+            <FormField
+              label="Target pre-compiler version"
+              htmlFor="target_pre_compiler_version"
+              name="target_pre_compiler_version"
+            >
+              <TextInput
+                placeholder="Enter value"
+                id="target_pre_compiler_version"
+                name="target_pre_compiler_version"
+              />
+            </FormField>
+          </Box>
+        )}
 
-        <FormField
-          label="Source pre-compiler version"
-          htmlFor="source_pre_compiler_version"
-          name="source_pre_compiler_version"
-        >
-          <TextInput
-            disabled={true}
-            placeholder="Oracle"
-            id="source_pre_compiler_version"
-            name="source_pre_compiler_version"
-          />
-        </FormField>
+        {/* Div after c/c++ selected */}
+        {showhide === 'C/C++/Pro*C' && (
+          <Box>
+            <FormField
+              label="Source Compiler"
+              htmlFor="source_compiler"
+              name="source_compiler"
+            >
+              <TextInput
+                placeholder="Enter Value"
+                id="source_compiler"
+                name="source_compiler"
+              />
+            </FormField>
+            <FormField
+              label="Source Compiler version"
+              htmlFor="source_compiler_version"
+              name="source_compiler_version"
+            >
+              <TextInput
+                placeholder="Enter Value"
+                id="source_compiler_version"
+                name="source_compiler_version"
+              />
+            </FormField>
+            <FormField
+              label="Target Compiler"
+              htmlFor="target_compiler"
+              name="target_compiler"
+            >
+              <TextInput
+                placeholder="Enter Value"
+                id="target_compiler"
+                name="target_compiler"
+              />
+            </FormField>
+            <FormField
+              label="Target Compiler version"
+              htmlFor="target_compiler_version"
+              name="target_compiler_version"
+            >
+              <TextInput
+                placeholder="Enter Value"
+                id="target_compiler_version"
+                name="target_compiler_version"
+              />
+            </FormField>
+            <FormField
+              label="Source pre-compiler"
+              htmlFor="source_pre_compiler"
+              name="source_pre_compiler"
+            >
+              <TextInput
+                disabled={true}
+                placeholder="Oracle"
+                id="source_pre_compiler"
+                name="source_pre_compiler"
+              />
+            </FormField>
 
-        <FormField
-          label="Target pre-compiler"
-          htmlFor="target_pre_compiler"
-          name="Target_pre_compiler"
-        >
-          <TextInput
-            placeholder="Enter value"
-            id="target_pre_compiler"
-            name="target_pre_compiler"
-          />
-        </FormField>
+            <FormField
+              label="Source pre-compiler version"
+              htmlFor="source_pre_compiler_version"
+              name="source_pre_compiler_version"
+            >
+              <TextInput
+                disabled={true}
+                placeholder="Oracle"
+                id="source_pre_compiler_version"
+                name="source_pre_compiler_version"
+              />
+            </FormField>
 
-        <FormField
-          label="Target pre-compiler version"
-          htmlFor="taget_pre_compiler_version"
-          name="target_pre_compiler_version"
-        >
-          <TextInput
-            placeholder="Enter value"
-            id="target_pre_compiler_version"
-            name="target_pre_compiler_version"
-          />
-        </FormField>
-      </Box>
-    )}
+            <FormField
+              label="Target pre-compiler"
+              htmlFor="target_pre_compiler"
+              name="Target_pre_compiler"
+            >
+              <TextInput
+                placeholder="Enter value"
+                id="target_pre_compiler"
+                name="target_pre_compiler"
+              />
+            </FormField>
 
-    {/* Div after shell selected */}
-    {showhide === "Shell" && (
-      <Box>
-        <FormField
-          label="Source Shell"
-          htmlFor="source_shell"
-          name="source_shell"
-        >
-          <TextInput
-            placeholder="Enter Value"
-            id="source_shell"
-            name="source_shell"
-          />
-        </FormField>
-        <FormField
-          label="Source Shell Version"
-          htmlFor="source_shell_version"
-          name="source_shell_version"
-        >
-          <TextInput
-            placeholder="Enter Value"
-            id="source_shell_version"
-            name="source_shell_version"
-          />
-        </FormField>
-        <FormField
-          label="Target Shell"
-          htmlFor="target_shell"
-          name="target_shell"
-        >
-          <TextInput
-            placeholder="Enter Value"
-            id="target_shell"
-            name="target_shell"
-          />
-        </FormField>
-        <FormField
-          label="Target Shell Version"
-          htmlFor="target_shell_version"
-          name="target_shell_version"
-        >
-          <TextInput
-            placeholder="Enter Value"
-            id="target_shell_version"
-            name="target_shell_version"
-          />
-        </FormField>
-      </Box>
-    )}
+            <FormField
+              label="Target pre-compiler version"
+              htmlFor="target_pre_compiler_version"
+              name="target_pre_compiler_version"
+            >
+              <TextInput
+                placeholder="Enter value"
+                id="target_pre_compiler_version"
+                name="target_pre_compiler_version"
+              />
+            </FormField>
+          </Box>
+        )}
 
-    <Box data-testid="test-4" width="medium" margin="0" pad="small">
-      <Text>Source Code</Text>
-      <FileInput
-        id="file_name"
-        name="file_name"
-        label="Source code"
-        accept=".zip"
-        messages={{
-          browse: numFiles > 0 ? "Replace file" : "Select file",
-        }}
-        disabled={fileInputDisabled}
-        required={true}
-        onChange={(event, { files }) => {
-          setNumFiles(files.length);
-          setProceedButtonDisabled(false);
-        }}
-      />
+        {/* Div after shell selected */}
+        {showhide === 'Shell' && (
+          <Box>
+            <FormField
+              label="Source Shell"
+              htmlFor="source_shell"
+              name="source_shell"
+            >
+              <TextInput
+                placeholder="Enter Value"
+                id="source_shell"
+                name="source_shell"
+              />
+            </FormField>
+            <FormField
+              label="Source Shell Version"
+              htmlFor="source_shell_version"
+              name="source_shell_version"
+            >
+              <TextInput
+                placeholder="Enter Value"
+                id="source_shell_version"
+                name="source_shell_version"
+              />
+            </FormField>
+            <FormField
+              label="Target Shell"
+              htmlFor="target_shell"
+              name="target_shell"
+            >
+              <TextInput
+                placeholder="Enter Value"
+                id="target_shell"
+                name="target_shell"
+              />
+            </FormField>
+            <FormField
+              label="Target Shell Version"
+              htmlFor="target_shell_version"
+              name="target_shell_version"
+            >
+              <TextInput
+                placeholder="Enter Value"
+                id="target_shell_version"
+                name="target_shell_version"
+              />
+            </FormField>
+          </Box>
+        )}
 
-      {/* <Box
+        <Box data-testid="test-4" width="medium" margin="0" pad="small">
+          <Text>Source Code</Text>
+          <FileInput
+            id="file_name"
+            name="file_name"
+            label="Source code"
+            accept=".zip"
+            messages={{
+              browse: numFiles > 0 ? 'Replace file' : 'Select file',
+            }}
+            disabled={fileInputDisabled}
+            required={true}
+            onChange={(event, { files }) => {
+              setNumFiles(files.length);
+              setProceedButtonDisabled(false);
+            }}
+          />
+
+          {/* <Box
         margin={{ top: "small", left: "small" }}
         direction="row"
         gap="large"
@@ -1141,26 +1010,26 @@ export const StepThree = (nextId) => {
         <Button href="/review">Review + Create</Button>
         <Button onClick={(e) => handleSpinner(e)}>Proceed</Button>
       </Box> */}
-      {showSpinner && (
-        <Box>
-          <Layer model>
-            <Box pad="small">
-              <Text>File uploading in Process</Text>
-              <Box align="center">
-                <Spinner
-                  message={{
-                    start: "Loading data.",
-                    end: "Data has been loaded.",
-                  }}
-                />
-              </Box>
+          {showSpinner && (
+            <Box>
+              <Layer model>
+                <Box pad="small">
+                  <Text>File uploading in Process</Text>
+                  <Box align="center">
+                    <Spinner
+                      message={{
+                        start: 'Loading data.',
+                        end: 'Data has been loaded.',
+                      }}
+                    />
+                  </Box>
+                </Box>
+              </Layer>
             </Box>
-          </Layer>
+          )}
         </Box>
-      )}
+      </Box>
     </Box>
-  </Box>
-  </Box>
   );
 };
 
@@ -1174,15 +1043,15 @@ const data = [
 export const steps = [
   {
     inputs: <StepOne />,
-    title: 'Step 1 title',
+    title: 'Previous',
   },
   {
     inputs: <StepTwo />,
-    title: 'Step 2 title',
+    title: 'Previous',
   },
   {
     inputs: <StepThree />,
-    title: 'Step 3 title',
+    title: 'Previous',
   },
 ];
 

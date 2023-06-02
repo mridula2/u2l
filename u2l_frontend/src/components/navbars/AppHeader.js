@@ -30,9 +30,9 @@ export const AppHeader = () => {
     {
       label: 'Home',
       path: '/dashboard',
-      onClick: () => {
-        navigate(headerLinks[0].path);
-      },
+      backgroundColor: '#0000000A',
+      onClick: () => { navigate(headerLinks[0].path) }
+    
     },
     {
       label: 'Documentation',
@@ -121,7 +121,7 @@ export const AppHeader = () => {
         {!['xsmall', 'small'].includes(size) ? (
           <Nav direction='row' gap='small'>
             {loginPageHeaderLinks.map((item) => (
-              <Button label={item.label} key={item.label} href={item.path} />
+              <Button style={{ borderRadius: '0' }} label={item.label} key={item.label} href={item.path} />
             ))}
           </Nav>
         ) : (
