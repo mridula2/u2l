@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { Box, Button, Footer, ResponsiveContext, Text, Anchor } from 'grommet';
-import './LinkPage.css';
+// import './LinkPage.css';
 
 export const LoginPageFooter = () => {
   const size = useContext(ResponsiveContext);

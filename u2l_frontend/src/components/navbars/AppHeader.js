@@ -30,7 +30,6 @@ export const AppHeader = () => {
     {
       label: 'Home',
       path: '/dashboard',
-      backgroundColor: '#0000000A',
       onClick: () => { navigate(headerLinks[0].path) }
     
     },
@@ -174,6 +173,7 @@ export const AppHeader = () => {
                     label={item.label}
                     key={item.label}
                     href={item.path}
+                    style={{ borderRadius: '0' }}
                   />
                 ))}
               </Nav>

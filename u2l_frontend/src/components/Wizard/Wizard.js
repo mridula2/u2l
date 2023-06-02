@@ -33,6 +33,7 @@ import { FormNext, FormPreviousLink, FormPrevious } from 'grommet-icons';
 // import BannerNotificationInfo from '../GlobalBannerNotification';
 import { getWidth } from './Utils';
 import ProjectService from '../../api/ProjectService';
+import WizardUtils from '../../utils/WizardUtils';
 
 const WizardValidationExample = ({ containerRef }) => {
   const location = useLocation();
@@ -174,64 +175,7 @@ const WizardValidationExample = ({ containerRef }) => {
   );
 
   function handleSubmit(value) {
-    let data = new FormData();
-    data.append('project_name', formValues.project_name);
-    data.append('project_client', formValues.project_client);
-    data.append('project_manager', formValues.project_manager);
-    data.append('application_name', formValues.application_name);
-    data.append('source_os', formValues.source_os);
-    data.append('source_os_version', formValues.source_os_version);
-    data.append('target_os', formValues.target_os);
-    data.append('target_os_version', formValues.target_os_version);
-
-    data.append('analysis_type', formValues.analysis_type);
-    // --------------------------------Java------------------------------------------ //
-    if (formValues.analysis_type === 'Java') {
-      data.append('source_jdk', formValues.source_jdk);
-      data.append('target_jdk', formValues.target_jdk);
-      data.append('source_jsp', formValues.source_jsp);
-      data.append('target_jsp', formValues.target_jsp);
-      data.append('source_servlet', formValues.source_servlet);
-      data.append('target_servlet', formValues.target_servlet);
-      // --------------------------------C/C++/Pro*C------------------------------------------ //
-    } else if (formValues.analysis_type === 'C/C++/Pro*C') {
-      data.append('source_compiler', formValues.source_compiler);
-      data.append('source_compiler_version', formValues.source_compiler_version);
-      data.append('target_compiler', formValues.target_compiler);
-      data.append('target_compiler_version', formValues.target_compiler_version);
-      data.append('target_compiler', formValues.source_pre_compiler);
-      data.append('target_compiler', formValues.source_pre_compiler_version);
-      data.append('target_compiler', formValues.target_pre_compiler);
-      data.append('target_compiler', formValues.target_pre_compiler_version);
-      // --------------------------------Pro*C------------------------------------------ //
-    } else if (formValues.analysis_type === 'Pro*C') {
-      data.append('target_compiler', formValues.source_pre_compiler);
-      data.append('target_compiler', formValues.source_pre_compiler_version);
-      data.append('target_compiler', formValues.target_pre_compiler);
-      data.append('target_compiler', formValues.target_pre_compiler_version);
-      // --------------------------------C------------------------------------------ //
-    } else if (formValues.analysis_type === 'C') {
-      data.append('source_compiler', formValues.source_compiler);
-      data.append('source_compiler_version', formValues.source_compiler_version);
-      data.append('target_compiler', formValues.target_compiler);
-      data.append('target_compiler_version', formValues.target_compiler_version);
-      // --------------------------------C------------------------------------------ //
-    } else if (formValues.analysis_type === 'C++') {
-      data.append('source_compiler', formValues.source_compiler);
-      data.append('source_compiler_version', formValues.source_compiler_version);
-      data.append('target_compiler', formValues.target_compiler);
-      data.append('target_compiler_version', formValues.target_compiler_version);
-    }
-    else if (formValues.analysis_type === 'Shell') {
-      data.append('source_shell', formValues.source_shell);
-      data.append('source_shell_version', formValues.source_shell_version);
-      data.append('target_shell', formValues.target_shell);
-      data.append('target_shell_version', formValues.target_shell_version);
-    }
-
-    data.append('file_name', formValues.file_name[0]);
-    console.log(formValues);
-    console.log(formValues.file_name[0]);
+    const data = WizardUtils.appendFormData(formValues)
 
     setNotificationMessage('Analysis in progress please wait!');
     setStatus('info');
@@ -467,13 +411,13 @@ export const StepTwo = (nextId) => {
           label="Source OS version"
           htmlFor="source_os_version"
           name="source_os_version"
+          required={true}
         >
           <TextInput
             placeholder="Enter Value"
             id="source_os_version"
             name="source_os_version"
-            type="number"
-            min={0}
+           
           />
         </FormField>
         <FormField
@@ -499,8 +443,6 @@ export const StepTwo = (nextId) => {
             placeholder="Enter Value"
             id="target_os_version"
             name="target_os_version"
-            type='number'
-            min={0}
           />
         </FormField>
       </Box>
@@ -612,6 +554,7 @@ export const StepThree = (nextId) => {
               label="Source JDK"
               htmlFor="source_jdk"
               name="source_jdk"
+              required={true}
             >
               <TextInput
                 placeholder="Enter Value"
@@ -623,6 +566,7 @@ export const StepThree = (nextId) => {
               label="Target JDK"
               htmlFor="target_jdk"
               name="target_jdk"
+              required={true}
             >
               <TextInput
                 placeholder="Enter Value"
@@ -686,6 +630,7 @@ export const StepThree = (nextId) => {
               label="Source Compiler"
               htmlFor="source_compiler"
               name="source_compiler"
+              required={true}
             >
               <TextInput
                 placeholder="Enter Value"
@@ -708,6 +653,7 @@ export const StepThree = (nextId) => {
               label="Target Compiler"
               htmlFor="target_compiler"
               name="target_compiler"
+              required={true}
             >
               <TextInput
                 placeholder="Enter Value"
@@ -736,6 +682,7 @@ export const StepThree = (nextId) => {
               label="Source Compiler"
               htmlFor="source_compiler"
               name="source_compiler"
+              required={true}
             >
               <TextInput
                 placeholder="Enter Value"
@@ -758,6 +705,7 @@ export const StepThree = (nextId) => {
               label="Target Compiler"
               htmlFor="target_compiler"
               name="target_compiler"
+              required={true}
             >
               <TextInput
                 placeholder="Enter Value"
@@ -786,10 +734,10 @@ export const StepThree = (nextId) => {
               label="Source pre-compiler"
               htmlFor="source_pre_compiler"
               name="source_pre_compiler"
+              required={true}
             >
               <TextInput
-                disabled={true}
-                placeholder="Oracle"
+                placeholder="Enter value"
                 id="source_pre_compiler"
                 name="source_pre_compiler"
               />
@@ -799,9 +747,9 @@ export const StepThree = (nextId) => {
               label="Source pre-compiler version"
               htmlFor="source_pre_compiler_version"
               name="source_pre_compiler_version"
+              required={true}
             >
               <TextInput
-                // disabled={true}
                 placeholder="Enter value"
                 id="source_pre_compiler_version"
                 name="source_pre_compiler_version"
@@ -824,6 +772,7 @@ export const StepThree = (nextId) => {
               label="Target pre-compiler version"
               htmlFor="target_pre_compiler_version"
               name="target_pre_compiler_version"
+              required={true}
             >
               <TextInput
                 placeholder="Enter value"
@@ -834,7 +783,7 @@ export const StepThree = (nextId) => {
           </Box>
         )}
 
-        {/* Div after c/c++ selected */}
+        {/* Div after c/c++/Pro*C selected */}
         {showhide === 'C/C++/Pro*C' && (
           <Box>
             <FormField
@@ -940,6 +889,7 @@ export const StepThree = (nextId) => {
               label="Source Shell"
               htmlFor="source_shell"
               name="source_shell"
+              required={true}
             >
               <TextInput
                 placeholder="Enter Value"
@@ -962,6 +912,7 @@ export const StepThree = (nextId) => {
               label="Target Shell"
               htmlFor="target_shell"
               name="target_shell"
+              required={true}
             >
               <TextInput
                 placeholder="Enter Value"
@@ -981,6 +932,210 @@ export const StepThree = (nextId) => {
               />
             </FormField>
           </Box>
+        )}
+
+        {/* Div after C/Pro*C selected */}
+        {showhide === 'C/Pro*C' && (
+          <Box>
+            <FormField
+              label="Source Compiler"
+              htmlFor="source_compiler"
+              name="source_compiler"
+              required={true}
+            >
+              <TextInput
+                placeholder="Enter Value"
+                id="source_compiler"
+                name="source_compiler"
+              />
+            </FormField>
+            <FormField
+              label="Source Compiler version"
+              htmlFor="source_compiler_version"
+              name="source_compiler_version"
+            >
+              <TextInput
+                placeholder="Enter Value"
+                id="source_compiler_version"
+                name="source_compiler_version"
+              />
+            </FormField>
+            <FormField
+              label="Target Compiler"
+              htmlFor="target_compiler"
+              name="target_compiler"
+              required={true}
+            >
+              <TextInput
+                placeholder="Enter Value"
+                id="target_compiler"
+                name="target_compiler"
+              />
+            </FormField>
+            <FormField
+              label="Target Compiler version"
+              htmlFor="target_compiler_version"
+              name="target_compiler_version"
+            >
+              <TextInput
+                placeholder="Enter Value"
+                id="target_compiler_version"
+                name="target_compiler_version"
+              />
+            </FormField>
+            <FormField
+              label="Source pre-compiler"
+              htmlFor="source_pre_compiler"
+              name="source_pre_compiler"
+              required={true}
+            >
+              <TextInput
+                placeholder="Enter value"
+                id="source_pre_compiler"
+                name="source_pre_compiler"
+              />
+            </FormField>
+
+            <FormField
+              label="Source pre-compiler version"
+              htmlFor="source_pre_compiler_version"
+              name="source_pre_compiler_version"
+              required={true}
+            >
+              <TextInput
+                placeholder="Enter value"
+                id="source_pre_compiler_version"
+                name="source_pre_compiler_version"
+              />
+            </FormField>
+
+            <FormField
+              label="Target pre-compiler"
+              htmlFor="target_pre_compiler"
+              name="Target_pre_compiler"
+            >
+              <TextInput
+                placeholder="Enter value"
+                id="target_pre_compiler"
+                name="target_pre_compiler"
+              />
+            </FormField>
+
+            <FormField
+              label="Target pre-compiler version"
+              htmlFor="target_pre_compiler_version"
+              name="target_pre_compiler_version"
+              required={true}
+            >
+              <TextInput
+                placeholder="Enter value"
+                id="target_pre_compiler_version"
+                name="target_pre_compiler_version"
+              />
+            </FormField>
+          </Box>
+        )}
+
+        {/* Div after C++/Pro*C selected */}
+        {showhide === 'C++/Pro*C' && (
+         <Box>
+         <FormField
+           label="Source Compiler"
+           htmlFor="source_compiler"
+           name="source_compiler"
+           required={true}
+         >
+           <TextInput
+             placeholder="Enter Value"
+             id="source_compiler"
+             name="source_compiler"
+           />
+         </FormField>
+         <FormField
+           label="Source Compiler version"
+           htmlFor="source_compiler_version"
+           name="source_compiler_version"
+         >
+           <TextInput
+             placeholder="Enter Value"
+             id="source_compiler_version"
+             name="source_compiler_version"
+           />
+         </FormField>
+         <FormField
+           label="Target Compiler"
+           htmlFor="target_compiler"
+           name="target_compiler"
+           required={true}
+         >
+           <TextInput
+             placeholder="Enter Value"
+             id="target_compiler"
+             name="target_compiler"
+           />
+         </FormField>
+         <FormField
+           label="Target Compiler version"
+           htmlFor="target_compiler_version"
+           name="target_compiler_version"
+         >
+           <TextInput
+             placeholder="Enter Value"
+             id="target_compiler_version"
+             name="target_compiler_version"
+           />
+         </FormField>
+         <FormField
+           label="Source pre-compiler"
+           htmlFor="source_pre_compiler"
+           name="source_pre_compiler"
+           required={true}
+         >
+           <TextInput
+             placeholder="Enter value"
+             id="source_pre_compiler"
+             name="source_pre_compiler"
+           />
+         </FormField>
+
+         <FormField
+           label="Source pre-compiler version"
+           htmlFor="source_pre_compiler_version"
+           name="source_pre_compiler_version"
+           required={true}
+         >
+           <TextInput
+             placeholder="Enter value"
+             id="source_pre_compiler_version"
+             name="source_pre_compiler_version"
+           />
+         </FormField>
+
+         <FormField
+           label="Target pre-compiler"
+           htmlFor="target_pre_compiler"
+           name="Target_pre_compiler"
+         >
+           <TextInput
+             placeholder="Enter value"
+             id="target_pre_compiler"
+             name="target_pre_compiler"
+           />
+         </FormField>
+
+         <FormField
+           label="Target pre-compiler version"
+           htmlFor="target_pre_compiler_version"
+           name="target_pre_compiler_version"
+           required={true}
+         >
+           <TextInput
+             placeholder="Enter value"
+             id="target_pre_compiler_version"
+             name="target_pre_compiler_version"
+           />
+         </FormField>
+       </Box>
         )}
 
         <Box data-testid="test-4" width="medium" margin="0" pad="small">

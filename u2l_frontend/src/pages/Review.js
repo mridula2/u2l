@@ -1,11 +1,32 @@
 import React from 'react';
 import { Box, Text, Button } from 'grommet';
-import { FormEdit } from 'grommet-icons';
+import { FormEdit, Previous } from 'grommet-icons';
 import { useLocation, useNavigate } from 'react-router-dom';
+import WizardUtils from '../utils/WizardUtils';
+import ProjectService from '../api/ProjectService';
 
 const Review = () => {
   const location = useLocation();
   const navigate = useNavigate();
+
+  function handleSubmit(value) {
+    const data = WizardUtils.appendFormData(location.state.formValues)
+ 
+    //  setNotificationMessage('Analysis in progress please wait!');
+    //  setStatus('info');
+    //  setNotificationVisible(true);
+ 
+     ProjectService.postProjectDetails(data)
+       .then((response) => {
+         // response.data
+         console.log(response);
+         navigate('/dashboard');
+       })
+       .catch((error) => {
+        //  setNotificationMessage(error.response.data.message);
+        //  setNotificationVisible(true);
+       });
+   }
 
   const handleTabs = (event, nextId) => {
     event.preventDefault();
@@ -483,8 +504,8 @@ const Review = () => {
         </Box>
 
         <Box direction="row" gap="medium" margin={{ left: "50%", top: "10%" }} >
-          <Button>Preview</Button>
-          <Button primary label="Create"></Button>
+          <Button icon={<Previous />} label="Previous" style={{borderRadius:"0"}}></Button>
+          <Button primary label="Create" onClick={handleSubmit} style={{borderRadius:"0"}}></Button>
         </Box>
       </Box>
     </Box>

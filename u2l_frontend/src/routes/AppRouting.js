@@ -1,9 +1,7 @@
 import { Route,Routes } from "react-router-dom";
 import axios from "axios";
-
 import LoginPage from "../pages/Login/LoginPage";
 import LogDetails from "../pages/LogDetails";
-// import LoginPage from "../pages/LoginPage";
 import PdfPreview from "../pages/pdf/PdfPreview";
 import PdfView from "../pages/pdf/PdfViewer";
 import Review from "../pages/Review";
@@ -11,6 +9,7 @@ import ProjectDetails from "../pages/ProjectDetails";
 import Dashboard from "../pages/Dashboard";
 import WizardValidationExample from "../components/Wizard/Wizard";
 import SignUp from "../pages/SignUp";
+import Documentation from "../pages/Documentation";
 
 
 const AppRouting = () => {
@@ -18,7 +17,6 @@ const AppRouting = () => {
     return (
       <Routes>
         <Route path="/" element={<LoginPage />} />
-        {/* <Route path="/login" element={<LoginPage />} /> */}
         <Route path="/logdetails" element={<LogDetails />} />
         <Route path="/pdfpreview" element={<PdfPreview />} />
         <Route path="/pdfview" element={<PdfView />} />
@@ -27,6 +25,9 @@ const AppRouting = () => {
         <Route path="/review" element={<Review />} /> 
         <Route path="/wizard" element={<WizardValidationExample />} />  
         <Route path="/signup" element={<SignUp />} />  
+        <Route path="/documentation" element={<Documentation />} />  
+        
+
         
       </Routes>
     );
