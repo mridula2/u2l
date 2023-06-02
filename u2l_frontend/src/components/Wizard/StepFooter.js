@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
 import { Box, Button, Footer, ResponsiveContext } from 'grommet';
-import { FormNextLink, LinkPrevious } from 'grommet-icons';
+import { FormNext, Previous } from 'grommet-icons';
 import WizardContext from '../Wizard/WizardContext';
 
 const StepFooter = ({ nextId, previousId, onNavigate, ...rest }) => {
@@ -21,6 +21,7 @@ const StepFooter = ({ nextId, previousId, onNavigate, ...rest }) => {
     >
       <Footer
         justify="end"
+        // margin={{left:"large"}}
         pad={
           !['xsmall', 'small'].includes(size)
             ? { vertical: 'medium' }
@@ -37,11 +38,11 @@ const StepFooter = ({ nextId, previousId, onNavigate, ...rest }) => {
             label={
               !['xsmall', 'small'].includes(size)
                 ? (steps[activeIndex - 1] && steps[activeIndex - 1].title) ||
-                  `Step ${activeStep - 1} title`
+                `Step ${activeStep - 1} title`
                 : // `Previous`
-                  undefined
+                undefined
             }
-            icon={<LinkPrevious />}
+            icon={<Previous />}
             onClick={() => setActiveIndex(activeIndex - 1)}
           />
         )}
@@ -59,8 +60,8 @@ const StepFooter = ({ nextId, previousId, onNavigate, ...rest }) => {
 
         <Button
           id={nextId}
-          icon={<FormNextLink />}
-          primary
+          icon={<FormNext />}
+
           reverse
           label={activeIndex === steps.length - 1 ? 'Proceed' : 'Next'}
           form={`${id}-form`}
