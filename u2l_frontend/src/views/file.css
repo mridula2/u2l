@@ -1,0 +1,669 @@
+/* Screen Shot 2022-02-15 at 9.16 1 */
+.avatar{
+ /* Theme=Light, Type=Initials, Size=Medium, Style=Circle, Color=Orange */
+
+position: absolute;
+width: 48px;
+height: 48px;
+left: 1107px;
+top: 1400px;
+
+/* Light / Primary, Orange */
+background: #FFBC44;
+border-radius: 24px;
+
+
+/* Initials */
+
+position: absolute;
+width: 16px;
+height: 24px;
+left: calc(50% - 16px/2);
+top: calc(50% - 24px/2);
+
+/* Paragraph / Desktop / default */
+font-family: 'MetricHPEXS';
+font-style: normal;
+font-weight: 400;
+font-size: 18px;
+line-height: 24px;
+/* identical to box height, or 133% */
+text-align: center;
+
+/* Light/Text, strong */
+color: #000000;
+
+
+}
+
+
+
+
+
+
+.name
+{
+position: absolute;
+width: 459px;
+height: 301px;
+left: 75px;
+top: 1304px;
+filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25));
+}
+
+.name2
+{
+    /* Theme=Light, Platform=GLCP, HPE Logo=Default, # of Tabs=4 */
+
+box-sizing: border-box;
+
+position: absolute;
+width: 1920px;
+height: 72px;
+left: 356px;
+top: 740px;
+
+/* Light / Background
+
+Know as `background` in the theme, this used by default for all layout elements created. This can also be applied form, button, and header backgrounds.
+*/
+background: #FFFFFF;
+/* Light/Border, weak
+
+Border or `border-weak` in the theme, is used to provide speration between or wrap around content elements. The weak border should be used when the seperation or wrappong of content is more subdued to create style. In it's subtle we use weak to also denote diabled state borders.
+*/
+border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+
+
+/* FPO */
+
+position: absolute;
+visibility: hidden;
+width: 1030px;
+height: 60px;
+left: 432px;
+top: 6px;
+
+
+
+/* FPO */
+
+position: absolute;
+width: 93px;
+height: 60px;
+left: 432px;
+top: 6px;
+
+font-family: 'MetricHPEXS';
+font-style: italic;
+font-weight: 700;
+font-size: 54px;
+line-height: 60px;
+/* identical to box height, or 111% */
+
+
+
+/* FPO */
+
+position: absolute;
+width: 93px;
+height: 60px;
+left: 1369px;
+top: 6px;
+
+font-family: 'MetricHPEXS';
+font-style: italic;
+font-weight: 700;
+font-size: 54px;
+line-height: 60px;
+/* identical to box height, or 111% */
+
+
+
+/* FPO */
+
+position: absolute;
+width: 93px;
+height: 60px;
+left: 921px;
+top: 6px;
+
+font-family: 'MetricHPEXS';
+font-style: italic;
+font-weight: 700;
+font-size: 54px;
+line-height: 60px;
+/* identical to box height, or 111% */
+
+
+
+/* Identifiers */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+justify-content: flex-end;
+align-items: center;
+padding: 0px;
+gap: 36px;
+
+position: absolute;
+width: 228px;
+height: 48px;
+right: 48px;
+top: calc(50% - 48px/2);
+
+
+
+/* Notification */
+
+width: 24px;
+height: 24px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Vector */
+
+position: absolute;
+left: 4.17%;
+right: 4.17%;
+top: 0%;
+bottom: 0%;
+
+/* Light/Text, strong
+
+Strong Text is used for important content to stand out. Strong Text should be used for all button label states (excluding disabled), 'enabled' and 'has-value' input types, and anchor links.
+*/
+background: #000000;
+
+
+/* Help */
+
+width: 24px;
+height: 24px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+
+
+/* Rectangle 99 */
+
+position: absolute;
+left: 0%;
+right: 0%;
+top: 0%;
+bottom: 0%;
+
+
+
+/* Group 1006 */
+
+position: absolute;
+left: 4.17%;
+right: 4.17%;
+top: 4.17%;
+bottom: 4.17%;
+
+
+
+/* Path */
+
+position: absolute;
+left: 4.17%;
+right: 4.17%;
+top: 4.17%;
+bottom: 4.17%;
+
+/* Light/Text, strong
+
+Strong Text is used for important content to stand out. Strong Text should be used for all button label states (excluding disabled), 'enabled' and 'has-value' input types, and anchor links.
+*/
+border: 2px solid #000000;
+border-radius: 4px;
+
+
+/* Path */
+
+position: absolute;
+left: 37.5%;
+right: 37.5%;
+top: 27.08%;
+bottom: 41.67%;
+
+/* Light/Text, strong
+
+Strong Text is used for important content to stand out. Strong Text should be used for all button label states (excluding disabled), 'enabled' and 'has-value' input types, and anchor links.
+*/
+border: 2px solid #000000;
+
+
+/* Path */
+
+position: absolute;
+left: 47.92%;
+right: 47.92%;
+top: 67.84%;
+bottom: 27.99%;
+
+/* Light/Text, strong
+
+Strong Text is used for important content to stand out. Strong Text should be used for all button label states (excluding disabled), 'enabled' and 'has-value' input types, and anchor links.
+*/
+border: 1px solid #000000;
+
+
+/* Menu */
+
+width: 24px;
+height: 24px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 2;
+flex-grow: 0;
+
+
+/* Union */
+
+position: absolute;
+width: 23.6px;
+height: 23.6px;
+left: 0.2px;
+top: 0.2px;
+
+/* Light/Text, strong
+
+Strong Text is used for important content to stand out. Strong Text should be used for all button label states (excluding disabled), 'enabled' and 'has-value' input types, and anchor links.
+*/
+background: #000000;
+
+
+/* Path */
+
+position: absolute;
+left: 5%;
+right: 60%;
+top: 5%;
+bottom: 60%;
+
+/* Light Text / text
+
+hpe design system light background text
+*/
+border: 2px solid #444444;
+border-radius: 2px;
+
+
+/* Path */
+
+position: absolute;
+left: 60%;
+right: 5%;
+top: 5%;
+bottom: 60%;
+
+/* Light Text / text
+
+hpe design system light background text
+*/
+border: 2px solid #444444;
+border-radius: 2px;
+
+
+/* Path */
+
+position: absolute;
+left: 5%;
+right: 60%;
+top: 60%;
+bottom: 5%;
+
+/* Light Text / text
+
+hpe design system light background text
+*/
+border: 2px solid #444444;
+border-radius: 2px;
+
+
+/* Path */
+
+position: absolute;
+left: 60%;
+right: 5%;
+top: 60%;
+bottom: 5%;
+
+/* Light Text / text
+
+hpe design system light background text
+*/
+border: 2px solid #444444;
+border-radius: 2px;
+
+
+/* Avatar */
+
+width: 48px;
+height: 48px;
+
+/* Light / Primary, Orange */
+background: #FFBC44;
+border-radius: 24px;
+
+/* Inside auto layout */
+flex: none;
+order: 3;
+flex-grow: 0;
+
+
+/* Initials */
+
+position: absolute;
+width: 16px;
+height: 24px;
+left: calc(50% - 16px/2);
+top: calc(50% - 24px/2);
+
+/* Paragraph / Desktop / default */
+font-family: 'MetricHPEXS';
+font-style: normal;
+font-weight: 400;
+font-size: 18px;
+line-height: 24px;
+/* identical to box height, or 133% */
+text-align: center;
+
+/* Light/Text, strong */
+color: #000000;
+
+
+
+/* Navigation Tabs */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+justify-content: center;
+align-items: flex-start;
+padding: 0px;
+gap: 24px;
+
+position: absolute;
+width: 469px;
+height: 36px;
+left: calc(50% - 469px/2);
+top: calc(50% - 36px/2);
+
+
+
+/* Button */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: center;
+padding: 6px 12px;
+
+width: 108px;
+height: 36px;
+
+border-radius: 4px;
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Identifier */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+align-items: center;
+padding: 0px;
+gap: 6px;
+
+width: 84px;
+height: 24px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Label */
+
+width: 84px;
+height: 24px;
+
+font-family: 'MetricHPEXS';
+font-style: normal;
+font-weight: 700;
+font-size: 19px;
+line-height: 24px;
+/* identical to box height, or 126% */
+
+/* Light/Text, strong */
+color: #000000;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Button */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: center;
+padding: 6px 12px;
+
+width: 121px;
+height: 36px;
+
+border-radius: 4px;
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+
+
+/* Identifier */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+align-items: center;
+padding: 0px;
+gap: 6px;
+
+width: 97px;
+height: 24px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Label */
+
+width: 97px;
+height: 24px;
+
+font-family: 'MetricHPEXS';
+font-style: normal;
+font-weight: 700;
+font-size: 19px;
+line-height: 24px;
+/* identical to box height, or 126% */
+
+/* Light/Text, strong */
+color: #000000;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Button */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: center;
+padding: 6px 12px;
+
+width: 83px;
+height: 36px;
+
+border-radius: 4px;
+
+/* Inside auto layout */
+flex: none;
+order: 2;
+flex-grow: 0;
+
+
+/* Identifier */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+align-items: center;
+padding: 0px;
+gap: 6px;
+
+width: 59px;
+height: 24px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Label */
+
+width: 59px;
+height: 24px;
+
+font-family: 'MetricHPEXS';
+font-style: normal;
+font-weight: 700;
+font-size: 19px;
+line-height: 24px;
+/* identical to box height, or 126% */
+
+/* Light/Text, strong */
+color: #000000;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Button */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: center;
+padding: 6px 12px;
+
+width: 85px;
+height: 36px;
+
+border-radius: 4px;
+
+/* Inside auto layout */
+flex: none;
+order: 3;
+flex-grow: 0;
+
+
+/* Identifier */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+align-items: center;
+padding: 0px;
+gap: 6px;
+
+width: 61px;
+height: 24px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Label */
+
+width: 61px;
+height: 24px;
+
+font-family: 'MetricHPEXS';
+font-style: normal;
+font-weight: 700;
+font-size: 19px;
+line-height: 24px;
+/* identical to box height, or 126% */
+
+/* Light/Text, strong */
+color: #000000;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Logo */
+
+position: absolute;
+left: 2.5%;
+right: 90.57%;
+top: 16.67%;
+bottom: 16.67%;
+
+
+
+/* HPE GreenLake badge */
+
+position: absolute;
+width: 133.1px;
+height: 48px;
+left: 48px;
+top: 12px;
+
+background: url(hpe_greenlake_grn_pos_rgb.png);
+
+}

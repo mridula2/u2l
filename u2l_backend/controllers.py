@@ -37,11 +37,35 @@ def authentication():
         if user_data_validate:
             if user_data_validate.password == form_password:
                 return jsonify({'message': 'authentication success'}), 200
+            else:
+                return jsonify({'message': 'authentication failed'}), 401
+    else:
+        return jsonify({'message': 'Invalid Email Id!'}), 401 
+
+@authentication_controller.route('/signup', methods=['POST'])
+def signup():
+    json_data = request.get_json()
+    print(json_data)
+    form_email = json_data['email']
+    form_password = json_data['password']
+    form_first_name = json_data['first_name']
+    form_last_name = json_data['last_name']
+    form_role = json_data['role']
+
+    if form_email and validate_email(form_email):
+        user_data_validate = user_details.query.filter_by(email=form_email).first()
+        if user_data_validate:
+            return jsonify({'message': 'Email Already Exsists !!'}), 401
         else:
-            return jsonify({'message': 'authentication failed'}), 401
+            #( email, password, first_name, last_name, user_role, created_at,updated_at)
+            cur_date = datetime.datetime.now()
+            new_user = user_details(form_email, form_password, form_first_name, form_last_name, form_role, cur_date, cur_date)
+            db.session.add(new_user)
+            db.session.commit()
+            return jsonify({'message': 'SignUp Successfull'}), 200
     else:
         return jsonify({'message': 'Invalid Email Id!'}), 401
-    
+
 @authentication_controller.route('/analysis', methods=['POST'])
 def upload():
     try:
@@ -803,6 +827,34 @@ def report(query_project_name):
             'Cache-Control': 'no-cache, no-store, must-revalidate'
         }
     )
+
+@authentication_controller.route('/configuration/<query_file_name>', methods=['GET'])
+def export_configuration_file(query_file_name):
+
+    if query_file_name == 'Code Delivery Guidelines-V0.4':      
+        file_path = '/usr/u2l/u2l_backend/media/'+ query_file_name +'.docx'
+    if query_file_name == 'HPE U2L Questionnaire-light':      
+        file_path = '/usr/u2l/u2l_backend/media/'+ query_file_name +'.xls'
+
+    if not os.path.exists(file_path):
+        return 'File not found', 404
+    
+    zip_buffer = zipfile.ZipFile('files.zip', 'w', zipfile.ZIP_DEFLATED)
+    zip_buffer.write(file_path, os.path.basename(file_path))
+    zip_buffer.close()
+
+    os.chmod('files.zip', 0o777)
+
+    return Response(
+        open('files.zip', 'rb').read(),
+        # mimetype='application/zip',
+        headers={
+            'Content-Disposition': 'attachment;filename=files.zip',
+            'Access-Control-Allow-Origin': '*',
+            'Content-Type': 'application/zip',
+            'Cache-Control': 'no-cache, no-store, must-revalidate'
+        }
+    )    
 
 @authentication_controller.route('/pdf/<query_project_name>', methods=['GET']) #{project_name} pdf generation
 def pdf(query_project_name):
