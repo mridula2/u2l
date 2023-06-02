@@ -332,7 +332,8 @@ const LoginPage = () => {
             </Box>
           </Form>
           <Box align="start" margin={{ top: "medium", bottom: "small" }}>
-            <Anchor label="Forgot password?" onClick={onForgotPassword} />
+          <a onClick={onForgotPassword}>Forgot password?</a>
+          <Text>Don't have an account? <a href='/signup'>Sign-up</a></Text>
             {showForgotPassword && (
               <Layer modal onClickOutside={onClose} onEsc={onClose}>
                 <ResetPassword

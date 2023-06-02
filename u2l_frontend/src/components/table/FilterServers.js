@@ -24,12 +24,13 @@ import { useFilters } from './FiltersContext';
 import { FiltersProvider } from './FiltersContext';
 // import dummyData from '../../Views/dummyData';
 import ProjectService from '../../api/ProjectService';
+import InProgress from "../../assets/Images/InProgress.png";
 
 const statusIcons = {
   Warning: <StatusWarningSmall color="status-warning" size="small" />,
   OK: <StatusGoodSmall color="status-ok" size="small" />,
   Critical: <StatusCriticalSmall color="status-critical" size="small" />,
-  Unknown: <StatusUnknownSmall color="status-unknown" size="small" />,
+  Started: <StatusUnknownSmall color="status-unknown" size="small" />,
 };
 
 const filtersConfig = [
@@ -83,7 +84,7 @@ export const FilterServers = ({
           />
         </Box>
         <Box flex></Box>
-        <Box responsive={true} justify="end">
+        <Box justify="end">
           <Button
             primary
             label="Start Assessment"
@@ -124,12 +125,14 @@ const ServerResults = ({ height, containerRef }) => {
   };
 
   const findSummary = (datum) => {
-    if (datum.analysis_status === 'analysis unknown') {
-      return 'In Progress';
+    if (datum.analysis_status === 'analysis started') {
+      return 'Assessment In Progress';
     } else if (datum.analysis_status === 'analysis successful') {
       return 'Successful Assessment';
     } else if (datum.analysis_status === 'analysis failed') {
       return 'Failed Assessment';
+    }else{
+      return 'Analysis status unknown';
     }
   };
 
@@ -138,8 +141,8 @@ const ServerResults = ({ height, containerRef }) => {
       return 'OK';
     } else if (analysis_status === 'analysis failed') {
       return 'Critical';
-    } else if (analysis_status === 'analysis unknown') {
-      return 'Unknown';
+    } else if (analysis_status === 'analysis started') {
+      return 'Started';
     }
   };
 
@@ -196,7 +199,7 @@ const ServerResults = ({ height, containerRef }) => {
           {
             property: 'file_size',
             header: 'File Size',
-            render: (datum) => `${datum.file_size} mb`,
+            render: (datum) => `${datum.file_size} kb`,
           },
           {
             property: 'analysis_status',
@@ -218,17 +221,16 @@ const ServerResults = ({ height, containerRef }) => {
             header: 'Reports',
             render: (datum) =>
               datum.analysis_status === 'analysis successful' ? (
-                <Text>
                   <Anchor
+                  style={{color:'rgb(111, 111, 111)', fontSize:'16px'}}
                     onClick={() => {
                       viewPdf(datum.project_name);
                     }}
                   >
-                    <Text>View</Text>
+                    View
                   </Anchor>
-                </Text>
               ) : (
-                <Text>View</Text>
+                <Text style={{color:'rgb(167,167,167)'}}>View</Text>
               ),
           },
         ]}

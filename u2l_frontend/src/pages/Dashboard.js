@@ -7,7 +7,7 @@ import FilteringTable from "../components/table/FilteringTable";
 import AppHeader from "../components/navbars/AppHeader";
 import SideBar from "../components/common/SideBar";
 import ProjectService from "../api/ProjectService";
-import AuthenticationService from "../api/AuthenticationService";
+import AuthenticationUtils from "../utils/AuthenticationUtils";
 // import dummyData from "../Views/dummyData";
 
 export const DefaultButtonExample = () => <Button label="Default button" />;
@@ -70,7 +70,7 @@ const Dashboard = (containerRef) => {
   };
 
   useEffect(() => {
-    ProjectService.getProjects(AuthenticationService.getEmail())
+    ProjectService.getProjects(AuthenticationUtils.getEmail())
       .then((response) => {
         // response.data
         console.log(response);
@@ -102,7 +102,7 @@ const Dashboard = (containerRef) => {
           />
         )}
       </Box>
-      <AppHeader data-testid="appheader" />
+      {/* <AppHeader data-testid="appheader" /> */}
       <Box direction="row-responsive" responsive={true} flex="shrink">
         <SideBar data-testid="sidebar" />
         <Box
