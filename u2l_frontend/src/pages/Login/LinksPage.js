@@ -198,12 +198,11 @@ const customerResourceColumn = [
 const LinksPage = () => {
   return (
     <Box fill direction="row-responsive" margin={{ top: "large", left: "large" }}>
-      <Box fill class="hpehf-links-container" className="LinkPage" gap="xsmall">
+      <Box fill gap="xsmall">
         <Text weight="bold"> COMPANY</Text>
         {companyColumn.map((link) => {
           return (
             <a
-              class="hpehf-link"
               key={link.label}
               href={link.hyperlink}
               id={link.label}
@@ -214,14 +213,13 @@ const LinksPage = () => {
         })}
       </Box>
 
-      <Box fill class="hpehf-links-container" className="LinkPage" gap="xsmall">
+      <Box fill gap="xsmall">
         <Text level={4} weight="bold">
           LEARN ABOUT
         </Text>
         {learnAboutColumn.map((link) => {
           return (
             <a
-              class="hpehf-link"
               key={link.label}
               href={link.hyperlink}
               id={link.label}
@@ -236,7 +234,6 @@ const LinksPage = () => {
         {newsAndEventsColumn.map((link) => {
           return (
             <a
-              class="hpehf-link"
               key={link.label}
               href={link.hyperlink}
               id={link.label}
@@ -252,7 +249,6 @@ const LinksPage = () => {
         {partnersColumn.map((link) => {
           return (
             <a
-              class="hpehf-link"
               key={link.label}
               href={link.hyperlink}
               id={link.label}
@@ -263,12 +259,11 @@ const LinksPage = () => {
         })}
       </Box>
 
-      <Box fill class="hpehf-links-container" className="LinkPage" gap="xsmall">
+      <Box fill gap="xsmall">
         <Text weight="bold"> SUPPORT</Text>
         {supportColumn.map((link) => {
           return (
             <a
-              class="hpehf-link"
               key={link.label}
               href={link.hyperlink}
               id={link.label}
@@ -283,7 +278,6 @@ const LinksPage = () => {
         {communitiesColumn.map((link) => {
           return (
             <a
-              class="hpehf-link"
               key={link.label}
               href={link.hyperlink}
               id={link.label}
@@ -294,12 +288,11 @@ const LinksPage = () => {
         })}
       </Box>
 
-      <Box fill class="hpehf-links-container" className="LinkPage" gap="xsmall">
+      <Box fill gap="xsmall">
         <Text weight="bold"> CUSTOMER RESOURCES</Text>
         {customerResourceColumn.map((link) => {
           return (
             <a
-              class="hpehf-link"
               key={link.label}
               href={link.hyperlink}
               id={link.label}
@@ -310,7 +303,7 @@ const LinksPage = () => {
         })}
       </Box>
 
-      <Box fill class="hpehf-links-container" className="LinkPage" gap="xsmall">
+      <Box fill gap="xsmall">
         <Text weight="bold"> FOLLOW HPE</Text>
         <Box direction="row">
           <a
