@@ -51,8 +51,8 @@ def signup():
     form_first_name = json_data['first_name']
     form_last_name = json_data['last_name']
     form_role = json_data['role']
-    roles = ['javaanalysis', 'canalysis', 'shellanalysis']
-    if form_role not in roles:
+    roles = ["delivery", "pursuit", "customer", "admin"]
+    if form_role.lower() not in roles:
       error_message = {'error' :"Invalid role type"}
       return jsonify(error_message), 404
 
