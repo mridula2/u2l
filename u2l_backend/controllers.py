@@ -37,11 +37,39 @@ def authentication():
         if user_data_validate:
             if user_data_validate.password == form_password:
                 return jsonify({'message': 'authentication success'}), 200
+            else:
+                return jsonify({'message': 'authentication failed'}), 401
+    else:
+        return jsonify({'message': 'Invalid Email Id!'}), 401 
+
+@authentication_controller.route('/signup', methods=['POST'])
+def signup():
+    json_data = request.get_json()
+    print(json_data)
+    form_email = json_data['email']
+    form_password = json_data['password']
+    form_first_name = json_data['first_name']
+    form_last_name = json_data['last_name']
+    form_role = json_data['role']
+    roles = ['javaanalysis', 'canalysis', 'shellanalysis']
+    if form_role not in roles:
+      error_message = {'error' :"Invalid role type"}
+      return jsonify(error_message), 404
+
+    if form_email and validate_email(form_email):
+        user_data_validate = user_details.query.filter_by(email=form_email).first()
+        if user_data_validate:
+            return jsonify({'message': 'Email Already Exsists !!'}), 401
         else:
-            return jsonify({'message': 'authentication failed'}), 401
+            #( email, password, first_name, last_name, user_role, created_at,updated_at)
+            cur_date = datetime.datetime.now()
+            new_user = user_details(form_email, form_password, form_first_name, form_last_name, form_role, cur_date, cur_date)
+            db.session.add(new_user)
+            db.session.commit()
+            return jsonify({'message': 'SignUp Successfull'}), 200
     else:
         return jsonify({'message': 'Invalid Email Id!'}), 401
-    
+
 @authentication_controller.route('/analysis', methods=['POST'])
 def upload():
     try:
@@ -330,6 +358,17 @@ def upload():
             except Exception as e:
                 return jsonify({'error': str(e)})   
 
+            # Run javaRulesRemedy.sh script
+            try:
+                script_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/Java/javaRulesRemedy.sh'
+                code_path = '/usr/u2l/u2l_backend/projects/' + file_name + 'U2L/java-vfunction_'+ yMD + '_' + hMS +'/work/javaanalysis/'
+                command = subprocess.Popen(['bash', script_path, code_path], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                output = command.communicate()[0].decode().strip()
+                lines = output.split('\n')
+                print(lines)
+                print('Completed running javaRulesRemedy.sh')
+            except Exception as e:
+                return jsonify({'error': str(e)})
 
             # Run javaFrameworkScan.sh script
             try:
@@ -345,17 +384,6 @@ def upload():
             except Exception as e:
                 return jsonify({'error': str(e)})
         
-            # Run javaRulesRemedy.sh script
-            try:
-                script_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/Java/javaRulesRemedy.sh'
-                code_path = '/usr/u2l/u2l_backend/projects/' + file_name + 'U2L/java-vfunction_'+ yMD + '_' + hMS +'/work/javaanalysis/'
-                command = subprocess.Popen(['bash', script_path, code_path], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                output = command.communicate()[0].decode().strip()
-                lines = output.split('\n')
-                print(lines)
-                print('Completed running javaRulesRemedy.sh')
-            except Exception as e:
-                return jsonify({'error': str(e)})
             try:
 
                 print("Moving texts files !!!")
@@ -400,7 +428,7 @@ def upload():
                 # Convert javaSourceCode2Remedy into .csv
                 javaSourceCode2Remedy = '/usr/u2l/u2l_backend/projects/' + file_name + '/javaSourceCode2Remedy'
                 if os.path.isfile(javaSourceCode2Remedy) and os.path.getsize(javaSourceCode2Remedy) > 0:
-                    df = pd.read_csv(javaSourceCode2Remedy, sep='\t|:', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True, engine='python')
+                    df = pd.read_csv(javaSourceCode2Remedy, sep='\t|:', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
                     df.columns = ['RULE ID', 'FILE NAME', 'LINE NUMBER', 'REMEDY']
                     df.index = df.index + 1
                     save_location = '/usr/u2l/u2l_backend/projects/' + file_name + '/java_report.xlsx'
@@ -803,6 +831,34 @@ def report(query_project_name):
             'Cache-Control': 'no-cache, no-store, must-revalidate'
         }
     )
+
+@authentication_controller.route('/configuration/<query_file_name>', methods=['GET'])
+def export_configuration_file(query_file_name):
+
+    if query_file_name == 'Code Delivery Guidelines-V0.4':      
+        file_path = '/usr/u2l/u2l_backend/media/'+ query_file_name +'.docx'
+    if query_file_name == 'HPE U2L Questionnaire-light':      
+        file_path = '/usr/u2l/u2l_backend/media/'+ query_file_name +'.xls'
+
+    if not os.path.exists(file_path):
+        return 'File not found', 404
+    
+    zip_buffer = zipfile.ZipFile('files.zip', 'w', zipfile.ZIP_DEFLATED)
+    zip_buffer.write(file_path, os.path.basename(file_path))
+    zip_buffer.close()
+
+    os.chmod('files.zip', 0o777)
+
+    return Response(
+        open('files.zip', 'rb').read(),
+        # mimetype='application/zip',
+        headers={
+            'Content-Disposition': 'attachment;filename=files.zip',
+            'Access-Control-Allow-Origin': '*',
+            'Content-Type': 'application/zip',
+            'Cache-Control': 'no-cache, no-store, must-revalidate'
+        }
+    )    
 
 @authentication_controller.route('/pdf/<query_project_name>', methods=['GET']) #{project_name} pdf generation
 def pdf(query_project_name):
