@@ -6,13 +6,17 @@ class user_details(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     email = db.Column(db.String(50), nullable=False)
     password = db.Column(db.String(50), nullable=False)
+    first_name = db.Column(db.String(50))
+    last_name = db.Column(db.String(50))
     user_role = db.Column(db.String(50))
     created_at = db.Column(db.DateTime)
     updated_at = db.Column(db.DateTime)
 
-    def __init__(self, email, password, user_role, created_at,updated_at):
+    def __init__(self, email, password, first_name, last_name, user_role, created_at,updated_at):
         self.email = email
         self.password = password
+        self.first_name = first_name
+        self.last_name = last_name
         self.user_role = user_role
         self.created_at = created_at
         self.updated_at = updated_at
