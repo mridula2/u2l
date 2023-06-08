@@ -3,6 +3,7 @@ from flask_cors import CORS
 from config import SQLALCHEMY_DATABASE_URI, SQLALCHEMY_TRACK_MODIFICATIONS
 from controllers import authentication_controller
 from models import *
+from utils import insert_user_details
 
 app = Flask(__name__)
 CORS(app)
@@ -18,6 +19,8 @@ with app.app_context():
     db.create_all()
 
 app.app_context().push()
+
+insert_user_details('admin@hpe.com', 'UGFzc3dvcmRAMTIz', 'admin', 'admin', 'admin')
 
 if __name__ == '__main__':
     app.run(debug=True)
