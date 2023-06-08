@@ -66,6 +66,9 @@ const WizardValidationExample = ({ containerRef }) => {
         source_shell_version: '',
         target_shell: '',
         target_shell_version: '',
+        framework: '',
+        source_framework_version: '',
+        target_framework_version: '',
       })
     } else {
       return ({
@@ -94,6 +97,9 @@ const WizardValidationExample = ({ containerRef }) => {
         source_shell_version: location.state.formValues.source_shell_version,
         target_shell: location.state.formValues.target_shell,
         target_shell_version: location.state.formValues.target_shell_version,
+        framework: location.state.formValues.framework,
+        source_framework_version: location.state.formValues.source_framework_version,
+        target_framework_version: location.state.formValues.target_framework_version,
       })
     }
   };
@@ -417,7 +423,7 @@ export const StepTwo = (nextId) => {
             placeholder="Enter Value"
             id="source_os_version"
             name="source_os_version"
-           
+
           />
         </FormField>
         <FormField
@@ -437,7 +443,6 @@ export const StepTwo = (nextId) => {
           htmlFor="target_os_version"
           name="target_os_version"
           required={true}
-
         >
           <TextInput
             placeholder="Enter Value"
@@ -466,6 +471,11 @@ export const StepThree = (nextId) => {
     console.log(getLang);
     setShowHide(getLang);
   };
+
+  const handleFramework = (event) => {
+    const getFramework = event.target.value;
+    console.log(getFramework);
+  }
 
   // const popupSpinner = () => {
   //   setShowpinner(true);
@@ -1038,105 +1048,150 @@ export const StepThree = (nextId) => {
 
         {/* Div after C++/Pro*C selected */}
         {showhide === 'C++/Pro*C' && (
-         <Box>
-         <FormField
-           label="Source Compiler"
-           htmlFor="source_compiler"
-           name="source_compiler"
-           required={true}
-         >
-           <TextInput
-             placeholder="Enter Value"
-             id="source_compiler"
-             name="source_compiler"
-           />
-         </FormField>
-         <FormField
-           label="Source Compiler version"
-           htmlFor="source_compiler_version"
-           name="source_compiler_version"
-         >
-           <TextInput
-             placeholder="Enter Value"
-             id="source_compiler_version"
-             name="source_compiler_version"
-           />
-         </FormField>
-         <FormField
-           label="Target Compiler"
-           htmlFor="target_compiler"
-           name="target_compiler"
-           required={true}
-         >
-           <TextInput
-             placeholder="Enter Value"
-             id="target_compiler"
-             name="target_compiler"
-           />
-         </FormField>
-         <FormField
-           label="Target Compiler version"
-           htmlFor="target_compiler_version"
-           name="target_compiler_version"
-         >
-           <TextInput
-             placeholder="Enter Value"
-             id="target_compiler_version"
-             name="target_compiler_version"
-           />
-         </FormField>
-         <FormField
-           label="Source pre-compiler"
-           htmlFor="source_pre_compiler"
-           name="source_pre_compiler"
-           required={true}
-         >
-           <TextInput
-             placeholder="Enter value"
-             id="source_pre_compiler"
-             name="source_pre_compiler"
-           />
-         </FormField>
+          <Box>
+            <FormField
+              label="Source Compiler"
+              htmlFor="source_compiler"
+              name="source_compiler"
+              required={true}
+            >
+              <TextInput
+                placeholder="Enter Value"
+                id="source_compiler"
+                name="source_compiler"
+              />
+            </FormField>
+            <FormField
+              label="Source Compiler version"
+              htmlFor="source_compiler_version"
+              name="source_compiler_version"
+            >
+              <TextInput
+                placeholder="Enter Value"
+                id="source_compiler_version"
+                name="source_compiler_version"
+              />
+            </FormField>
+            <FormField
+              label="Target Compiler"
+              htmlFor="target_compiler"
+              name="target_compiler"
+              required={true}
+            >
+              <TextInput
+                placeholder="Enter Value"
+                id="target_compiler"
+                name="target_compiler"
+              />
+            </FormField>
+            <FormField
+              label="Target Compiler version"
+              htmlFor="target_compiler_version"
+              name="target_compiler_version"
+            >
+              <TextInput
+                placeholder="Enter Value"
+                id="target_compiler_version"
+                name="target_compiler_version"
+              />
+            </FormField>
+            <FormField
+              label="Source pre-compiler"
+              htmlFor="source_pre_compiler"
+              name="source_pre_compiler"
+              required={true}
+            >
+              <TextInput
+                placeholder="Enter value"
+                id="source_pre_compiler"
+                name="source_pre_compiler"
+              />
+            </FormField>
 
-         <FormField
-           label="Source pre-compiler version"
-           htmlFor="source_pre_compiler_version"
-           name="source_pre_compiler_version"
-           required={true}
-         >
-           <TextInput
-             placeholder="Enter value"
-             id="source_pre_compiler_version"
-             name="source_pre_compiler_version"
-           />
-         </FormField>
+            <FormField
+              label="Source pre-compiler version"
+              htmlFor="source_pre_compiler_version"
+              name="source_pre_compiler_version"
+              required={true}
+            >
+              <TextInput
+                placeholder="Enter value"
+                id="source_pre_compiler_version"
+                name="source_pre_compiler_version"
+              />
+            </FormField>
 
-         <FormField
-           label="Target pre-compiler"
-           htmlFor="target_pre_compiler"
-           name="Target_pre_compiler"
-         >
-           <TextInput
-             placeholder="Enter value"
-             id="target_pre_compiler"
-             name="target_pre_compiler"
-           />
-         </FormField>
+            <FormField
+              label="Target pre-compiler"
+              htmlFor="target_pre_compiler"
+              name="Target_pre_compiler"
+            >
+              <TextInput
+                placeholder="Enter value"
+                id="target_pre_compiler"
+                name="target_pre_compiler"
+              />
+            </FormField>
 
-         <FormField
-           label="Target pre-compiler version"
-           htmlFor="target_pre_compiler_version"
-           name="target_pre_compiler_version"
-           required={true}
-         >
-           <TextInput
-             placeholder="Enter value"
-             id="target_pre_compiler_version"
-             name="target_pre_compiler_version"
-           />
-         </FormField>
-       </Box>
+            <FormField
+              label="Target pre-compiler version"
+              htmlFor="target_pre_compiler_version"
+              name="target_pre_compiler_version"
+              required={true}
+            >
+              <TextInput
+                placeholder="Enter value"
+                id="target_pre_compiler_version"
+                name="target_pre_compiler_version"
+              />
+            </FormField>
+          </Box>
         )}
+
+        <FormField
+          htmlFor="framework"
+          name="framework"
+          label="Framework"
+        >
+          <Select
+            placeholder="Select"
+            id="framework"
+            name="framework"
+            options={[
+              'Spring',
+              'Struts',
+              'JSF',
+              'Hibernate',
+            ]}
+            onChange={(e) => handleFramework(e)}
+          />
+        </FormField>
+
+        <FormField
+          label="Source Framework Version"
+          htmlFor="source_framework_version"
+          name="source_framework_version"
+          required={true}
+        >
+          <TextInput
+            placeholder="Enter value"
+            id="source_framework_version"
+            name="source_framework_version"
+          />
+        </FormField>
+
+        <FormField
+          label="Target Framework Version"
+          htmlFor="target_framework_version"
+          name="target_framework_version"
+          required={true}
+        >
+          <TextInput
+            placeholder="Enter value"
+            id="target_framework_version"
+            name="target_framework_version"
+          />
+        </FormField>
 
         <Box data-testid="test-4" width="medium" margin="0" pad="small">
           <Text>Source Code</Text>

@@ -503,6 +503,42 @@ const Review = () => {
           )}
         </Box>
 
+        <h3>Framework</h3>
+        <Box gap="small"> 
+        <Box direction='row'>
+            <Box width="small">
+              <Text weight="bold">
+                Framework:
+              </Text>
+            </Box>
+            <Text margin={{ left: 'medium' }}>
+              {location.state.formValues.framework}
+            </Text>
+          </Box>
+
+          <Box direction='row'>
+            <Box width="small">
+              <Text weight="bold">
+              Source Framework Version:
+              </Text>
+            </Box>
+            <Text margin={{ left: 'medium' }}>
+              {location.state.formValues.source_framework_version}
+            </Text>
+          </Box>
+
+          <Box direction='row'>
+            <Box width="small">
+              <Text weight="bold">
+              Target Framework Version:
+              </Text>
+            </Box>
+            <Text margin={{ left: 'medium' }}>
+              {location.state.formValues.target_framework_version}
+            </Text>
+          </Box>
+        </Box>
+
         <Box direction="row" gap="medium" margin={{ left: "50%", top: "10%" }} >
           <Button icon={<Previous />} label="Previous" style={{borderRadius:"0"}}></Button>
           <Button primary label="Create" onClick={handleSubmit} style={{borderRadius:"0"}}></Button>
