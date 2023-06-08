@@ -76,6 +76,7 @@ def upload():
         file = request.files['file_name']
 
         form_project_name = request.form['project_name']
+        form_application_name = request.form['application_name']
         form_project_client = request.form['project_client']
         form_project_manager = request.form['project_manager']
         global tool_analysis_type
@@ -86,6 +87,7 @@ def upload():
         form_target_os = request.form['target_os']
         form_target_os_version = request.form['target_os_version']
 
+        c_analysis_types = ['C', 'C++', 'Pro*C', 'C/Pro*C', 'C++/Pro*C']
 
         if(tool_analysis_type == 'Java'):
             tool_analysis_type = 'javaanalysis'
@@ -95,22 +97,50 @@ def upload():
             form_target_jsp = request.form['target_jsp']
             form_source_servlet = request.form['source_servlet']
             form_target_servlet = request.form['target_servlet']
-        elif(tool_analysis_type == 'C'):
-            tool_analysis_type = 'canalysis'
-            form_source_compiler = request.form['source_compiler']
-            form_target_compiler = request.form['target_compiler']
-            form_source_compiler_version = request.form['source_compiler_version']
-            form_target_compiler_version = request.form['target_compiler_version']
-            # form_source_oracle_version = request.form['source_oracle_version']
-            # form_target_oracle_version = request.form['target_oracle_version']
-        # elif(tool_analysis_type == 'C/C++/Pro*C'):
-        #     tool_analysis_type = 'canalysis'
-        #     form_source_compiler = request.form['source_compiler']
-        #     form_target_compiler = request.form['target_compiler']
-        #     form_source_compiler_version = request.form['source_compiler_version']
-        #     form_target_compiler_version = request.form['target_compiler_version']
-        #     form_source_oracle_version = request.form['source_oracle_version']
-        #     form_target_oracle_version = request.form['target_oracle_version']
+        
+        elif(tool_analysis_type in c_analysis_types):
+            if(tool_analysis_type == 'Pro*C'):
+                
+                tool_analysis_type = 'canalysis'
+
+                form_source_pre_compiler = request.form['source_pre_compiler']
+                form_target_pre_compiler = request.form['target_pre_compiler']
+                form_source_pre_compiler_version = request.form['source_pre_compiler_version']
+                form_target_pre_compiler_version = request.form['target_pre_compiler_version']
+
+                form_source_compiler = ''
+                form_target_compiler = ''
+                form_source_compiler_version = ''
+                form_target_compiler_version = ''
+
+            elif(tool_analysis_type == 'C' or tool_analysis_type == 'C++'):
+                
+                tool_analysis_type = 'canalysis'
+                
+                form_source_compiler = request.form['source_compiler']
+                form_target_compiler = request.form['target_compiler']
+                form_source_compiler_version = request.form['source_compiler_version']
+                form_target_compiler_version = request.form['target_compiler_version']
+
+                form_source_pre_compiler = ''
+                form_target_pre_compiler = ''
+                form_source_pre_compiler_version = ''
+                form_target_pre_compiler_version = ''
+
+            elif(tool_analysis_type == 'C/Pro*C' or tool_analysis_type == 'C++/Pro*C'):
+
+                tool_analysis_type = 'canalysis'
+
+                form_source_pre_compiler = request.form['source_pre_compiler']
+                form_target_pre_compiler = request.form['target_pre_compiler']
+                form_source_pre_compiler_version = request.form['source_pre_compiler_version']
+                form_target_pre_compiler_version = request.form['target_pre_compiler_version']  
+
+                form_source_compiler = request.form['source_compiler']
+                form_target_compiler = request.form['target_compiler']
+                form_source_compiler_version = request.form['source_compiler_version']
+                form_target_compiler_version = request.form['target_compiler_version'] 
+
         elif(tool_analysis_type == 'Shell'):  
             tool_analysis_type = 'shellanalysis'
             form_source_shell = request.form['source_shell']
@@ -195,7 +225,7 @@ def upload():
             return response 
 
         #storing values in db project_details table
-        db_project_details = project_details(form_project_name, 'admin@hpe.com', 1, form_project_client, form_project_manager, file_name, file_size_mb, 'analysis started', cur_date)
+        db_project_details = project_details(form_project_name, form_application_name, 'admin@hpe.com', 1, form_project_client, form_project_manager, file_name, file_size_mb, 'analysis started', cur_date)
         db.session.add(db_project_details)
         try:
             db.session.commit()
@@ -204,7 +234,7 @@ def upload():
             return jsonify({'message': 'project_details : Project name already exists'}), 409
 
         #storing values in db analysis_type table
-        db_analysis_type = analysis_type(form_project_name, tool_analysis_type)
+        db_analysis_type = analysis_type(form_project_name, form_application_name, tool_analysis_type)
         db.session.add(db_analysis_type)
         try:
             db.session.commit()
@@ -213,7 +243,7 @@ def upload():
             return jsonify({'message': 'analysis_type : Project name already exists'}), 409
 
         #storing values in db os_details table
-        db_os_details = os_details(form_project_name, form_source_os, form_source_os_version, form_target_os, form_target_os_version)
+        db_os_details = os_details(form_project_name, form_application_name, form_source_os, form_source_os_version, form_target_os, form_target_os_version)
         db.session.add(db_os_details)
         try:
             db.session.commit()
@@ -224,7 +254,7 @@ def upload():
         #storing values in db analysis_status table
         analysis_start_time = datetime.datetime.now()
         analysis_end_time = datetime.datetime.now()
-        db_analysis_status = analysis_status(form_project_name, db_analysis_type.id, 'admin@hpe.com', 'analysis started', file_name, file_size_mb, analysis_start_time, analysis_end_time)
+        db_analysis_status = analysis_status(form_project_name, form_application_name, db_analysis_type.id, 'admin@hpe.com', 'analysis started', file_name, file_size_mb, analysis_start_time, analysis_end_time)
         db.session.add(db_analysis_status)
         try:
             db.session.commit()
@@ -236,17 +266,17 @@ def upload():
         script_path = './projects/' + file_name + '/U2L/U2LTool_Install.sh'
     
         if(db_analysis_type.analysis_type == 'javaanalysis'):
-            db_analysis_java = analysis_java(form_project_name, db_analysis_type.id, form_source_jdk, form_target_jdk, form_source_jsp, form_target_jsp, form_source_servlet, form_target_servlet)
+            db_analysis_java = analysis_java(form_project_name, form_application_name, db_analysis_type.id, form_source_jdk, form_target_jdk, form_source_jsp, form_target_jsp, form_source_servlet, form_target_servlet)
             db.session.add(db_analysis_java)
             db.session.commit()
             file_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/java-vfunction_' + yMD + '_' + hMS
         elif(db_analysis_type.analysis_type == 'canalysis'):
-            db_analysis_c = analysis_c(form_project_name, db_analysis_type.id, form_source_compiler, form_target_compiler, form_source_compiler_version, form_target_compiler_version, form_source_oracle_version, form_target_oracle_version)
+            db_analysis_c = analysis_c(form_project_name, form_application_name, db_analysis_type.id, form_source_compiler, form_target_compiler, form_source_compiler_version, form_target_compiler_version, form_source_pre_compiler, form_target_pre_compiler, form_source_pre_compiler_version, form_target_pre_compiler_version)
             db.session.add(db_analysis_c)
             db.session.commit()
             file_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/c-vfunction_' + yMD + '_' + hMS
         elif(db_analysis_type.analysis_type == 'shellanalysis'):
-            db_analysis_shell = analysis_shell(form_project_name, db_analysis_type.id, form_source_shell, form_target_shell, form_source_shell_version, form_target_shell_version)
+            db_analysis_shell = analysis_shell(form_project_name, form_application_name, db_analysis_type.id, form_source_shell, form_target_shell, form_source_shell_version, form_target_shell_version)
             db.session.add(db_analysis_shell)
             db.session.commit()
             file_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/shell-vfunction_' + yMD + '_' + hMS
