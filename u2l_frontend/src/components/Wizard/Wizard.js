@@ -1171,7 +1171,6 @@ export const StepThree = (nextId) => {
           label="Source Framework Version"
           htmlFor="source_framework_version"
           name="source_framework_version"
-          required={true}
         >
           <TextInput
             placeholder="Enter value"
@@ -1184,7 +1183,6 @@ export const StepThree = (nextId) => {
           label="Target Framework Version"
           htmlFor="target_framework_version"
           name="target_framework_version"
-          required={true}
         >
           <TextInput
             placeholder="Enter value"
