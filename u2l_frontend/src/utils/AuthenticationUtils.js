@@ -1,5 +1,7 @@
 const userEmail = 'user_email';
-const userName = 'user_name';
+const firstName = 'first_name';
+const lastName = 'last_name';
+const userRole = 'user_role';
 
 const storeUserDetails = (data) => {
   //check if checked values is sent(for login page)
@@ -7,13 +9,17 @@ const storeUserDetails = (data) => {
     //here write logic for staying signed in
     //set email,name,role,jwt in localstorage
     localStorage.setItem(userEmail, data.email);
-    localStorage.setItem(userName, data.name);
+    localStorage.setItem(firstName, data.firstName);
+    localStorage.setItem(lastName, data.lastName);
+    localStorage.setItem(userRole, data.userRole);
     localStorage.setItem('jwt', data.jwt);
   }
   //if checked is not sent
   else {
     sessionStorage.setItem(userEmail, data.email);
-    sessionStorage.setItem(userName, data.name);
+    sessionStorage.setItem(firstName, data.firstName);
+    sessionStorage.setItem(lastName, data.lastName);
+    sessionStorage.setItem(userRole, data.userRole);
     sessionStorage.setItem('jwt', data.jwt);
   }
 };
@@ -30,15 +36,21 @@ const isUserLoggedIn = () => {
     : true;
 };
 const getEmail = () => {
-  return sessionStorage.getItem(userEmail) !== null
+  return isUserLoggedIn()
     ? sessionStorage.getItem(userEmail)
     : localStorage.getItem(userEmail);
 };
 
 const getUserName = () => {
-  return sessionStorage.getItem(userName) !== null
-    ? sessionStorage.getItem(userName)
-    : localStorage.getItem(userName);
+  return sessionStorage.getItem(firstName)
+    ? `${sessionStorage.getItem(firstName)} ${sessionStorage.getItem(lastName)}`
+    : `${localStorage.getItem(firstName)} ${localStorage.getItem(lastName)}`;
+};
+
+const getUserRole = () => {
+  return isUserLoggedIn()
+    ? sessionStorage.getItem(userRole)
+    : localStorage.getItem(userRole);
 };
 
 const AuthenticationUtils = {
@@ -47,6 +59,7 @@ const AuthenticationUtils = {
   isUserLoggedIn,
   getEmail,
   getUserName,
+  getUserRole,
 };
 
 export default AuthenticationUtils;

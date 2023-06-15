@@ -1,11 +1,12 @@
-a {
+.links a {
   text-decoration: none;
   font-family: 'Metric Light', Arial, sans-serif;
   font-size: 14px;
   color: rgba(51, 51, 51, 1);
 }
 
-a:hover {
+.links a:hover {
   text-decoration: underline;
   cursor: pointer;
 }
+
