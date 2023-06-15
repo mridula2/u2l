@@ -198,7 +198,7 @@ const customerResourceColumn = [
 const LinksPage = () => {
   return (
     <Box fill direction="row-responsive" margin={{ top: "large", left: "large" }}>
-      <Box fill gap="xsmall">
+      <Box fill gap="xsmall" className="links">
         <Text weight="bold"> COMPANY</Text>
         {companyColumn.map((link) => {
           return (
@@ -213,7 +213,7 @@ const LinksPage = () => {
         })}
       </Box>
 
-      <Box fill gap="xsmall">
+      <Box fill gap="xsmall" className="links">
         <Text level={4} weight="bold">
           LEARN ABOUT
         </Text>
@@ -259,7 +259,7 @@ const LinksPage = () => {
         })}
       </Box>
 
-      <Box fill gap="xsmall">
+      <Box fill gap="xsmall" className="links">
         <Text weight="bold"> SUPPORT</Text>
         {supportColumn.map((link) => {
           return (
@@ -288,7 +288,7 @@ const LinksPage = () => {
         })}
       </Box>
 
-      <Box fill gap="xsmall">
+      <Box fill gap="xsmall" className="links">
         <Text weight="bold"> CUSTOMER RESOURCES</Text>
         {customerResourceColumn.map((link) => {
           return (
@@ -303,7 +303,7 @@ const LinksPage = () => {
         })}
       </Box>
 
-      <Box fill gap="xsmall">
+      <Box fill gap="xsmall" className="links">
         <Text weight="bold"> FOLLOW HPE</Text>
         <Box direction="row">
           <a

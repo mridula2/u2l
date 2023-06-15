@@ -14,7 +14,7 @@ import {
   TextInput,
   Notification,
 } from 'grommet';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { emailValidation } from '../../utils/FormValidation';
 import AuthenticationService from '../../api/AuthenticationService';
 import CommonUtils from '../../utils/CommonUtils';
@@ -137,7 +137,6 @@ const LoginForm = () => {
   };
 
   const onSubmit = ({ value }) => {
-    console.log(window.location.pathname)
     AuthenticationService.signIn({
       email: `${value.email}`,
       password: `${CommonUtils.convertStringToBase64(value.password)}`,
@@ -147,9 +146,11 @@ const LoginForm = () => {
         if (response.data.message === 'authentication success') {
           AuthenticationUtils.storeUserDetails({
             jwt: 'jwt',
-            // name:response.data.user_name,
             email: value.email,
-            checked,
+            firstName:response.data['first_name'],
+            lastName:response.data['last_name'],
+            userRole:response.data['user_role'],
+            checked
           });
           console.log(AuthenticationUtils.getEmail());
           navigate('/dashboard');
@@ -206,6 +207,7 @@ const LoginForm = () => {
         pad={{ horizontal: 'xxsmall' }}
         width='90%'
         margin={{ top: '3%' }}
+        className="links"
       >
         <Form
           validate='blur'
@@ -268,8 +270,8 @@ const LoginForm = () => {
           </Box>
         </Form>
         <Box align='start'>
-          <a onClick={onForgotPassword}>Forgot password?</a>
-          <Text>Don't have an account? <a href='/signup'>Sign-up</a></Text>
+          <Link onClick={onForgotPassword}>Forgot password?</Link>
+          <Text>Don't have an account? <Link to='/signup' aria-current='page'>Sign-up</Link></Text>
           {showForgotPassword && (
             <Layer modal onClickOutside={onClose} onEsc={onClose}>
               <ResetPassword

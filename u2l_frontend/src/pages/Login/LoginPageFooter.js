@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { Box, Button, Footer, ResponsiveContext, Text, Anchor } from 'grommet';
-// import './LinkPage.css';
+import './LinkPage.css';
 
 export const LoginPageFooter = () => {
   const size = useContext(ResponsiveContext);
@@ -50,12 +50,12 @@ export const LoginPageFooter = () => {
         align={!['xsmall', 'small'].includes(size) ? 'center' : undefined}
         gap='xsmall'
         wrap
-        className='LinkPage'
+        className='links'
         margin={{ right: '50px' }}
       >
         {LoginPageFooterLinks.map((link) => {
           return (
-            <Box key={link.label} margin={{ left: '40px' }}>
+            <Box key={link.label}  margin={{ left: '40px' }}>
               <a href={link.hyperlink} id={link.label}>
                 {link.label}
               </a>
