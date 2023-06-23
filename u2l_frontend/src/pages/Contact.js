@@ -32,7 +32,7 @@ const Contact = () => {
               </Link>
             </Box>
           </Box>
-          <Box direction='row' gap='small' margin='small'>
+          {/* <Box direction='row' gap='small' margin='small'>
             <Box>
               <Text weight='bold' >
                 Call us
@@ -41,7 +41,7 @@ const Contact = () => {
             <Box >
               <Text style={{ textDecoration: 'underline' }} size='small'>0845 161 0050</Text>
             </Box>
-          </Box>
+          </Box> */}
         </Box>
 
         <Box margin={{ left: '10%' }}>
