@@ -4,21 +4,15 @@ import PropTypes from 'prop-types';
 import { ThemeContext } from 'styled-components';
 import {
   Box,
-  CheckBoxGroup,
   FormField,
-  Grid,
-  List,
   Heading,
-  Form,
   FileInput,
   Button,
-  RadioButtonGroup,
   ResponsiveContext,
   Select,
   Text,
   Spinner,
   Layer,
-  TextArea,
   TextInput,
   Notification,
 } from 'grommet';
@@ -218,6 +212,8 @@ const WizardValidationExample = ({ containerRef }) => {
       </Box>
 
       <Box direction="row-responsive" responsive={true}>
+
+        {/*Sidebar*/}
         <Box direction="column" width="small" responsive={true} height="80vh">
           <Button
             label="Code Assessment"
@@ -280,6 +276,8 @@ const WizardValidationExample = ({ containerRef }) => {
             style={styles.btndisable}
           />)}
         </Box>
+
+
         <StepContent
           onSubmit={({ value }) => {
             handleSubmit(value);
@@ -1166,7 +1164,7 @@ export const StepThree = (nextId) => {
             onChange={(e) => handleFramework(e)}
           />
         </FormField>
-
+ 
         <FormField
           label="Source Framework Version"
           htmlFor="source_framework_version"
