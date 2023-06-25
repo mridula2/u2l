@@ -1,6 +1,11 @@
 import re
 import pandas as pd
 from openpyxl import load_workbook
+<<<<<<< Updated upstream
+=======
+from models import *
+from datetime import datetime
+>>>>>>> Stashed changes
 
 def validate_email(email):
     pattern = r'^[\w\.-]+@[\w\.-]+\.\w+$'
@@ -13,3 +18,26 @@ def generate_workbook(df, save_location,sheet):
     writer.sheets = dict((ws.title, ws) for ws in book.worksheets)
     df.to_excel(writer, sheet_name=sheet, index=True)
     writer.save()
+<<<<<<< Updated upstream
+=======
+
+def sheet_transfer(source_sheet, target_sheet, startrow, startcol, source_file, dest_file):
+    file = source_file
+    df = pd.read_excel(file, sheet_name=source_sheet, engine='openpyxl')
+    output_file = dest_file
+    book = load_workbook(output_file)
+    writer = pd.ExcelWriter(output_file, engine='openpyxl', mode='a')
+    writer.book = book
+    writer.sheets = dict((ws.title, ws) for ws in book.worksheets)
+    df.to_excel(writer, sheet_name=target_sheet, index=False, startrow=startrow, startcol=startcol, header=False)
+    writer.save()
+
+def insert_user_details(email, password, first_name, last_name, user_role):
+    user = user_details.query.filter_by(email=email).first()
+    if user:
+        return
+    current_time = datetime.utcnow()
+    new_user = user_details(email, password, first_name, last_name, user_role, current_time, current_time)
+    db.session.add(new_user)
+    db.session.commit()
+>>>>>>> Stashed changes
