@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Box, Button, Footer, ResponsiveContext } from 'grommet';
 import { FormNext, Previous } from 'grommet-icons';
@@ -6,8 +6,13 @@ import WizardContext from '../Wizard/WizardContext';
 
 const StepFooter = ({ nextId, previousId, onNavigate, ...rest }) => {
   const size = useContext(ResponsiveContext);
+  const [btnDisable, setButtonDisable] = useState(false);
   const { activeIndex, id, steps, width, activeStep, setActiveIndex } =
     useContext(WizardContext);
+
+  const handleBtn = () => {
+    setButtonDisable(true)
+  }
 
   return (
     <Box
@@ -61,7 +66,7 @@ const StepFooter = ({ nextId, previousId, onNavigate, ...rest }) => {
         <Button
           id={nextId}
           icon={<FormNext />}
-
+          // disabled={!btnDisable && (activeStep === 0 || activeStep === 1 || activeStep === 2)}
           reverse
           label={activeIndex === steps.length - 1 ? 'Proceed' : 'Next'}
           form={`${id}-form`}

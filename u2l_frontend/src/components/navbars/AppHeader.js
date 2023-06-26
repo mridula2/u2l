@@ -15,10 +15,10 @@ import {
   HelpOption,
   Projects,
   Search,
+  Link,
   Language,
 } from 'grommet-icons';
-import { Link, useNavigate } from 'react-router-dom';
-import AuthenticationUtils from '../../utils/AuthenticationUtils';
+import { useNavigate } from 'react-router-dom';
 
 export const AppHeader = () => {
   const size = useContext(ResponsiveContext);
@@ -30,19 +30,16 @@ export const AppHeader = () => {
     {
       label: 'Home',
       path: '/dashboard',
-      onClick: () => {
-        navigate(headerLinks[0].path);
-      },
+      onClick: () => { navigate(headerLinks[0].path) }
     },
-  ];
-  AuthenticationUtils.getUserRole() !== 'Delivery' &&
-    headerLinks.push({
+    {
       label: 'Documentation',
       path: '/documentation',
       onClick: () => {
         navigate(headerLinks[1].path);
       },
-    });
+    },
+  ];
 
   const loginPageHeaderLinks = [
     {
@@ -68,9 +65,16 @@ export const AppHeader = () => {
     },
     {
       label: 'Contact',
-      path: 'https://www.hpe.com/uk/en/contact-hpe.html',
+      path: '/contact',
       onClick: () => {
         window.location.replace(loginPageHeaderLinks[3].path);
+      },
+    },
+     {
+      label: 'About us',
+      path: '/aboutus',
+      onClick: () => {
+        window.location.replace(loginPageHeaderLinks[4].path);
       },
     },
   ];
@@ -82,22 +86,29 @@ export const AppHeader = () => {
   }, [focused, setFocused]);
 
   const mystyle = {
+    width: '40px',
+    height: '40px',
     backgroundColor: '#FFBC44',
+    Type: 'Initials',
+    left: '1107',
+    top: '1400',
+    border: '24',
   };
 
+  const name = 'Jalt Kohlar';
   const getInitials = function () {
-    const name = AuthenticationUtils.getUserName();
-    const parts = name.split(' ');
+    // const name = AuthenticationService.getUserName();
+    let parts = name.split(' ');
     let initials = '';
-    for (const element of parts) {
-      if (element.length > 0 && element !== '') {
-        initials += element[0].toUpperCase();
+    for (let i = 0; i < parts.length; i++) {
+      if (parts[i].length > 0 && parts[i] !== '') {
+        initials += parts[i][0].toUpperCase();
       }
     }
     return initials;
   };
 
-  if (window.location.pathname === '/') {
+  if (window.location.pathname === '/' || window.location.pathname === '/aboutus' || window.location.pathname === '/contact') {
     return (
       <Header margin={{ top: 'xsmall' }}>
         <Box direction='column' gap='none' margin={{ left: 'medium' }}>
@@ -114,12 +125,7 @@ export const AppHeader = () => {
         {!['xsmall', 'small'].includes(size) ? (
           <Nav direction='row' gap='small'>
             {loginPageHeaderLinks.map((item) => (
-              <Button
-                style={{ borderRadius: '0' }}
-                label={item.label}
-                key={item.label}
-                href={item.path}
-              />
+              <Button style={{ borderRadius: '0' }} label={item.label} key={item.label} href={item.path} />
             ))}
           </Nav>
         ) : (
@@ -130,9 +136,9 @@ export const AppHeader = () => {
             <Search />
           </Box>
           <Box margin={{ right: 'medium' }}>
-            {/* <Link to='/projects' aria-current='page'> */}
+            <a href='/projects'>
               <Projects />
-            {/* </Link> */}
+            </a>
           </Box>
           <Box margin={{ right: 'medium' }}>
             <Language />
@@ -199,16 +205,12 @@ export const AppHeader = () => {
               <Projects style={{ width: '100%', height: 20 }}></Projects>
             </Button>
             <Button>
-              <Avatar style={mystyle} size='42px'>
-                {getInitials()}
-              </Avatar>
+              <Avatar style={mystyle}>{getInitials()}</Avatar>
             </Button>
           </Box>
         </Box>
       </Header>
     );
-  } else {
-    return;
   }
 };
 
