@@ -1,18 +1,20 @@
-from flask import Blueprint, jsonify, request, Response
+from flask import Blueprint, jsonify, request, Response, Flask
 from utils import *
 from models import *
 import datetime
 import os
 import subprocess
-import shutil
+import shutil   
 import pandas as pd
 from openpyxl import load_workbook
 import re
 import numpy as np
 import zipfile
 import openpyxl
+# from tasks import *
 
 authentication_controller = Blueprint('authentication', __name__)
+analysis_bp = Blueprint('analysis', __name__)
 
 tool_analysis_type = ''
 PJHOME = ''
@@ -24,34 +26,16 @@ hM = ''
 db_username = ''
 db_password_encrypt = ''
 
-@authentication_controller.route('/login', methods=['POST'])
-def authentication():
-    json_data = request.get_json()
-    print(json_data)
-    form_email = json_data['email']
-    form_password = json_data['password']
-
-    if form_email and validate_email(form_email):
-        user_data_validate = user_details.query.filter_by(email=form_email).first()
-        print(user_data_validate)
-        if user_data_validate:
-            if user_data_validate.password == form_password:
-                return jsonify({'message': 'authentication success'}), 200
-            else:
-                return jsonify({'message': 'authentication failed'}), 401
-    else:
-        return jsonify({'message': 'Invalid Email Id!'}), 401 
-
 @authentication_controller.route('/signup', methods=['POST'])
 def signup():
     json_data = request.get_json()
-    print(json_data)
     form_email = json_data['email']
     form_password = json_data['password']
     form_first_name = json_data['first_name']
     form_last_name = json_data['last_name']
-    form_role = json_data['role']
+    form_role = json_data['user_role']
     roles = ["delivery", "pursuit", "customer", "admin"]
+
     if form_role.lower() not in roles:
       error_message = {'error' :"Invalid role type"}
       return jsonify(error_message), 404
@@ -61,7 +45,6 @@ def signup():
         if user_data_validate:
             return jsonify({'message': 'Email Already Exsists !!'}), 401
         else:
-            #( email, password, first_name, last_name, user_role, created_at,updated_at)
             cur_date = datetime.datetime.now()
             new_user = user_details(form_email, form_password, form_first_name, form_last_name, form_role, cur_date, cur_date)
             db.session.add(new_user)
@@ -70,9 +53,27 @@ def signup():
     else:
         return jsonify({'message': 'Invalid Email Id!'}), 401
 
+@authentication_controller.route('/login', methods=['POST'])
+def authentication():
+    json_data = request.get_json()
+    form_email = json_data['email']
+    form_password = json_data['password']
+
+    if form_email and validate_email(form_email):
+        user_data_validate = user_details.query.filter_by(email=form_email).first()
+        print(user_data_validate)
+        if user_data_validate:
+            if user_data_validate.password == form_password:
+                return jsonify({'message': 'authentication success', 'first_name':user_data_validate.first_name,'last_name':user_data_validate.last_name,'user_email':user_data_validate.email,'user_role':user_data_validate.user_role}), 200
+        else:
+            return jsonify({'message': 'authentication failed'}), 401
+    else:
+        return jsonify({'message': 'Invalid Email Id!'}), 401
+    
 @authentication_controller.route('/analysis', methods=['POST'])
 def upload():
     try:
+
         file = request.files['file_name']
 
         form_project_name = request.form['project_name']
@@ -97,50 +98,37 @@ def upload():
             form_target_jsp = request.form['target_jsp']
             form_source_servlet = request.form['source_servlet']
             form_target_servlet = request.form['target_servlet']
-        
         elif(tool_analysis_type in c_analysis_types):
             if(tool_analysis_type == 'Pro*C'):
-                
                 tool_analysis_type = 'canalysis'
-
                 form_source_pre_compiler = request.form['source_pre_compiler']
                 form_target_pre_compiler = request.form['target_pre_compiler']
                 form_source_pre_compiler_version = request.form['source_pre_compiler_version']
                 form_target_pre_compiler_version = request.form['target_pre_compiler_version']
-
                 form_source_compiler = ''
                 form_target_compiler = ''
                 form_source_compiler_version = ''
                 form_target_compiler_version = ''
-
             elif(tool_analysis_type == 'C' or tool_analysis_type == 'C++'):
-                
                 tool_analysis_type = 'canalysis'
-                
                 form_source_compiler = request.form['source_compiler']
                 form_target_compiler = request.form['target_compiler']
                 form_source_compiler_version = request.form['source_compiler_version']
                 form_target_compiler_version = request.form['target_compiler_version']
-
                 form_source_pre_compiler = ''
                 form_target_pre_compiler = ''
                 form_source_pre_compiler_version = ''
                 form_target_pre_compiler_version = ''
-
             elif(tool_analysis_type == 'C/Pro*C' or tool_analysis_type == 'C++/Pro*C'):
-
                 tool_analysis_type = 'canalysis'
-
                 form_source_pre_compiler = request.form['source_pre_compiler']
                 form_target_pre_compiler = request.form['target_pre_compiler']
                 form_source_pre_compiler_version = request.form['source_pre_compiler_version']
                 form_target_pre_compiler_version = request.form['target_pre_compiler_version']  
-
                 form_source_compiler = request.form['source_compiler']
                 form_target_compiler = request.form['target_compiler']
                 form_source_compiler_version = request.form['source_compiler_version']
-                form_target_compiler_version = request.form['target_compiler_version'] 
-
+                form_target_compiler_version = request.form['target_compiler_version']
         elif(tool_analysis_type == 'Shell'):  
             tool_analysis_type = 'shellanalysis'
             form_source_shell = request.form['source_shell']
@@ -178,8 +166,9 @@ def upload():
         file.save(os.path.join(directory, file_name +'.zip'))
 
         file_size_bytes = os.stat(directory +'/'+ file_name + '.zip').st_size
-        file_size_mb = round(file_size_bytes/(1024*1024), 3)
+        file_size_mb = round(file_size_bytes/(1024), 3)
 
+        #to copy Java, U2L and report_templates folder
         try:
             source_dir = '/usr/u2l/u2l_backend/'
             source_dir_report = '/usr/u2l/u2l_backend/report_templates/'
@@ -193,12 +182,27 @@ def upload():
                 dest_path = os.path.join(dest_dir, 'Java')
                 shutil.copytree(source_path, dest_path)
 
+                source_path = os.path.join(source_dir, 'pmd-bin-6.55.0')
+                dest_path = os.path.join(dest_dir, 'pmd-bin-6.55.0')
+                shutil.copytree(source_path, dest_path)
+
+                make_directory = dest_dir + '/pmd-bin-6.55.0/Reports_1'
+                os.makedirs(make_directory)
+
                 source_path = os.path.join(source_dir_report, 'java_report.xlsx')
                 dest_path = os.path.join(dest_dir, 'java_report.xlsx')
                 shutil.copy(source_path, dest_path)
 
                 source_path = os.path.join(source_dir_report, 'java_inventory_report.xlsx')
                 dest_path = os.path.join(dest_dir, 'java_inventory_report.xlsx')
+                shutil.copy(source_path, dest_path)
+
+                source_path = os.path.join(source_dir_report, 'java_remediation_report_new.xlsx')
+                dest_path = os.path.join(dest_dir, 'java_remediation_report_new.xlsx')
+                shutil.copy(source_path, dest_path)
+
+                source_path = os.path.join(source_dir_report, 'java_high_level_report.xlsx')
+                dest_path = os.path.join(dest_dir, 'java_high_level_report.xlsx')
                 shutil.copy(source_path, dest_path)
 
             elif(tool_analysis_type == 'shellanalysis'):
@@ -231,6 +235,7 @@ def upload():
             db.session.commit()
         except Exception as e:
             db.session.rollback()
+            print(e)
             return jsonify({'message': 'project_details : Project name already exists'}), 409
 
         #storing values in db analysis_type table
@@ -302,7 +307,6 @@ def upload():
 
         # Copy source code to java/c/shell analysis directory
         source_path = '/usr/u2l/u2l_backend/projects/' + file_name +'/'+ file_name + '.zip'
-
         try:
             if(tool_analysis_type == 'javaanalysis'):
                 destination_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/java-vfunction_'+ yMD + '_' + hMS +'/work/javaanalysis/'
@@ -361,8 +365,7 @@ def upload():
             PJHOME = '/usr/u2l/u2l_backend/projects/' + file_name + '/Java'
             os.environ['PJHOME'] = PJHOME
 
-            # Run javaSourceDiscovery.sh scriptPassword@123
-
+            # Run javaSourceDiscovery.sh script
             try:
                 script_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/Java/javaSourceDiscovery.sh'
                 code_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/java-vfunction_'+ yMD + '_' + hMS +'/work/javaanalysis/'
@@ -388,6 +391,20 @@ def upload():
             except Exception as e:
                 return jsonify({'error': str(e)})   
 
+            # Run javaFrameworkScan.sh script
+            try:
+                script_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/Java/javaFrameworkScan.sh'
+                code_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/java-vfunction_'+ yMD + '_' + hMS +'/work/javaanalysis/'
+                framework_type = 'Jsf'
+                command = ['sh', script_path, code_path, framework_type]
+                process = subprocess.Popen(command, stdout=subprocess.PIPE)
+                output = process.communicate()[0].decode().strip()
+                lines = output.split('\n')
+                print(lines)
+                print('\nCompleted running javaFrameworkScan.sh\n')
+            except Exception as e:
+                return jsonify({'error': str(e)})
+        
             # Run javaRulesRemedy.sh script
             try:
                 script_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/Java/javaRulesRemedy.sh'
@@ -399,21 +416,6 @@ def upload():
                 print('Completed running javaRulesRemedy.sh')
             except Exception as e:
                 return jsonify({'error': str(e)})
-
-            # Run javaFrameworkScan.sh script
-            try:
-                script_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/Java/javaFrameworkScan.sh'
-                code_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/java-vfunction_'+ yMD + '_' + hMS +'/work/javaanalysis/'
-                framework_type = 'Spring'
-                command = ['sh', script_path, code_path, framework_type]
-                process = subprocess.Popen(command, stdout=subprocess.PIPE)
-                output = process.communicate()[0].decode().strip()
-                lines = output.split('\n')
-                print(lines)
-                print('\nCompleted running javaFrameworkScan.sh\n')
-            except Exception as e:
-                return jsonify({'error': str(e)})
-        
             try:
 
                 print("Moving texts files !!!")
@@ -436,7 +438,97 @@ def upload():
                             except FileNotFoundError:
                                 continue
             except Exception as e:
-                return jsonify({'error': str(e)})    
+                return jsonify({'error': str(e)})
+
+            extracted_file_name = file_name.split('_')[0]
+            
+            #Performance
+            run_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/pmd-bin-6.55.0/bin/run.sh'
+            pmd = 'pmd'
+            d = '-d'
+            src_filepath = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/java-vfunction_'+ yMD + '_' + hMS +'/work/javaanalysis/' + extracted_file_name
+            f = '-f'
+            report_format = 'csv'
+            r = '-R'
+            rule_set = 'rulesets/java/u2l_performance.xml'
+            use_version = '--use-version'
+            version = 'java-1.8'
+            report_file = '--report-file'
+            report_file_name = '/usr/u2l/u2l_backend/projects/' + file_name + '/pmd-bin-6.55.0/Reports_1/Performance_Report.csv'
+
+            command = ['sh', run_path, pmd, d, src_filepath, f, report_format, r, rule_set, use_version, version, report_file, report_file_name]
+
+            try:
+                process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                output, error = process.communicate()
+            except:
+                return 'PMD failed'
+
+            #Best Practices
+            run_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/pmd-bin-6.55.0/bin/run.sh'
+            pmd = 'pmd'
+            d = '-d'
+            src_filepath = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/java-vfunction_'+ yMD + '_' + hMS +'/work/javaanalysis/' + extracted_file_name
+            f = '-f'
+            report_format = 'csv'
+            r = '-R'
+            rule_set = 'rulesets/java/u2l_bestpractices.xml'
+            use_version = '--use-version'
+            version = 'java-1.8'
+            report_file = '--report-file'
+            report_file_name = '/usr/u2l/u2l_backend/projects/' + file_name + '/pmd-bin-6.55.0/Reports_1/BestPractices_Report.csv'
+
+            command = ['sh', run_path, pmd, d, src_filepath, f, report_format, r, rule_set, use_version, version, report_file, report_file_name]
+
+            try:
+                process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                output, error = process.communicate()
+            except:
+                return 'PMD failed'
+
+            #Multithreading
+            run_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/pmd-bin-6.55.0/bin/run.sh'
+            pmd = 'pmd'
+            d = '-d'
+            src_filepath = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/java-vfunction_'+ yMD + '_' + hMS +'/work/javaanalysis/' + extracted_file_name
+            f = '-f'
+            report_format = 'csv'
+            r = '-R'
+            rule_set = 'rulesets/java/u2l_multithread.xml'
+            use_version = '--use-version'
+            version = 'java-1.8'
+            report_file = '--report-file'
+            report_file_name = '/usr/u2l/u2l_backend/projects/' + file_name + '/pmd-bin-6.55.0/Reports_1/MultiThreading_Report.csv'
+
+            command = ['sh', run_path, pmd, d, src_filepath, f, report_format, r, rule_set, use_version, version, report_file, report_file_name]
+
+            try:
+                process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                output, error = process.communicate()
+            except:
+                return 'PMD failed'
+
+            #Security
+            run_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/pmd-bin-6.55.0/bin/run.sh'
+            pmd = 'pmd'
+            d = '-d'
+            src_filepath = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/java-vfunction_'+ yMD + '_' + hMS +'/work/javaanalysis/' + extracted_file_name
+            f = '-f'
+            report_format = 'csv'
+            r = '-R'
+            rule_set = 'rulesets/java/u2l_security.xml'
+            use_version = '--use-version'
+            version = 'java-1.8'
+            report_file = '--report-file'
+            report_file_name = '/usr/u2l/u2l_backend/projects/' + file_name + '/pmd-bin-6.55.0/Reports_1/Security_Report.csv'
+
+            command = ['sh', run_path, pmd, d, src_filepath, f, report_format, r, rule_set, use_version, version, report_file, report_file_name]
+
+            try:
+                process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                output, error = process.communicate()
+            except:
+                return 'PMD failed' 
 
         # Converting logs into dataframes and generating reports
         try:
@@ -444,8 +536,10 @@ def upload():
             if(tool_analysis_type == 'javaanalysis'):
 
                 yyyy_mmdd = yMD[:4] + '-' + yMD[4:]
+                java_remediation_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/java_remediation_report_new.xlsx'
                 
                 # Convert javaSourceScanRemedy into .csv
+                print("Start 1")
                 javaSourceScanRemedy = '/usr/u2l/u2l_backend/projects/' + file_name + '/javaSourceScanRemedy'
                 if os.path.isfile(javaSourceScanRemedy) and os.path.getsize(javaSourceScanRemedy) > 0:
                     df = pd.read_csv(javaSourceScanRemedy, sep='\t', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
@@ -454,38 +548,38 @@ def upload():
                     save_location = '/usr/u2l/u2l_backend/projects/' + file_name + '/java_report.xlsx'
 
                     generate_workbook(df, save_location,'javaSourceScanRemedy')
+                print("End 1")
 
                 # Convert javaSourceCode2Remedy into .csv
+                print("Start 2")
                 javaSourceCode2Remedy = '/usr/u2l/u2l_backend/projects/' + file_name + '/javaSourceCode2Remedy'
                 if os.path.isfile(javaSourceCode2Remedy) and os.path.getsize(javaSourceCode2Remedy) > 0:
-                    df = pd.read_csv(javaSourceCode2Remedy, sep='\t|:', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
-                    df.columns = ['RULE ID', 'FILE NAME', 'LINE NUMBER', 'REMEDY']
+                    df = pd.read_csv(javaSourceCode2Remedy, sep='\t|:', engine='python', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
+                    if(len(df.columns) == 5):
+                        df.columns = ['RULE ID', 'FILE NAME', 'LINE NUMBER', 'Column4', 'AFFECTED CODE']
+                        df = df.drop(columns=['Column4'])
+                        print(df)
+                    df.columns = ['RULE ID', 'FILE NAME', 'LINE NUMBER', 'AFFECTED CODE']
                     df.index = df.index + 1
                     save_location = '/usr/u2l/u2l_backend/projects/' + file_name + '/java_report.xlsx'
-
+                    
                     generate_workbook(df, save_location,'javaSourceCode2Remedy')
-
-                # Convert javaAffectedSourceInformation files into .csv
-                javaAffectedSourceInformation = '/usr/u2l/u2l_backend/projects/' + file_name + '/javaAffectedSourceInformation'
-                if os.path.isfile(javaAffectedSourceInformation) and os.path.getsize(javaAffectedSourceInformation) > 0:
-                    df = pd.read_csv(javaAffectedSourceInformation, sep='\t', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
-                    df.columns = ['FILE NAME', 'LINE NUMBER', 'AFFECTED CODE']
-                    df.index = df.index + 1
-                    save_location = '/usr/u2l/u2l_backend/projects/' + file_name + '/java_report.xlsx'
-
-                    generate_workbook(df, save_location,'javaAffectedSourceInformation')
+                    
+                df1 = pd.read_excel(save_location, engine='openpyxl', sheet_name='javaSourceScanRemedy', skiprows=0)
+                df1 = df1.drop(df1.columns[0], axis=1)
+                df1 = df1.iloc[:, 3]
                 
-                # Convert javacIssue.log files into .csv
-                javacIssue_dir_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/java-vfunction_'+ yMD + '_' + hMS + '/log/' + tool_analysis_type + '/java/javacLog/' + yyyy_mmdd + '/javacIssue.log'
-                if os.path.isfile(javacIssue_dir_path) and os.path.getsize(javacIssue_dir_path) > 0:
-                    df = pd.read_csv(javacIssue_dir_path, sep=':', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
-                    df.columns = ['FILE NAME', 'LINE NUMBER', 'COMMAND', 'ERROR MESSAGE']
-                    df.index = df.index + 1
-                    save_location = '/usr/u2l/u2l_backend/projects/' + file_name + '/java_report.xlsx'
-
-                    generate_workbook(df, save_location,'Compilation Error Report')
-
-                # Convert javacWarnings.list files into .csv
+                writer = pd.ExcelWriter(save_location, engine='openpyxl', mode='a')
+                book = load_workbook(save_location)
+                writer.book = book
+                writer.sheets = dict((ws.title, ws) for ws in book.worksheets)
+                df1.to_excel(writer, sheet_name='javaSourceCode2Remedy', index=False, startrow=1, startcol=5, header=False)
+                writer.save()
+                sheet_transfer('javaSourceCode2Remedy', '10. Java Source Scan Remedy', 6, 1, save_location, java_remediation_path)
+                print("End 2")
+                
+                # Convert javacWarnings.list
+                print("Start 4")
                 javacWarnings_dir_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/java-vfunction_'+ yMD + '_' + hMS + '/log/' + tool_analysis_type + '/java/javacLog/' + yyyy_mmdd + '/javacWarnings.list'
                 if os.path.isfile(javacWarnings_dir_path) and os.path.getsize(javacWarnings_dir_path) > 0:
                     df = pd.read_csv(javacWarnings_dir_path, sep=':', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
@@ -493,8 +587,11 @@ def upload():
                     save_location = '/usr/u2l/u2l_backend/projects/' + file_name + '/java_report.xlsx'
 
                     generate_workbook(df, save_location,'Compilation Warning Report')
+                    sheet_transfer('Compilation Warning Report', '2. Compilation Warning Detail', 6, 1, save_location, java_remediation_path)
+                print("End 4")
 
                 # Convert import_lines.out
+                print("Start 5")
                 importLines_dir_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/java-vfunction_'+ yMD + '_' + hMS + '/log/' + tool_analysis_type + '/java/import/' + yyyy_mmdd + '/import_lines.out'
                 if os.path.isfile(importLines_dir_path) and os.path.getsize(importLines_dir_path) > 0:
                     df = pd.read_csv(importLines_dir_path, sep='\t', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
@@ -503,8 +600,11 @@ def upload():
                     save_location = '/usr/u2l/u2l_backend/projects/' + file_name + '/java_report.xlsx'
 
                     generate_workbook(df, save_location,'Import Class Report')
+                    sheet_transfer('Import Class Report', '8. Import Class Detail', 6, 1, save_location, java_remediation_path)
+                print("End 5")
 
                 # Convert import_lines_jsp.out
+                print("Start 6")
                 importLinesJsp_dir_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/java-vfunction_'+ yMD + '_' + hMS + '/log/' + tool_analysis_type + '/java/import/' + yyyy_mmdd + '/import_lines_jsp.out'
                 if os.path.isfile(importLinesJsp_dir_path) and os.path.getsize(importLinesJsp_dir_path) > 0:
                     df = pd.read_csv(importLinesJsp_dir_path, sep='\t', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
@@ -512,29 +612,63 @@ def upload():
                     save_location = '/usr/u2l/u2l_backend/projects/' + file_name + '/java_report.xlsx'
 
                     generate_workbook(df, save_location,'Import JSP Report')
-
-                # Convert OS_diff.out
-                OSDiff_dir_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/java-vfunction_'+ yMD + '_' + hMS + '/log/' + tool_analysis_type + '/java/versiondiff/' + yyyy_mmdd + '/OS_diff.out'
-                if os.path.isfile(OSDiff_dir_path) and os.path.getsize(OSDiff_dir_path) > 0:
-                    df = pd.read_csv(OSDiff_dir_path, sep='\s+', engine='python', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
-                    df.columns = ['Column1', 'FILE NAME', 'LINE NUMBER', 'SOURCE CODE']
-                    df = df.drop(columns=['Column1'])
-                    df.index = df.index + 1
+                    sheet_transfer('Import JSP Report', '9. Import JSP Detail', 6, 1, save_location,java_remediation_path)
+                print("End 6")
+                
+                # Best Practices
+                print("Start 7")
+                best_pratices_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/pmd-bin-6.55.0/Reports_1/BestPractices_Report.csv'
+                if os.path.isfile(best_pratices_path) and os.path.getsize(best_pratices_path) > 0:
+                    df = pd.read_csv(best_pratices_path, sep=',', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
+                    df.columns = ['Problem','Package','File','Priority','Line','Description','Rule Set','Rule']
+                    df = df.drop(df.index[0])
                     save_location = '/usr/u2l/u2l_backend/projects/' + file_name + '/java_report.xlsx'
 
-                    generate_workbook(df, save_location,'OS Analysis Details')
+                    generate_workbook(df, save_location,'Best_Practices')
+                    sheet_transfer('Best_Practices', '11. Best Practices', 6, 1, save_location, java_remediation_path)
+                print("End 7")
 
-                # Convert jdk_diff.out
-                jdkDiff_dir_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/java-vfunction_'+ yMD + '_' + hMS + '/log/' + tool_analysis_type + '/java/versiondiff/' + yyyy_mmdd + '/jdk_diff.out'
-                if os.path.isfile(jdkDiff_dir_path) and os.path.getsize(jdkDiff_dir_path) > 0:
-                    df = pd.read_csv(jdkDiff_dir_path, sep='\s+', engine='python', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
-                    df = df.drop(columns=['Column1'])
-                    df.index = df.index + 1
+                # MultiThreading
+                print("Start 8")
+                multithreading_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/pmd-bin-6.55.0/Reports_1/MultiThreading_Report.csv'
+                if os.path.isfile(multithreading_path) and os.path.getsize(multithreading_path) > 0:
+                    df = pd.read_csv(multithreading_path, sep=',', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
+                    df.columns = ['Problem','Package','File','Priority','Line','Description','Rule Set','Rule']
+                    df = df.drop(df.index[0])
                     save_location = '/usr/u2l/u2l_backend/projects/' + file_name + '/java_report.xlsx'
 
-                    generate_workbook(df, save_location,'JDK Anaylsis Details')
+                    generate_workbook(df, save_location,'Multithreading')
+                    sheet_transfer('Multithreading', '12. MultiThreading', 6, 1, save_location, java_remediation_path)
+                print("End 8")
+
+                # Performance
+                print("Start 9")
+                performance_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/pmd-bin-6.55.0/Reports_1/Performance_Report.csv'
+                if os.path.isfile(performance_path) and os.path.getsize(performance_path) > 0:
+                    df = pd.read_csv(performance_path, sep=',', engine='python', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
+                    df.columns = ["Problem","Package","File","Priority","Line","Description","Rule set","Rule"]
+                    df = df.drop(df.index[0])
+                    save_location = '/usr/u2l/u2l_backend/projects/' + file_name + '/java_report.xlsx'
+
+                    generate_workbook(df, save_location,'Performance')
+                    sheet_transfer('Performance', '13. Performance', 6, 1, save_location, java_remediation_path)
+                print("End 9")
+
+                # Security
+                print("Start 10")
+                security_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/pmd-bin-6.55.0/Reports_1/Security_Report.csv'
+                if os.path.isfile(security_path) and os.path.getsize(security_path) > 0:
+                    df = pd.read_csv(security_path, sep=',', engine='python', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
+                    df.columns = ["Problem","Package","File","Priority","Line","Description","Rule set","Rule"]
+                    df = df.drop(df.index[0])
+                    save_location = '/usr/u2l/u2l_backend/projects/' + file_name + '/java_report.xlsx'
+
+                    generate_workbook(df, save_location,'Security')
+                    sheet_transfer('Security', '14. Security', 6, 1, save_location, java_remediation_path)
+                print("End 10")
                 
                 #Source Code Inventory
+                print("Start 11")
                 regex = r'^.*$'
                 source_code_java_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/java-vfunction_'+ yMD + '_' + hMS + '/log/' + tool_analysis_type + '/Log_Source_Analysis_' + yMD + '.log'
                 print(source_code_java_path)
@@ -567,13 +701,95 @@ def upload():
                     result_df = result_df.reset_index(drop=True)
                     result_df.index += 1
 
+                    save_location_1 = '/usr/u2l/u2l_backend/projects/' + file_name + '/java_report.xlsx'
+
+                    generate_workbook(result_df, save_location_1,'Source Code Inventory')
+
+                    save_location_2 = '/usr/u2l/u2l_backend/projects/' + file_name + '/java_inventory_report.xlsx'
+
+                    generate_workbook(result_df, save_location_2,'Source Code Inventory')
+                    sheet_transfer('Source Code Inventory', 'Source Code Inventory', 6, 1, save_location_1, java_remediation_path)
+                print("End 11")
+
+                # Convert OS_diff.out
+                print("Start 12")
+                OSDiff_dir_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/java-vfunction_'+ yMD + '_' + hMS + '/log/' + tool_analysis_type + '/java/versiondiff/' + yyyy_mmdd + '/OS_diff.out'
+                if os.path.isfile(OSDiff_dir_path) and os.path.getsize(OSDiff_dir_path) > 0:
+                    print("inside 12")
+                    df = pd.read_csv(OSDiff_dir_path, sep='\t', engine='python', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
+                    print(df)
+                    if(len(df.columns) == 6):
+                        df.columns = ['Column1', 'FILE NAME', 'LINE NUMBER', 'Column4', 'Column5', 'REMEDY']
+                        df = df.drop(columns=['Column4', 'Column5'])
+                        print(df)
+                    if(len(df.columns) == 5):
+                        df.columns = ['Column1', 'FILE NAME', 'LINE NUMBER', 'Column4', 'REMEDY']
+                        df = df.drop(columns=['Column4'])
+                        print(df)
+                    df.columns = ['Column1', 'FILE NAME', 'LINE NUMBER', 'SOURCE CODE']
+                    df = df.drop(columns=['Column1'])
+                    df.index = df.index + 1
                     save_location = '/usr/u2l/u2l_backend/projects/' + file_name + '/java_report.xlsx'
 
-                    generate_workbook(result_df, save_location,'Source Code Inventory')
+                    generate_workbook(df, save_location,'OS Analysis Details')
+                    sheet_transfer('OS Analysis Details', '5. OS Analysis Detail', 6, 1, save_location, java_remediation_path)
+                print("End 12")
 
-                    save_location = '/usr/u2l/u2l_backend/projects/' + file_name + '/java_inventory_report.xlsx'
+                # Convert jdk_diff.out
+                print("Start 13")
+                jdkDiff_dir_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/java-vfunction_'+ yMD + '_' + hMS + '/log/' + tool_analysis_type + '/java/versiondiff/' + yyyy_mmdd + '/jdk_diff.out'
+                if os.path.isfile(jdkDiff_dir_path) and os.path.getsize(jdkDiff_dir_path) > 0:
+                    df = pd.read_csv(jdkDiff_dir_path, sep='\s+', engine='python', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
+                    df = df.drop(columns=['Column1'])
+                    df.index = df.index + 1
+                    save_location = '/usr/u2l/u2l_backend/projects/' + file_name + '/java_report.xlsx'
 
-                    generate_workbook(result_df, save_location,'Source Code Inventory')
+                    generate_workbook(df, save_location,'JDK Anaylsis Details')
+                    sheet_transfer('JDK Anaylsis Details', '3. JDK Analysis Detail', 6, 1, save_location, java_remediation_path)
+                print("End 13")
+
+                #java_high_level_report.xlsx
+
+                excel_file = java_remediation_path
+                sheet_configs = {
+                    '1. Compilation Error Report': {'usecols': lambda x: x != 1, 'skiprows': 5, 'column_index': 2},
+                    '2. Compilation Warning Detail': {'usecols': lambda x: x != 1, 'skiprows': 5, 'column_index': 2},
+                    '3. JDK Analysis Detail': {'usecols': lambda x: x != 1, 'skiprows': 5, 'column_index': 2},
+                    '4. J2EE Analysis Detail': {'usecols': lambda x: x != 1, 'skiprows': 5, 'column_index': 2},
+                    '5. OS Analysis Detail': {'usecols': lambda x: x != 1, 'skiprows': 5, 'column_index': 1},
+                    '6. App Server Analysis Detail': {'usecols': lambda x: x != 1, 'skiprows': 5, 'column_index': 2},
+                    '7. Database Analysis Detail': {'usecols': lambda x: x != 1, 'skiprows': 5, 'column_index': 2},
+                    '8. Import Class Detail': {'usecols': lambda x: x != 1, 'skiprows': 5, 'column_index': 2},
+                    '9. Import JSP Detail': {'usecols': lambda x: x != 1, 'skiprows': 5, 'column_index': 2},
+                    '10. Java Source Scan Remedy': {'usecols': lambda x: x != 1, 'skiprows': 5, 'column_index': 2},
+                    '11. Best Practices': {'usecols': lambda x: x != 1, 'skiprows': 5, 'column_index': 3},
+                    '12. MultiThreading': {'usecols': lambda x: x != 1, 'skiprows': 5, 'column_index': 3},
+                    '13. Performance': {'usecols': lambda x: x != 1, 'skiprows': 5, 'column_index': 3},
+                    '14. Security': {'usecols': lambda x: x != 1, 'skiprows': 5, 'column_index': 3},
+                }
+
+                dfs = []
+
+                for sheet_name, config in sheet_configs.items():
+                    df = pd.read_excel(excel_file, engine='openpyxl', sheet_name=sheet_name, usecols=config['usecols'], skiprows=config['skiprows'])
+                    df = df.drop(df.columns[0], axis=1)
+                    df = df.iloc[:, config['column_index']]
+
+                    if not df.empty and not df.isnull().all().all():
+                        dfs.append(df)
+
+                df_combined = pd.concat(dfs, ignore_index=True)
+                df_combined = df_combined.drop_duplicates()
+                df_combined = df_combined.reset_index(drop=True)
+                print(df_combined)
+
+                save_location = '/usr/u2l/u2l_backend/projects/' + file_name + '/java_high_level_report.xlsx'
+                writer = pd.ExcelWriter(save_location, engine='openpyxl', mode='a')
+                book = load_workbook(save_location)
+                writer.book = book
+                writer.sheets = dict((ws.title, ws) for ws in book.worksheets)
+                df_combined.to_excel(writer, sheet_name='Source Code Impacted', index=False, startrow=6, startcol=1, header=False)
+                writer.save()
 
             elif(tool_analysis_type == 'canalysis'):
 
@@ -862,34 +1078,6 @@ def report(query_project_name):
         }
     )
 
-@authentication_controller.route('/configuration/<query_file_name>', methods=['GET'])
-def export_configuration_file(query_file_name):
-
-    if query_file_name == 'Code Delivery Guidelines-V0.4':      
-        file_path = '/usr/u2l/u2l_backend/media/'+ query_file_name +'.docx'
-    if query_file_name == 'HPE U2L Questionnaire-light':      
-        file_path = '/usr/u2l/u2l_backend/media/'+ query_file_name +'.xls'
-
-    if not os.path.exists(file_path):
-        return 'File not found', 404
-    
-    zip_buffer = zipfile.ZipFile('files.zip', 'w', zipfile.ZIP_DEFLATED)
-    zip_buffer.write(file_path, os.path.basename(file_path))
-    zip_buffer.close()
-
-    os.chmod('files.zip', 0o777)
-
-    return Response(
-        open('files.zip', 'rb').read(),
-        # mimetype='application/zip',
-        headers={
-            'Content-Disposition': 'attachment;filename=files.zip',
-            'Access-Control-Allow-Origin': '*',
-            'Content-Type': 'application/zip',
-            'Cache-Control': 'no-cache, no-store, must-revalidate'
-        }
-    )    
-
 @authentication_controller.route('/pdf/<query_project_name>', methods=['GET']) #{project_name} pdf generation
 def pdf(query_project_name):
 
@@ -994,3 +1182,25 @@ def pdf(query_project_name):
     rounded_percentage = round(percentage, 2)
 
     return jsonify({'project_details': json_project_details, 'os_details': json_os_details, 'analysis_type': json_analysis_type, 'chart1': column_sums.to_dict(), 'chart2' : counts_list, 'percent' : rounded_percentage}), 200    
+
+@authentication_controller.route('/configuration/<query_file_name>', methods=['GET'])
+def export_configuration_file(query_file_name):
+    if query_file_name == 'Code Delivery Guidelines-V0.4':      
+        file_path = '/usr/u2l/u2l_backend/media/'+ query_file_name +'.docx'
+    if query_file_name == 'HPE U2L Questionnaire-light':      
+        file_path = '/usr/u2l/u2l_backend/media/'+ query_file_name +'.xls'
+    if not os.path.exists(file_path):
+        return 'File not found', 404
+    zip_buffer = zipfile.ZipFile('files.zip', 'w', zipfile.ZIP_DEFLATED)
+    zip_buffer.write(file_path, os.path.basename(file_path))
+    zip_buffer.close()
+    os.chmod('files.zip', 0o777)
+    return Response(
+        open('files.zip', 'rb').read(),
+        headers={
+            'Content-Disposition': 'attachment;filename=files.zip',
+            'Access-Control-Allow-Origin': '*',
+            'Content-Type': 'application/zip',
+            'Cache-Control': 'no-cache, no-store, must-revalidate'
+        }
+    )

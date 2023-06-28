@@ -199,3 +199,51 @@ class analysis_status(db.Model):
         self.analysis_start_time = analysis_start_time
         self.analysis_end_time = analysis_end_time                          
 
+class source_code_inventory(db.Model):
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    project_name = db.Column(db.String(50), nullable=False)
+    application_name = db.Column(db.String(50), nullable=False)
+    artefact_type = db.Column(db.String(50))
+    no_of_artefacts = db.Column(db.String(50))
+    no_of_loc = db.Column(db.String(50))
+    total_lines = db.Column(db.String(50))
+
+    def __init__(self, project_name, application_name, artefact_type, no_of_artefacts, no_of_loc, total_lines):
+        self.project_name = project_name
+        self.application_name = application_name
+        self.artefact_type = artefact_type
+        self.no_of_artefacts = no_of_artefacts
+        self.no_of_loc = no_of_loc
+        self.total_lines = total_lines
+
+class migration_summary(db.Model):
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    project_name = db.Column(db.String(50), nullable=False)
+    application_name = db.Column(db.String(50), nullable=False)
+    no_of_artefacts = db.Column(db.String(50))
+    artefacts_impacted = db.Column(db.String(50))
+    no_of_loc = db.Column(db.String(50))
+    lines_impacted = db.Column(db.String(50))
+
+    def __init__(self, project_name, application_name, no_of_artefacts, artefacts_impacted, no_of_loc, lines_impacted):
+        self.project_name = project_name
+        self.application_name = application_name
+        self.no_of_artefacts = no_of_artefacts
+        self.artefacts_impacted = artefacts_impacted
+        self.no_of_loc = no_of_loc
+        self.lines_impacted = lines_impacted
+
+class artefacts_summary(db.Model):
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    project_name = db.Column(db.String(50), nullable=False)
+    application_name = db.Column(db.String(50), nullable=False)
+    migration_area = db.Column(db.String(50))
+    no_of_artefacts = db.Column(db.String(50))
+    no_of_loc = db.Column(db.String(50))
+
+    def __init__(self, project_name, application_name, migration_area, no_of_artefacts, no_of_loc):
+        self.project_name = project_name
+        self.application_name = application_name
+        self.migration_area = migration_area
+        self.no_of_artefacts = no_of_artefacts
+        self.no_of_loc = no_of_loc
