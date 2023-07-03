@@ -48,7 +48,7 @@ const Contact = () => {
       .then((response) => {
         console.log(response)
         if (response.status === 200) {
-          setNotificationMessage('Message sent successfully');
+          setNotificationMessage('Message sent successfully. We will contact you');
           setNotificationVisible(true);
         } else {
           setNotificationMessage('Message not sent! Please try again!');
