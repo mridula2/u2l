@@ -39,10 +39,26 @@ const getReport = (project_name) => {
   return axios(config);
 };
 
+const saveContact = (data) => {
+  const config = {
+    method: 'post',
+    maxBodyLength: Infinity,
+    url: `${url}/contact`, 
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: {
+      ...data,
+    },
+  };
+  return axios(config);
+};
+
 const ProjectService = {
   getProjectDetails,
   postProjectDetails,
   getProjects,
   getReport,
+  saveContact,
 };
 export default ProjectService
