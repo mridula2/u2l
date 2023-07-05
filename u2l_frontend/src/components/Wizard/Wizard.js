@@ -29,6 +29,88 @@ import { getWidth } from './Utils';
 import ProjectService from '../../api/ProjectService';
 import WizardUtils from '../../utils/WizardUtils';
 
+// export const SidebarLocal = (activeIndex,event) => {
+
+//   const handleTabs = (event, nextId) => {
+//     event.preventDefault();
+//     console.log(event.currentTarget.id);
+//     const id = event.currentTarget.id;
+
+//     if (id === 'project_details') {
+//       console.log("project details");
+//       <StepOne />;
+//     } else if (id === 'os_details') {
+//       <StepTwo />;
+//     } else if (id === 'analysis_type') {
+//       <StepThree />;
+//     }
+//   };
+
+//   return(
+//     <Box direction="column" width="small" responsive={true} height="80vh">
+//       <Button
+//         label="Code Assessment"
+//         href="/dashboard"
+//         style={styles.sideBarbtn}
+//       />
+
+//       {activeIndex === 0 ?
+//         (<Button
+//           label="Project Details"
+//           onClick={(event) => handleTabs(event)}
+//           style={styles.sideBarbtnonselect}
+
+//         />) : ((<Button
+//           disabled={true}
+//           label="Project Details"
+//           onClick={(event) => handleTabs(event)}
+//           style={styles.btndisable}
+
+//         />))
+//       }
+
+//       {activeIndex === 1 ?
+//         (<Button
+//           label="OS Details"
+//           id="os_details"
+//           onClick={(event) => handleTabs(event)}
+//           style={styles.sideBarbtnonselect}
+//         />) : (<Button
+//           disabled={true}
+//           label="OS Details"
+//           id="os_details"
+//           onClick={(event) => handleTabs(event)}
+//           style={styles.btndisable}
+//         />)
+
+//       }
+
+//       {activeIndex === 2 ? (
+//         <Button
+//           label="Analysis Type"
+//           id="analysis_type"
+//           onClick={(event) => handleTabs(event)}
+//           style={styles.sideBarbtnonselect}
+//         />) :
+//         (<Button
+//           label="Analysis Type"
+//           id="analysis_type"
+//           disabled={true}
+//           onClick={(event) => handleTabs(event)}
+//           style={styles.sideBarbtn}
+//         />)
+//       }
+//       <Button label="Review" style={styles.sideBarbtn} />
+//       {activeIndex === 2 && (<Button
+//         margin={{ left: 'small' }}
+//         label="Review and Create"
+//         href="/review"
+//         disabled={true}
+//         style={styles.btndisable}
+//       />)}
+//     </Box>)
+// };
+
 const WizardValidationExample = ({ containerRef }) => {
   const location = useLocation();
   const defaultFormValues = () => {
@@ -109,16 +191,11 @@ const WizardValidationExample = ({ containerRef }) => {
   const [notificationVisible, setNotificationVisible] = React.useState();
   const [notificationMessage, setNotificationMessage] = React.useState('');
   const [status, setStatus] = React.useState('normal');
-  const [showProjectDetails, setShowProjectDetails] = useState(true);
-  const [showOSDetails, setShowOSDetails] = useState(false);
-  const [showAnalysisType, setShowAnalysisType] = useState(false);
-
 
   const handleTabs = (event, nextId) => {
     event.preventDefault();
     console.log(event.currentTarget.id);
     const id = event.currentTarget.id;
-
 
     if (id === 'project_details') {
       console.log("project details");
@@ -133,6 +210,7 @@ const WizardValidationExample = ({ containerRef }) => {
   const onNotificationOpen = () => {
     setNotificationVisible(true);
   };
+
   const onNotificationClose = () => {
     setNotificationVisible(false);
   };
@@ -213,7 +291,7 @@ const WizardValidationExample = ({ containerRef }) => {
 
       <Box direction="row-responsive" responsive={true}>
 
-        {/*Sidebar*/}
+        {/* <SidebarLocal /> */}
         <Box direction="column" width="small" responsive={true} height="80vh">
           <Button
             label="Code Assessment"
@@ -277,13 +355,13 @@ const WizardValidationExample = ({ containerRef }) => {
           />)}
         </Box>
 
-
         <StepContent
           onSubmit={({ value }) => {
             handleSubmit(value);
           }}
         />
       </Box>
+
       <StepFooter onNavigate={handleNavigate} />
 
       {open && (
@@ -297,7 +375,6 @@ const WizardValidationExample = ({ containerRef }) => {
 };
 
 const styles = {
-  btn: { width: '100%', textAlign: 'left' },
   sideBarbtn: {
     display: 'flex', height: '6vh',
     alignItems: 'center', borderRadius: '0',
@@ -308,7 +385,6 @@ const styles = {
     alignItems: 'center', borderRadius: '0',
     borderBottom: '0.1px solid white', fontWeight: 'bold',
     background: '#0000000A 0% 0% no-repeat padding-box',
-
   },
   btndisable: {
     display: 'flex', height: '6vh',
@@ -325,9 +401,7 @@ export const StepOne = (nextId) => {
   const { activeIndex, id, steps, width } = useContext(WizardContext);
 
   return (
-    <Box align="center">
-      {/* <Box direction="row-responsive" responsive={true} >
-        <SideBar /> */}
+    <Box margin={{left:'20%'}} align="center">
       <Box width={{ max: 'medium' }} align="center">
         <Box>
           <h3>Project details</h3>
@@ -338,8 +412,6 @@ export const StepOne = (nextId) => {
             required={true}
           >
             <TextInput
-              // width="240px"
-              // height="37px"
               placeholder="Enter Value"
               id="project_name"
               name="project_name"
@@ -383,10 +455,6 @@ export const StepOne = (nextId) => {
               name="application_name"
             />
           </FormField>
-          {/* <Box align="end" margin={{ Top: "small" }}>
-                <Button>Next</Button>
-              </Box> */}
-          {/* </Box> */}
         </Box>
         {!valid && <Error>There is an error with one or more inputs.</Error>}
       </Box>
@@ -396,7 +464,7 @@ export const StepOne = (nextId) => {
 
 export const StepTwo = (nextId) => {
   return (
-    <Box align="center">
+    <Box margin={{left:'20%'}} align="center">
       <Box width={{ max: 'medium' }}>
         <h3>OS details</h3>
         <FormField
@@ -475,61 +543,11 @@ export const StepThree = (nextId) => {
     console.log(getFramework);
   }
 
-  // const popupSpinner = () => {
-  //   setShowpinner(true);
-  //   setShow(true);
-  //   setFileUploaded(true);
-
-  //   {
-  //     fileUploaded && (
-  //       <Layer full={true} onClickOutside={() => setFileUploaded(false)}>
-  //         <Box width="250px" height="100px" direction="column" align="center">
-  //           <h3>File Uploaded</h3>
-  //         </Box>
-  //       </Layer>
-  //     );
-  //   }
-
-  //   // setTimeout(() => {
-  //   // setShow(false);
-  //   // }, 10000);
-  // };
-
-  const handleSpinner = (e) => {
-    e.preventDefault();
-    setShowSpinner(true);
-
-    setTimeout(() => {
-      setShowSpinner(false);
-    }, 1000);
-  };
-
-  const uploadFile = () => {
-    console.log('Uploading file');
-    // axios.post('https://localhost:5000/uploaded_file', uploadFile)
-  };
-
-  // const BannerNotificationInfo = () => (
-  //   <Notification
-  //     status="info"
-  //     onClose={() => {}}
-  //     actions={[
-  //       {
-  //         href: '#',
-  //         label: 'View more',
-  //       },
-  //     ]}
-  //     message="Updates to this service will be available soon
-  //      including feature a, b, and c."
-  //     global
-  //   />
-  // );
 
   return (
-    <Box align="center">
+    <Box margin={{left:'20%'}} align="center">
       <Box width={{ max: 'medium' }}>
         <Heading level={2} size="small" marginTop="0">
-          {/* margin="2"  for heading if needed*/}
           Analysis Type
         </Heading>
 
@@ -1161,10 +1179,10 @@ export const StepThree = (nextId) => {
               'JSF',
               'Hibernate',
             ]}
-            onChange={(e) => handleFramework(e)}
+            onChange={(event) => handleFramework(event)}
           />
         </FormField>
- 
+
         <FormField
           label="Source Framework Version"
           htmlFor="source_framework_version"
@@ -1207,15 +1225,6 @@ export const StepThree = (nextId) => {
             }}
           />
 
-          {/* <Box
-        margin={{ top: "small", left: "small" }}
-        direction="row"
-        gap="large"
-      >
-        <Button>Previous</Button>
-        <Button href="/review">Review + Create</Button>
-        <Button onClick={(e) => handleSpinner(e)}>Proceed</Button>
-      </Box> */}
           {showSpinner && (
             <Box>
               <Layer model>
