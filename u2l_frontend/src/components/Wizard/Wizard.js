@@ -244,6 +244,8 @@ const WizardValidationExample = ({ containerRef }) => {
       ref: wizardRef,
       setValid,
       steps,
+      // proceedButtonDisabled, 
+      // setProceedButtonDisabled,
       formValues,
       setFormValues,
       wizardTitle: 'Project Creation Form',
@@ -406,6 +408,8 @@ export const StepOne = (nextId) => {
         <Box>
           <h3>Project details</h3>
           <FormField
+            display='flex'
+            flexDirection='column'
             label="Project name"
             htmlFor="project_name"
             name="project_name"

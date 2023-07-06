@@ -62,26 +62,16 @@ const StepFooter = ({ nextId, previousId, onNavigate, ...rest }) => {
           />
         )}
 
-        {activeIndex === steps.length - 1 && (
-          <Button
-            id={nextId}
-            primary
-            reverse
-            label="Review + Create"
-            form={`${id}-form`}
-            onClick={onNavigate}
-          />
-        )}
-
         <Button
           id={nextId}
           icon={<FormNext />}
-          disabled={activeStep === 3}
+          // disabled={activeStep === 3}
           reverse
-          label={activeIndex === steps.length - 1 ? 'Proceed' : 'Next'}
+          label={activeIndex === steps.length - 1 ? 'Review + Create' : 'Next'}
           // label={decideLable}
           form={`${id}-form`}
           type="submit"
+          onClick={activeIndex === 2 && onNavigate}
         />
       </Footer>
     </Box>
