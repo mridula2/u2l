@@ -1,21 +1,21 @@
-import React, { forwardRef, useContext } from 'react';
+import React, { forwardRef, useContext, useEffect } from 'react';
 import { ThemeContext } from 'styled-components';
 // import { defaultProps } from '../../default-props';
 import { Box } from 'grommet';
 
-const Card = forwardRef(({ ...rest }, ref) => {
+const CardTemplate = forwardRef(({ myKey, ...rest }, ref) => {
   // const theme = useContext(ThemeContext) || defaultProps.theme;
   const theme = useContext(ThemeContext);
 
   return (
     <Box
       // color='grey'
-      title='Card1.......'
-      overflow="hidden"
+      overflow='hidden'
       kind={{
         hover: theme.card.hover?.container,
         ...theme.card.container,
       }}
+      key={myKey}
       ref={ref}
       {...theme.card.container}
       {...rest}
@@ -23,6 +23,6 @@ const Card = forwardRef(({ ...rest }, ref) => {
   );
 });
 
-Card.displayName = 'Card';
+CardTemplate.displayName = 'Card';
 
-export { Card };
+export { CardTemplate };

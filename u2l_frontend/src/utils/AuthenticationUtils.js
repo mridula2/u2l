@@ -36,7 +36,7 @@ const isUserLoggedIn = () => {
     : true;
 };
 const getEmail = () => {
-  return isUserLoggedIn()
+  return sessionStorage.getItem(userEmail)
     ? sessionStorage.getItem(userEmail)
     : localStorage.getItem(userEmail);
 };
@@ -48,7 +48,7 @@ const getUserName = () => {
 };
 
 const getUserRole = () => {
-  return isUserLoggedIn()
+  return sessionStorage.getItem(userRole)
     ? sessionStorage.getItem(userRole)
     : localStorage.getItem(userRole);
 };
