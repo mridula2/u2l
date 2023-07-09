@@ -403,7 +403,7 @@ export const StepOne = (nextId) => {
   const { activeIndex, id, steps, width } = useContext(WizardContext);
 
   return (
-    <Box margin={{left:'20%'}} align="center">
+    <Box margin={{left:'10%'}} align="center">
       <Box width={{ max: 'medium' }} align="center">
         <Box>
           <h3>Project details</h3>
@@ -468,7 +468,7 @@ export const StepOne = (nextId) => {
 
 export const StepTwo = (nextId) => {
   return (
-    <Box margin={{left:'20%'}} align="center">
+    <Box margin={{left:'10%'}} align="center">
       <Box width={{ max: 'medium' }}>
         <h3>OS details</h3>
         <FormField
@@ -549,7 +549,7 @@ export const StepThree = (nextId) => {
 
 
   return (
-    <Box margin={{left:'20%'}} align="center">
+    <Box margin={{left:'10%'}} align="center">
       <Box width={{ max: 'medium' }}>
         <Heading level={2} size="small" marginTop="0">
           Analysis Type
