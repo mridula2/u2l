@@ -28,6 +28,7 @@ import { FormNext, FormPreviousLink, FormPrevious } from 'grommet-icons';
 import { getWidth } from './Utils';
 import ProjectService from '../../api/ProjectService';
 import WizardUtils from '../../utils/WizardUtils';
+import classes from './Wizard.module.css'
 
 // export const SidebarLocal = (activeIndex,event) => {
 

@@ -4,17 +4,15 @@ import { FormEdit, Previous } from 'grommet-icons';
 import { useLocation, useNavigate } from 'react-router-dom';
 import WizardUtils from '../utils/WizardUtils';
 import ProjectService from '../api/ProjectService';
+import classes from './Styling.module.css';
 
 const Review = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const formValuesData = location.state.formValues;
 
   function handleSubmit(value) {
-    const data = WizardUtils.appendFormData(location.state.formValues)
- 
-    //  setNotificationMessage('Analysis in progress please wait!');
-    //  setStatus('info');
-    //  setNotificationVisible(true);
+    const data = WizardUtils.appendFormData(formValuesData)
  
      ProjectService.postProjectDetails(data)
        .then((response) => {
@@ -31,18 +29,22 @@ const Review = () => {
   const handleTabs = (event, nextId) => {
     event.preventDefault();
     console.log(event.currentTarget.id);
-    // const id = event.currentTarget.id;
   };
 
   const handleEdit = (formValues) => {
-    console.log(location.state.formValues)
-    navigate('/wizard', { state: { formValues: location.state.formValues } });
+    console.log(formValuesData)
+    navigate('/wizard', { state: { formValues: formValuesData } });
   }
 
   return (
     <Box direction="row-responsive" responsive={true} flex="shrink">
       <Box direction="column" width="small" responsive={true} height="91vh">
-        <Button label="Code Assessment" href="/dashboard" style={styles.sideBarbtn} />
+        <Button label="Code Assessment" 
+        href="/dashboard" 
+        // className={classes.sideBarbtn} 
+        style={styles.sideBarbtn} 
+        />
+        
         <Button
           disabled={true}
           label="Project Details"
@@ -72,6 +74,7 @@ const Review = () => {
           style={styles.sideBarbtnonselect}
         />
       </Box>
+      
       <Box margin={{ left: 'large' }} direction='column'>
         <h2>Overall Review</h2>
         <Box gap="small" direction="row">
@@ -86,46 +89,46 @@ const Review = () => {
 
         <Box gap="small" >
           <Box direction='row'>
-            <Box width="small">
-              <Text weight="bold">
+            <Box className={classes.boxWidth}>
+              <Text className={classes.textsize}>
                 Project name:
               </Text>
             </Box>
-            <Text margin={{ left: 'medium' }}>
-              {location.state.formValues.project_name}
+            <Text className={classes.alignment}>
+              {formValuesData.project_name}
             </Text>
           </Box>
 
           <Box direction='row'>
-            <Box width="small">
-              <Text weight="bold">
+            <Box className={classes.boxWidth}>
+              <Text className={classes.textsize}>
                 Project client:
               </Text>
             </Box>
-            <Text margin={{ left: 'medium' }}>
-              {location.state.formValues.project_client}
+            <Text className='classes.alignment'>
+              {formValuesData.project_client}
             </Text>
           </Box>
 
           <Box direction='row'>
-            <Box width="small">
-              <Text weight="bold">
+            <Box className={classes.boxWidth}>
+              <Text className={classes.textsize}>
                 Project manager:
               </Text>
             </Box>
-            <Text margin={{ left: 'medium' }}>
-              {location.state.formValues.project_manager}
+            <Text className='classes.alignment'>
+              {formValuesData.project_manager}
             </Text>
           </Box>
 
           <Box direction='row'>
-            <Box width="small">
-              <Text weight="bold">
+            <Box className={classes.boxWidth}>
+              <Text className={classes.textsize}>
                 Application name:
               </Text>
             </Box>
-            <Text margin={{ left: 'medium' }}>
-              {location.state.formValues.application_name}
+            <Text className='classes.alignment'>
+              {formValuesData.application_name}
             </Text>
           </Box>
         </Box>
@@ -133,44 +136,44 @@ const Review = () => {
         <h3>OS Details</h3>
         <Box gap="small" direction='column'>
           <Box direction='row'>
-            <Box width="small">
-              <Text weight="bold">
+            <Box className={classes.boxWidth}>
+              <Text className={classes.textsize}>
                 Source OS:
               </Text>
             </Box>
-            <Text margin={{ left: 'medium' }}>
-              {location.state.formValues.source_os}
+            <Text className='classes.alignment'>
+              {formValuesData.source_os}
             </Text>
           </Box>
           <Box direction='row'>
-            <Box width="small">
-              <Text weight="bold">
+            <Box className={classes.boxWidth}>
+              <Text className={classes.textsize}>
                 Source OS Version:
               </Text>
             </Box>
-            <Text margin={{ left: 'medium' }}>
-              {location.state.formValues.source_os_version}
+            <Text className='classes.alignment'>
+              {formValuesData.source_os_version}
             </Text>
           </Box>
           <Box direction='row'>
-            <Box width="small">
-              <Text weight="bold">
+            <Box className={classes.boxWidth}>
+              <Text className={classes.textsize}>
                 Target OS:
               </Text>
             </Box>
-            <Text margin={{ left: 'medium' }}>
-              {location.state.formValues.target_os}
+            <Text className='classes.alignment'>
+              {formValuesData.target_os}
             </Text>
           </Box>
 
           <Box direction='row'>
-            <Box width="small">
-              <Text weight="bold">
+            <Box className={classes.boxWidth}>
+              <Text className={classes.textsize}>
                 Target OS Version:
               </Text>
             </Box>
-            <Text margin={{ left: 'medium' }}>
-              {location.state.formValues.target_os}
+            <Text className='classes.alignment'>
+              {formValuesData.target_os}
             </Text>
           </Box>
         </Box>
@@ -178,327 +181,374 @@ const Review = () => {
         <h3>Analysis Type</h3>
         <Box gap="small">
           <Box direction='row'>
-            <Box width="small">
-              <Text weight="bold">
+            <Box className={classes.boxWidth}>
+              <Text className={classes.textsize}>
                 Type of Analysis:
               </Text>
             </Box>
-            <Text margin={{ left: 'medium' }}>
-              {location.state.formValues.analysis_type}
+            <Text className='classes.alignment'>
+              {formValuesData.analysis_type}
             </Text>
           </Box>
 
-          {location.state.formValues.analysis_type === 'Java' && (
+          {formValuesData.analysis_type === 'Java' && (
             <Box gap="small">
               <Box direction='row'>
-                <Box width="small">
-                  <Text weight="bold">
+                <Box className={classes.boxWidth}>
+                  <Text className={classes.textsize}>
                     Source JDK:
                   </Text>
                 </Box>
-                <Text margin={{ left: 'medium' }}>
-                  {location.state.formValues.source_jdk}
+                <Text className='classes.alignment'>
+                  {formValuesData.source_jdk}
                 </Text>
               </Box>
 
               <Box direction='row'>
-                <Box width="small">
-                  <Text weight="bold">
+                <Box className={classes.boxWidth}>
+                  <Text className={classes.textsize}>
                     Target JDK:
                   </Text>
                 </Box>
-                <Text margin={{ left: 'medium' }}>
-                  {location.state.formValues.target_jdk}
+                <Text className='classes.alignment'>
+                  {formValuesData.target_jdk}
                 </Text>
               </Box>
 
               <Box direction='row'>
-                <Box width="small">
-                  <Text weight="bold">
+                <Box className={classes.boxWidth}>
+                  <Text className={classes.textsize}>
                     Source JSP:
                   </Text>
                 </Box>
-                <Text margin={{ left: 'medium' }}>
-                  {location.state.formValues.source_jsp}
+                <Text className='classes.alignment'>
+                  {formValuesData.source_jsp}
                 </Text>
               </Box>
 
               <Box direction='row'>
-                <Box width="small">
-                  <Text weight="bold">
+                <Box className={classes.boxWidth}>
+                  <Text className={classes.textsize}>
                     Target JSP:
                   </Text>
                 </Box>
-                <Text margin={{ left: 'medium' }}>
-                  {location.state.formValues.target_jsp}
+                <Text className='classes.alignment'>
+                  {formValuesData.target_jsp}
                 </Text>
               </Box>
 
               <Box direction='row'>
-                <Box width="small">
-                  <Text weight="bold">
+                <Box className={classes.boxWidth}>
+                  <Text className={classes.textsize}>
                     Source Servlet:
                   </Text>
                 </Box>
-                <Text margin={{ left: 'medium' }}>
-                  {location.state.formValues.source_servlet}
+                <Text className='classes.alignment'>
+                  {formValuesData.source_servlet}
                 </Text>
               </Box>
 
               <Box direction='row'>
-                <Box width="small">
-                  <Text weight="bold">
+                <Box className={classes.boxWidth}>
+                  <Text className={classes.textsize}>
                     Target Servlet:
                   </Text>
                 </Box>
-                <Text margin={{ left: 'medium' }}>
-                  {location.state.formValues.target_servlet}
+                <Text className='classes.alignment'>
+                  {formValuesData.target_servlet}
                 </Text>
               </Box>
 
               {/* <Text>
               Source code:
-              <Text weight="bold" margin={{ left: 'medium' }}>
-                {location.state.formValues.source_jdk}
+              <Text className={classes.textsize} margin={{ left: 'medium' }}>
+                {formValuesData.source_jdk}
               </Text>
             </Text> */}
             </Box>
           )}
 
-          {location.state.formValues.analysis_type === 'C' && (
+          {formValuesData.analysis_type === 'C' && (
             <Box gap="small">
-              <Text>
-                <Text weight="bold">
+              <Box direction='row'>
+                <Box className={classes.boxWidth}>
+                <Text className={classes.textsize}>
                   Source Compiler:
                 </Text>
-                <Text margin={{ left: 'medium' }}>
-                  {location.state.formValues.source_compiler}
+                </Box>
+                <Text className='classes.alignment'>
+                  {formValuesData.source_compiler}
                 </Text>
-              </Text>
+              </Box>
 
-              <Text>
-                <Text weight="bold">
+              <Box direction='row'>
+                <Box className={classes.boxWidth}>
+                <Text className={classes.textsize}>
                   Source Compiler version:
                 </Text>
-                <Text margin={{ left: 'medium' }}>
-                  {location.state.formValues.source_compiler_version}
+                </Box>
+                <Text className='classes.alignment'>
+                  {formValuesData.source_compiler_version}
                 </Text>
-              </Text>
+              </Box>
 
-              <Text>
-                <Text weight="bold">
+              <Box direction='row'>
+                <Box className={classes.boxWidth}>
+                <Text className={classes.textsize}>
                   Target Compiler:
                 </Text>
-                <Text margin={{ left: 'medium' }}>
-                  {location.state.formValues.target_compiler}
+                </Box>
+                <Text className='classes.alignment'>
+                  {formValuesData.target_compiler}
                 </Text>
-              </Text>
+              </Box>
 
-              <Text>
-                <Text weight="bold">
+              <Box direction='row'>
+                <Box className={classes.boxWidth}>
+                <Text className={classes.textsize}>
                   Target Compiler version:
                 </Text>
-                <Text margin={{ left: 'medium' }}>
-                  {location.state.formValues.target_compiler_version}
+                </Box>
+                <Text className='classes.alignment'>
+                  {formValuesData.target_compiler_version}
                 </Text>
-              </Text>
+              </Box>
             </Box>
           )}
 
-          {location.state.formValues.analysis_type === 'C++' && (
+          {formValuesData.analysis_type === 'C++' && (
             <Box gap="small">
-              <Text>
-                <Text weight="bold">
+              <Box direction='row'>
+                <Box className={classes.boxWidth}>
+                <Text className={classes.textsize}>
                   Source Compiler:
                 </Text>
-                <Text margin={{ left: 'medium' }}>
-                  {location.state.formValues.source_compiler}
+                </Box>
+                <Text className='classes.alignment'>
+                  {formValuesData.source_compiler}
                 </Text>
-              </Text>
+              </Box>
 
-              <Text>
-                <Text weight="bold">
+              <Box direction='row'>
+                <Box className={classes.boxWidth}>
+                <Text className={classes.textsize}>
                   Source Compiler version:
                 </Text>
-                <Text margin={{ left: 'medium' }}>
-                  {location.state.formValues.source_compiler_version}
+                </Box>
+                <Text className='classes.alignment'>
+                  {formValuesData.source_compiler_version}
                 </Text>
-              </Text>
+              </Box>
 
-              <Text>
-                <Text weight="bold">
+              <Box direction='row'>
+                <Box className={classes.boxWidth}>
+                <Text className={classes.textsize}>
                   Target Compiler:
                 </Text>
-                <Text margin={{ left: 'medium' }}>
-                  {location.state.formValues.target_compiler}
+                </Box>
+                <Text className='classes.alignment'>
+                  {formValuesData.target_compiler}
                 </Text>
-              </Text>
+              </Box>
 
-              <Text>
-                <Text weight="bold">
+              <Box direction='row'>
+                <Box className={classes.boxWidth}>
+                <Text className={classes.textsize}>
                   Target Compiler version:
                 </Text>
-                <Text margin={{ left: 'medium' }}>
-                  {location.state.formValues.target_compiler_version}
+                </Box>
+                <Text className='classes.alignment'>
+                  {formValuesData.target_compiler_version}
                 </Text>
-              </Text>
+              </Box>
             </Box>
           )}
 
-          {location.state.formValues.analysis_type === 'Pro*C' && (
+          {formValuesData.analysis_type === 'Pro*C' && (
             <Box gap="small">
-              <Text>
-                <Text weight="bold">
+              <Box direction='row'>
+                <Box className={classes.boxWidth}>
+                <Text className={classes.textsize}>
                   Source pre-compiler:
                 </Text>
-                <Text margin={{ left: 'medium' }}>
-                  {/* {location.state.formValues.source_pre_compiler} */}
+                </Box>
+                <Text className='classes.alignment'>
+                  {/* {formValuesData.source_pre_compiler} */}
                   {"Oracle"}
                 </Text>
-              </Text>
+              </Box>
 
-              <Text>
-                <Text weight="bold">
+              <Box direction='row'>
+                <Box className={classes.boxWidth}>
+                <Text className={classes.textsize}>
                   Source pre-compiler version:
                 </Text>
-                <Text margin={{ left: 'medium' }}>
-                  {location.state.formValues.source_pre_compiler_version}
-
+                </Box>
+                <Text className='classes.alignment'>
+                  {formValuesData.source_pre_compiler_version}
                 </Text>
-              </Text>
+              </Box>
 
-              <Text>
-                <Text weight="bold">
+              <Box direction='row'>
+                <Box className={classes.boxWidth}>
+                <Text className={classes.textsize}>
                   Target pre-compiler:
                 </Text>
-                <Text margin={{ left: 'medium' }}>
-                  {location.state.formValues.target_pre_compiler}
+                </Box>
+                <Text className='classes.alignment'>
+                  {formValuesData.target_pre_compiler}
                 </Text>
-              </Text>
+              </Box>
 
-              <Text>
-                <Text weight="bold">
+              <Box direction='row'>
+                <Box className={classes.boxWidth}>
+                <Text className={classes.textsize}>
                   Target pre-compiler version:
                 </Text>
-                <Text margin={{ left: 'medium' }}>
-                  {location.state.formValues.target_pre_compiler_version}
+                </Box>
+                <Text className='classes.alignment'>
+                  {formValuesData.target_pre_compiler_version}
                 </Text>
-              </Text>
+              </Box>
             </Box>
           )}
 
-          {location.state.formValues.analysis_type === 'C/C++/Pro*C' && (
+          {formValuesData.analysis_type === 'C/C++/Pro*C' && (
             <Box gap="small">
-              <Text>
-                <Text weight="bold">
+              <Box direction='row'>
+                <Box className={classes.boxWidth}>
+                <Text className={classes.textsize}>
                   Source Compiler:
                 </Text>
-                <Text margin={{ left: 'medium' }}>
-                  {location.state.formValues.source_compiler}
+                </Box>
+                <Text className='classes.alignment'>
+                  {formValuesData.source_compiler}
                 </Text>
-              </Text>
+              </Box>
 
-              <Text>
-                <Text weight="bold">
+              <Box direction='row'>
+                <Box className={classes.boxWidth}>
+                <Text className={classes.textsize}>
                   Source Compiler version:
                 </Text>
-                <Text margin={{ left: 'medium' }}>
-                  {location.state.formValues.source_compiler_version}
+                </Box>
+                <Text className='classes.alignment'>
+                  {formValuesData.source_compiler_version}
                 </Text>
-              </Text>
+              </Box>
 
-              <Text>
-                <Text weight="bold">
+              <Box direction='row'>
+                <Box className={classes.boxWidth}>
+                <Text className={classes.textsize}>
                   Target Compiler:
                 </Text>
-                <Text margin={{ left: 'medium' }}>
-                  {location.state.formValues.target_compiler}
+                </Box>
+                <Text className='classes.alignment'>
+                  {formValuesData.target_compiler}
                 </Text>
-              </Text>
+              </Box>
 
-              <Text>
-                <Text weight="bold">
+              <Box direction='row'>
+                <Box className={classes.boxWidth}>
+                <Text className={classes.textsize}>
                   Target Compiler version:
                 </Text>
-                <Text margin={{ left: 'medium' }}>
-                  {location.state.formValues.target_compiler_version}
+                </Box>
+                <Text className='classes.alignment'>
+                  {formValuesData.target_compiler_version}
                 </Text>
-              </Text>
-              <Text>
-                <Text weight="bold">
+              </Box>
+              <Box direction='row'>
+                <Box className={classes.boxWidth}>
+                <Text className={classes.textsize}>
                   Source pre-compiler:
                 </Text>
-                <Text margin={{ left: 'medium' }}>
-                  {location.state.formValues.source_pre_compiler}
+                </Box>
+                <Text className='classes.alignment'>
+                  {formValuesData.source_pre_compiler}
                 </Text>
-              </Text>
+              </Box>
 
-              <Text>
-                <Text weight="bold">
+              <Box direction='row'>
+                <Box className={classes.boxWidth}>
+                <Text className={classes.textsize}>
                   Source pre-compiler version:
                 </Text>
-                <Text margin={{ left: 'medium' }}>
-                  {location.state.formValues.source_pre_compiler_version}
+                </Box>
+                <Text className='classes.alignment'>
+                  {formValuesData.source_pre_compiler_version}
                 </Text>
-              </Text>
+              </Box>
 
-              <Text>
-                <Text weight="bold">
+              <Box direction='row'>
+                <Box className={classes.boxWidth}>
+                <Text className={classes.textsize}>
                   Target pre-compiler:
                 </Text>
-                <Text margin={{ left: 'medium' }}>
-                  {location.state.formValues.target_pre_compiler}
+                </Box>
+                <Text className='classes.alignment'>
+                  {formValuesData.target_pre_compiler}
                 </Text>
-              </Text>
+              </Box>
 
-              <Text>
-                <Text weight="bold">
+              <Box direction='row'>
+                <Box className={classes.boxWidth}>
+                <Text className={classes.textsize}>
                   Target pre-compiler version:
                 </Text>
-                <Text margin={{ left: 'medium' }}>
-                  {location.state.formValues.taget_pre_compiler_version}
+                </Box>
+                <Text className='classes.alignment'>
+                  {formValuesData.taget_pre_compiler_version}
                 </Text>
-              </Text>
+              </Box>
             </Box>
           )}
 
-          {location.state.formValues.analysis_type === 'Shell' && (
+          {formValuesData.analysis_type === 'Shell' && (
             <Box gap="small">
-              <Text>
-                <Text weight="bold">
+              <Box direction='row'>
+                <Box className={classes.boxWidth}>
+                <Text className={classes.textsize}>
                   Source Shell:
                 </Text>
-                <Text margin={{ left: 'medium' }}>
-                  {location.state.formValues.source_shell}
+                </Box>
+                <Text className='classes.alignment'>
+                  {formValuesData.source_shell}
                 </Text>
-              </Text>
+              </Box>
 
-              <Text>
-                <Text weight="bold" >
+              <Box direction='row'>
+                <Box className={classes.boxWidth}>
+                <Text className={classes.textsize} >
                   Source Shell Version:
                 </Text>
-                <Text margin={{ left: 'medium' }}>
-                  {location.state.formValues.source_shell_version}
+                </Box>
+                <Text className='classes.alignment'>
+                  {formValuesData.source_shell_version}
                 </Text>
-              </Text>
+              </Box>
 
-              <Text>
-                <Text weight="bold">
+              <Box direction='row'>
+                <Box className={classes.boxWidth}>
+                <Text className={classes.textsize}>
                   Target Shell:
                 </Text>
-                <Text margin={{ left: 'medium' }}>
-                  {location.state.formValues.target_shell}
+                </Box>
+                <Text className='classes.alignment'>
+                  {formValuesData.target_shell}
                 </Text>
-              </Text>
+              </Box>
 
-              <Text>
-                <Text weight="bold">
+              <Box direction='row'>
+                <Box className={classes.boxWidth}>
+                <Text className={classes.textsize}>
                   Target Shell Version:
                 </Text>
-                <Text margin={{ left: 'medium' }}>
-                  {location.state.formValues.target_shell_version}
+                </Box>
+                <Text className='classes.alignment'>
+                  {formValuesData.target_shell_version}
                 </Text>
-              </Text>
+              </Box>
             </Box>
           )}
         </Box>
@@ -507,40 +557,39 @@ const Review = () => {
         <Box gap="small"> 
         <Box direction='row'>
             <Box width="small">
-              <Text weight="bold">
+              <Text className={classes.textsize}>
                 Framework:
               </Text>
             </Box>
-            <Text margin={{ left: 'medium' }}>
-              {location.state.formValues.framework}
+            <Text className='classes.alignment'>
+              {formValuesData.framework}
             </Text>
           </Box>
 
           <Box direction='row'>
             <Box width="small">
-              <Text weight="bold">
+              <Text className={classes.textsize}>
               Source Framework Version:
               </Text>
             </Box>
-            <Text margin={{ left: 'medium' }}>
-              {location.state.formValues.source_framework_version}
+            <Text className='classes.alignment'>
+              {formValuesData.source_framework_version}
             </Text>
           </Box>
 
           <Box direction='row'>
             <Box width="small">
-              <Text weight="bold">
+              <Text className={classes.textsize}>
               Target Framework Version:
               </Text>
             </Box>
-            <Text margin={{ left: 'medium' }}>
-              {location.state.formValues.target_framework_version}
+            <Text className='classes.alignment'>
+              {formValuesData.target_framework_version}
             </Text>
           </Box>
         </Box>
 
-        <Box direction="row" gap="medium" margin={{ left: "50%", top: "10%" }} >
-          <Button icon={<Previous />} label="Previous" style={{borderRadius:"0"}}></Button>
+        <Box direction="row" gap="medium" margin={{ left: "70%", top: "10%", bottom:'7%' }} >
           <Button primary label="Create" onClick={handleSubmit} style={{borderRadius:"0"}}></Button>
         </Box>
       </Box>
