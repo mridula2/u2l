@@ -19,6 +19,7 @@ import {
   Language,
 } from 'grommet-icons';
 import { useNavigate } from 'react-router-dom';
+import classes from './AppHeader.module.css';
 
 export const AppHeader = () => {
   const size = useContext(ResponsiveContext);
@@ -85,15 +86,15 @@ export const AppHeader = () => {
     }
   }, [focused, setFocused]);
 
-  const mystyle = {
-    width: '40px',
-    height: '40px',
-    backgroundColor: '#FFBC44',
-    Type: 'Initials',
-    left: '1107',
-    top: '1400',
-    border: '24',
-  };
+  // const mystyle = {
+  //   width: '40px',
+  //   height: '40px',
+  //   backgroundColor: '#FFBC44',
+  //   Type: 'Initials',
+  //   left: '1107',
+  //   top: '1400',
+  //   border: '24',
+  // };
 
   const name = 'Jalt Kohlar';
   const getInitials = function () {
@@ -205,7 +206,7 @@ export const AppHeader = () => {
               <Projects style={{ width: '100%', height: 20 }}></Projects>
             </Button>
             <Button>
-              <Avatar style={mystyle}>{getInitials()}</Avatar>
+              <Avatar className={classes.mystyle} >{getInitials()}</Avatar>
             </Button>
           </Box>
         </Box>

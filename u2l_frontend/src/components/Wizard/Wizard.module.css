@@ -1,0 +1,31 @@
+.sideBarbtn {
+  display: flex;
+  height: 6vh;
+  align-items: center;
+  border-radius: 0;
+  border-bottom: 0.1px solid white; 
+  font-weight: normal;
+}
+
+.sideBarbtnonselect {
+  display: flex;
+  height: 6vh;
+  align-items: center; 
+  border-radius: 0;
+  border-bottom: 0.1px solid white;
+  font-weight: bold;
+  background: #0000000A 0% 0% no-repeat padding-box;
+
+}
+
+.btndisable {
+  display: flex; 
+  height: 6vh;
+  align-items: center ; 
+  border-radius: 0;
+  border-bottom: 0.1px solid white; 
+  font-weight: normal;
+  background: #F7F7F7 0% 0% no-repeat padding-box;
+  width: 100%; 
+  text-align: left;
+}
