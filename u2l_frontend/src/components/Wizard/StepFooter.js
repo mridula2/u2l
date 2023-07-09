@@ -14,6 +14,16 @@ const StepFooter = ({ nextId, previousId, onNavigate, ...rest }) => {
     setButtonDisable(true)
   }
 
+  // const decideLable = () => {
+  //   if(activeIndex === 0){
+  //     'Next'
+  //   } else if (activeIndex === 1){
+  //     'Next'
+  //   } else {
+  //     'Proceed'
+  //   }
+  // }
+
   return (
     <Box
       margin={
@@ -26,7 +36,7 @@ const StepFooter = ({ nextId, previousId, onNavigate, ...rest }) => {
     >
       <Footer
         justify="end"
-        // margin={{left:"large"}}
+        margin={{left:"10%"}}
         pad={
           !['xsmall', 'small'].includes(size)
             ? { vertical: 'medium' }
@@ -52,25 +62,16 @@ const StepFooter = ({ nextId, previousId, onNavigate, ...rest }) => {
           />
         )}
 
-        {activeIndex === steps.length - 1 && (
-          <Button
-            id={nextId}
-            primary
-            reverse
-            label="Review + Create"
-            form={`${id}-form`}
-            onClick={onNavigate}
-          />
-        )}
-
         <Button
           id={nextId}
           icon={<FormNext />}
-          // disabled={!btnDisable && (activeStep === 0 || activeStep === 1 || activeStep === 2)}
+          // disabled={activeStep === 3}
           reverse
-          label={activeIndex === steps.length - 1 ? 'Proceed' : 'Next'}
+          label={activeIndex === steps.length - 1 ? 'Review + Create' : 'Next'}
+          // label={decideLable}
           form={`${id}-form`}
           type="submit"
+          onClick={activeIndex === 2 && onNavigate}
         />
       </Footer>
     </Box>

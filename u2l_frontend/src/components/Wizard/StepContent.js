@@ -77,7 +77,7 @@ const StepContent = ({ onSubmit }) => {
             value={formValues}
             onChange={(nextValue) => setFormValues(nextValue)}
             onSubmit={handleSubmit}
-            onValidate={onValidate}
+            // onValidate={onValidate}
             method="post"
             messages={{
               required: 'This is a required field.',
