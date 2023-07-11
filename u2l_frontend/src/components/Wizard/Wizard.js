@@ -31,6 +31,7 @@ import WizardUtils from '../../utils/WizardUtils';
 
 const WizardValidationExample = ({ containerRef }) => {
   const location = useLocation();
+
   const defaultFormValues = () => {
     console.log(location);
     if (!location.state) {
@@ -113,12 +114,10 @@ const WizardValidationExample = ({ containerRef }) => {
   const [showOSDetails, setShowOSDetails] = useState(false);
   const [showAnalysisType, setShowAnalysisType] = useState(false);
 
-
   const handleTabs = (event, nextId) => {
     event.preventDefault();
     console.log(event.currentTarget.id);
     const id = event.currentTarget.id;
-
 
     if (id === 'project_details') {
       console.log("project details");
@@ -212,7 +211,6 @@ const WizardValidationExample = ({ containerRef }) => {
       </Box>
 
       <Box direction="row-responsive" responsive={true}>
-
         {/*Sidebar*/}
         <Box direction="column" width="small" responsive={true} height="80vh">
           <Button
@@ -277,7 +275,6 @@ const WizardValidationExample = ({ containerRef }) => {
           />)}
         </Box>
 
-
         <StepContent
           onSubmit={({ value }) => {
             handleSubmit(value);
@@ -326,67 +323,55 @@ export const StepOne = (nextId) => {
 
   return (
     <Box align="center">
-      {/* <Box direction="row-responsive" responsive={true} >
-        <SideBar /> */}
       <Box width={{ max: 'medium' }} align="center">
         <Box>
-          <h3>Project details</h3>
-          <FormField
-            label="Project name"
-            htmlFor="project_name"
-            name="project_name"
-            required={true}
-          >
+          <h3>Project details</h3>       
+          <Box htmlFor="project_name" direction='row' margin={{ bottom: 'medium', top: 'medium' }}>
+            <Box width='80%'>
+              <label htmlFor="project_name">Project name*</label>
+            </Box>
             <TextInput
-              // width="240px"
-              // height="37px"
               placeholder="Enter Value"
               id="project_name"
               name="project_name"
               type='text'
+              required={true}
             />
-          </FormField>
+          </Box>       
 
-          <FormField
-            label="Project Client"
-            htmlFor="project_client"
-            name="project_client"
-            required={true}
-          >
+          <Box htmlFor="project_client" direction='row' margin={{ bottom: 'medium' }}>
+            <Box width='80%'>
+              <label htmlFor="project_client" >Project Client*</label>
+            </Box>
             <TextInput
               placeholder="Enter Value"
               id="project_client"
               name="project_client"
             />
-          </FormField>
-          <FormField
-            label="Project Manager"
-            htmlFor="project_manager"
-            name="project_manager"
-            required={true}
-          >
+          </Box>
+
+          <Box htmlFor="project_manager" direction='row' margin={{ bottom: 'medium' }}>
+            <Box width='80%'>
+              <label htmlFor="project_manager" >Project Manager*</label>
+            </Box>
             <TextInput
               placeholder="Enter Value"
               id="project_manager"
               name="project_manager"
             />
-          </FormField>
-          <FormField
-            label="Application Name"
-            htmlFor="application_name"
-            name="application_name"
-            required={true}
-          >
+          </Box>
+
+          <Box htmlFor="application_name" direction='row' margin={{ bottom: 'medium' }}>
+            <Box width='80%'>
+              <label htmlFor="application_name">Application Name*</label>
+            </Box>
             <TextInput
-              placeholder="Enter Application Name"
+              placeholder="Enter Value"
               id="application_name"
               name="application_name"
             />
-          </FormField>
-          {/* <Box align="end" margin={{ Top: "small" }}>
-                <Button>Next</Button>
-              </Box> */}
-          {/* </Box> */}
+          </Box>
+
         </Box>
         {!valid && <Error>There is an error with one or more inputs.</Error>}
       </Box>
@@ -399,55 +384,55 @@ export const StepTwo = (nextId) => {
     <Box align="center">
       <Box width={{ max: 'medium' }}>
         <h3>OS details</h3>
-        <FormField
-          label="Source OS"
-          htmlFor="source_os"
-          name="source_os"
-          required={true}
-        >
+
+        <Box htmlFor="source_os" direction='row' margin={{ bottom: 'medium' }}>
+          <Box width='80%'>
+            <label htmlFor="source_os">Source OS*</label>
+          </Box>
           <TextInput
             placeholder="Enter Value"
             id="source_os"
             name="source_os"
+            required={true}
           />
-        </FormField>
-        <FormField
-          label="Source OS version"
-          htmlFor="source_os_version"
-          name="source_os_version"
-          required={true}
-        >
+        </Box>
+
+        <Box htmlFor="source_os_version" direction='row' margin={{ bottom: 'medium' }}>
+          <Box width='80%'>
+            <label htmlFor="source_os_version">Source OS version*</label>
+          </Box>
           <TextInput
             placeholder="Enter Value"
             id="source_os_version"
             name="source_os_version"
-
+            required={true}
           />
-        </FormField>
-        <FormField
-          label="Target OS"
-          htmlFor="target_os"
-          name="target_os"
-          required={true}
-        >
+        </Box>
+
+        <Box htmlFor="target_os" direction='row' margin={{ bottom: 'medium' }}>
+          <Box width='80%'>
+            <label htmlFor="target_os">Target OS*</label>
+          </Box>
           <TextInput
             placeholder="Enter Value"
             id="target_os"
             name="target_os"
+            required={true}
           />
-        </FormField>
-        <FormField
-          label="Target OS version"
-          htmlFor="target_os_version"
-          name="target_os_version"
-          required={true}
-        >
+        </Box>
+
+        <Box htmlFor="target_os_version" direction='row' margin={{ bottom: 'medium' }}>
+          <Box width='80%'>
+            <label htmlFor="target_os_version">Target OS version*</label>
+          </Box>
           <TextInput
             placeholder="Enter Value"
             id="target_os_version"
             name="target_os_version"
+            required={true}
           />
-        </FormField>
+        </Box>
+
       </Box>
     </Box>
   );
@@ -529,15 +514,13 @@ export const StepThree = (nextId) => {
     <Box align="center">
       <Box width={{ max: 'medium' }}>
         <Heading level={2} size="small" marginTop="0">
-          {/* margin="2"  for heading if needed*/}
           Analysis Type
         </Heading>
 
-        <FormField
-          htmlFor="analysis_type"
-          name="analysis_type"
-          label="Type of analysis"
-        >
+        <Box htmlFor="analysis_type" direction='row' margin={{ bottom: 'medium' }}>
+          <Box width='68%'>
+            <label htmlFor="analysis_type">Type of analysis*</label>
+          </Box>
           <Select
             placeholder="Analysis Type"
             id="analysis_type"
@@ -552,605 +535,594 @@ export const StepThree = (nextId) => {
               'C++/Pro*C',
             ]}
             onChange={(e) => handleshowhide(e)}
+            required={true}
           />
-        </FormField>
+        </Box>
 
         {/* Div after Java Slelected */}
         {showhide === 'Java' && (
           <Box width="medium">
-            <FormField
-              label="Source JDK"
-              htmlFor="source_jdk"
-              name="source_jdk"
-              required={true}
-            >
+            <Box htmlFor="source_jdk" direction='row' margin={{ bottom: 'medium' }}>
+              <Box width='medium'>
+                <label htmlFor="source_jdk">Source JDK*</label>
+              </Box>
               <TextInput
                 placeholder="Enter Value"
                 id="source_jdk"
                 name="source_jdk"
+                required={true}
               />
-            </FormField>
-            <FormField
-              label="Target JDK"
-              htmlFor="target_jdk"
-              name="target_jdk"
-              required={true}
-            >
+            </Box>
+
+            <Box htmlFor="target_jdk" direction='row' margin={{ bottom: 'medium' }}>
+              <Box width='medium'>
+                <label htmlFor="target_jdk">Target JDK*</label>
+              </Box>
               <TextInput
                 placeholder="Enter Value"
                 id="target_jdk"
                 name="target_jdk"
+                required={true}
               />
-            </FormField>
+            </Box>
 
-            <FormField
-              label="Source JSP"
-              htmlFor="source_jsp"
-              name="source_jsp"
-            >
+
+            <Box htmlFor="source_jsp" direction='row' margin={{ bottom: 'medium' }}>
+              <Box width='medium'>
+                <label htmlFor="source_jsp">Source JSP</label>
+              </Box>
               <TextInput
                 placeholder="Enter Value"
                 id="source_jsp"
                 name="source_jsp"
               />
-            </FormField>
-            <FormField
-              label="Target JSP"
-              htmlFor="target_jsp"
-              name="target_jsp"
-            >
+            </Box>
+
+            <Box htmlFor="target_jsp" direction='row' margin={{ bottom: 'medium' }}>
+              <Box width='medium'>
+                <label htmlFor="target_jsp">Target JSP</label>
+              </Box>
               <TextInput
                 placeholder="Enter Value"
                 id="target_jsp"
                 name="target_jsp"
               />
-            </FormField>
+            </Box>
 
-            <FormField
-              label="Source Servlet"
-              htmlFor="source_servlet"
-              name="source_servlet"
-            >
+            <Box htmlFor="source_servlet" direction='row' margin={{ bottom: 'medium' }}>
+              <Box width='medium'>
+                <label htmlFor="source_servlet">Source Servlet</label>
+              </Box>
               <TextInput
                 placeholder="Enter Value"
                 id="source_servlet"
                 name="source_servlet"
               />
-            </FormField>
-            <FormField
-              label="Target Servlet"
-              htmlFor="target_servlet"
-              name="target_servlet"
-            >
+            </Box>
+
+            <Box htmlFor="target_servlet" direction='row' margin={{ bottom: 'medium' }}>
+              <Box width='medium'>
+                <label htmlFor="target_servlet">Target Servlet</label>
+              </Box>
               <TextInput
                 placeholder="Enter Value"
                 id="target_servlet"
                 name="target_servlet"
               />
-            </FormField>
+            </Box>
           </Box>
         )}
 
         {/* Div After C selected */}
         {showhide === 'C' && (
           <Box>
-            <FormField
-              label="Source Compiler"
-              htmlFor="source_compiler"
-              name="source_compiler"
-              required={true}
-            >
+
+            <Box htmlFor="source_compiler" direction='row' margin={{ bottom: 'medium' }}>
+              <Box width='medium'>
+                <label htmlFor="source_compiler">Source Compiler*</label>
+              </Box>
               <TextInput
                 placeholder="Enter Value"
                 id="source_compiler"
                 name="source_compiler"
+                required={true}
               />
-            </FormField>
-            <FormField
-              label="Source Compiler version"
-              htmlFor="source_compiler_version"
-              name="source_compiler_version"
-            >
+            </Box>
+
+            <Box htmlFor="source_compiler_version" direction='row' margin={{ bottom: 'medium' }}>
+              <Box width='medium'>
+                <label htmlFor="source_compiler_version">Source Compiler version</label>
+              </Box>
               <TextInput
                 placeholder="Enter Value"
                 id="source_compiler_version"
                 name="source_compiler_version"
               />
-            </FormField>
-            <FormField
-              label="Target Compiler"
-              htmlFor="target_compiler"
-              name="target_compiler"
-              required={true}
-            >
+            </Box>
+
+            <Box htmlFor="target_compiler" direction='row' margin={{ bottom: 'medium' }}>
+              <Box width='medium'>
+                <label htmlFor="target_compiler">Target Compiler*</label>
+              </Box>
               <TextInput
                 placeholder="Enter Value"
                 id="target_compiler"
                 name="target_compiler"
+                required={true}
               />
-            </FormField>
-            <FormField
-              label="Target Compiler version"
-              htmlFor="target_compiler_version"
-              name="target_compiler_version"
-            >
+            </Box>
+
+
+            <Box htmlFor="target_compiler_version" direction='row' margin={{ bottom: 'medium' }}>
+              <Box width='medium'>
+                <label htmlFor="target_compiler_version">Target Compiler version</label>
+              </Box>
               <TextInput
                 placeholder="Enter Value"
                 id="target_compiler_version"
                 name="target_compiler_version"
               />
-            </FormField>
+            </Box>
           </Box>
         )}
 
         {/* Div After C++ selected */}
         {showhide === 'C++' && (
           <Box>
-            <FormField
-              label="Source Compiler"
-              htmlFor="source_compiler"
-              name="source_compiler"
-              required={true}
-            >
+
+            <Box htmlFor="source_compiler" direction='row' margin={{ bottom: 'medium' }}>
+              <Box width='medium'>
+                <label htmlFor="source_compiler">Source Compiler*</label>
+              </Box>
               <TextInput
                 placeholder="Enter Value"
                 id="source_compiler"
                 name="source_compiler"
+                required={true}
               />
-            </FormField>
-            <FormField
-              label="Source Compiler version"
-              htmlFor="source_compiler_version"
-              name="source_compiler_version"
-            >
+            </Box>
+
+            <Box htmlFor="source_compiler_version" direction='row' margin={{ bottom: 'medium' }}>
+              <Box width='medium'>
+                <label htmlFor="source_compiler_version">Source Compiler version</label>
+              </Box>
               <TextInput
                 placeholder="Enter Value"
                 id="source_compiler_version"
                 name="source_compiler_version"
               />
-            </FormField>
-            <FormField
-              label="Target Compiler"
-              htmlFor="target_compiler"
-              name="target_compiler"
-              required={true}
-            >
+            </Box>
+
+            <Box htmlFor="target_compiler" direction='row' margin={{ bottom: 'medium' }}>
+              <Box width='medium'>
+                <label htmlFor="target_compiler">Target Compiler*</label>
+              </Box>
               <TextInput
                 placeholder="Enter Value"
                 id="target_compiler"
                 name="target_compiler"
+                required={true}
               />
-            </FormField>
-            <FormField
-              label="Target Compiler version"
-              htmlFor="target_compiler_version"
-              name="target_compiler_version"
-            >
+            </Box>
+
+            <Box htmlFor="target_compiler_version" direction='row' margin={{ bottom: 'medium' }}>
+              <Box width='medium'>
+                <label htmlFor="target_compiler_version">Target Compiler version</label>
+              </Box>
               <TextInput
                 placeholder="Enter Value"
                 id="target_compiler_version"
                 name="target_compiler_version"
               />
-            </FormField>
+            </Box>
           </Box>
         )}
 
         {/* Div after Pro*C selected */}
         {showhide === 'Pro*C' && (
           <Box>
-            <FormField
-              label="Source pre-compiler"
-              htmlFor="source_pre_compiler"
-              name="source_pre_compiler"
-              required={true}
-            >
+            <Box htmlFor="source_pre_compiler" direction='row' margin={{ bottom: 'medium' }}>
+              <Box width='medium'>
+                <label htmlFor="source_pre_compiler">Source pre-compiler*</label>
+              </Box>
               <TextInput
                 placeholder="Enter value"
                 id="source_pre_compiler"
                 name="source_pre_compiler"
+                required={true}
               />
-            </FormField>
+            </Box>
 
-            <FormField
-              label="Source pre-compiler version"
-              htmlFor="source_pre_compiler_version"
-              name="source_pre_compiler_version"
-              required={true}
-            >
+            <Box htmlFor="source_pre_compiler_version" direction='row' margin={{ bottom: 'medium' }}>
+              <Box width='medium'>
+                <label htmlFor="source_pre_compiler_version">Source pre-compiler version*</label>
+              </Box>
               <TextInput
                 placeholder="Enter value"
                 id="source_pre_compiler_version"
                 name="source_pre_compiler_version"
+                required={true}
               />
-            </FormField>
+            </Box>
 
-            <FormField
-              label="Target pre-compiler"
-              htmlFor="target_pre_compiler"
-              name="Target_pre_compiler"
-            >
+            <Box htmlFor="target_pre_compiler" direction='row' margin={{ bottom: 'medium' }}>
+              <Box width='medium'>
+                <label htmlFor="target_pre_compiler">Target pre-compiler</label>
+              </Box>
               <TextInput
                 placeholder="Enter value"
                 id="target_pre_compiler"
                 name="target_pre_compiler"
               />
-            </FormField>
+            </Box>
 
-            <FormField
-              label="Target pre-compiler version"
-              htmlFor="target_pre_compiler_version"
-              name="target_pre_compiler_version"
-              required={true}
-            >
+            <Box htmlFor="target_pre_compiler_version" direction='row' margin={{ bottom: 'medium' }}>
+              <Box width='medium'>
+                <label htmlFor="target_pre_compiler_version">Target pre-compiler version</label>
+              </Box>
               <TextInput
                 placeholder="Enter value"
                 id="target_pre_compiler_version"
                 name="target_pre_compiler_version"
+                required={true}
               />
-            </FormField>
+            </Box>
+
           </Box>
         )}
 
         {/* Div after c/c++/Pro*C selected */}
         {showhide === 'C/C++/Pro*C' && (
           <Box>
-            <FormField
-              label="Source Compiler"
-              htmlFor="source_compiler"
-              name="source_compiler"
-            >
+
+
+            <Box htmlFor="source_compiler" direction='row' margin={{ bottom: 'medium' }}>
+              <Box width='medium'>
+                <label htmlFor="source_compiler">Source Compiler</label>
+              </Box>
               <TextInput
                 placeholder="Enter Value"
                 id="source_compiler"
                 name="source_compiler"
+
               />
-            </FormField>
-            <FormField
-              label="Source Compiler version"
-              htmlFor="source_compiler_version"
-              name="source_compiler_version"
-            >
+            </Box>
+
+            <Box htmlFor="source_compiler_version" direction='row' margin={{ bottom: 'medium' }}>
+              <Box width='medium'>
+                <label htmlFor="source_compiler_version">Source Compiler version</label>
+              </Box>
               <TextInput
                 placeholder="Enter Value"
                 id="source_compiler_version"
                 name="source_compiler_version"
               />
-            </FormField>
-            <FormField
-              label="Target Compiler"
-              htmlFor="target_compiler"
-              name="target_compiler"
-            >
+            </Box>
+
+            <Box htmlFor="target_compiler" direction='row' margin={{ bottom: 'medium' }}>
+              <Box width='medium'>
+                <label htmlFor="target_compiler">Target Compiler</label>
+              </Box>
               <TextInput
                 placeholder="Enter Value"
                 id="target_compiler"
                 name="target_compiler"
+
               />
-            </FormField>
-            <FormField
-              label="Target Compiler version"
-              htmlFor="target_compiler_version"
-              name="target_compiler_version"
-            >
+            </Box>
+
+            <Box htmlFor="target_compiler_version" direction='row' margin={{ bottom: 'medium' }}>
+              <Box width='medium'>
+                <label htmlFor="target_compiler_version">Target Compiler version</label>
+              </Box>
               <TextInput
                 placeholder="Enter Value"
                 id="target_compiler_version"
                 name="target_compiler_version"
               />
-            </FormField>
-            <FormField
-              label="Source pre-compiler"
-              htmlFor="source_pre_compiler"
-              name="source_pre_compiler"
-            >
+            </Box>
+
+            <Box htmlFor="source_pre_compiler" direction='row' margin={{ bottom: 'medium' }}>
+              <Box width='medium'>
+                <label htmlFor="source_pre_compiler">Source pre-compiler</label>
+              </Box>
               <TextInput
                 disabled={true}
                 placeholder="Oracle"
                 id="source_pre_compiler"
                 name="source_pre_compiler"
               />
-            </FormField>
+            </Box>
 
-            <FormField
-              label="Source pre-compiler version"
-              htmlFor="source_pre_compiler_version"
-              name="source_pre_compiler_version"
-            >
+
+            <Box htmlFor="source_pre_compiler_version" direction='row' margin={{ bottom: 'medium' }}>
+              <Box width='medium'>
+                <label htmlFor="source_pre_compiler_version">Source pre-compiler version</label>
+              </Box>
               <TextInput
                 disabled={true}
                 placeholder="Oracle"
                 id="source_pre_compiler_version"
                 name="source_pre_compiler_version"
               />
-            </FormField>
+            </Box>
 
-            <FormField
-              label="Target pre-compiler"
-              htmlFor="target_pre_compiler"
-              name="Target_pre_compiler"
-            >
+            <Box htmlFor="target_pre_compiler" direction='row' margin={{ bottom: 'medium' }}>
+              <Box width='medium'>
+                <label htmlFor="target_pre_compiler">Target pre-compiler</label>
+              </Box>
               <TextInput
                 placeholder="Enter value"
                 id="target_pre_compiler"
                 name="target_pre_compiler"
               />
-            </FormField>
+            </Box>
 
-            <FormField
-              label="Target pre-compiler version"
-              htmlFor="target_pre_compiler_version"
-              name="target_pre_compiler_version"
-            >
+            <Box htmlFor="target_pre_compiler_version" direction='row' margin={{ bottom: 'medium' }}>
+              <Box width='medium'>
+                <label htmlFor="target_pre_compiler_version">Target pre-compiler version</label>
+              </Box>
               <TextInput
                 placeholder="Enter value"
                 id="target_pre_compiler_version"
                 name="target_pre_compiler_version"
               />
-            </FormField>
+            </Box>
           </Box>
         )}
 
         {/* Div after shell selected */}
         {showhide === 'Shell' && (
           <Box>
-            <FormField
-              label="Source Shell"
-              htmlFor="source_shell"
-              name="source_shell"
-              required={true}
-            >
+
+            <Box htmlFor="source_shell" direction='row' margin={{ bottom: 'medium' }}>
+              <Box width='medium'>
+                <label htmlFor="source_shell">Source Shell*</label>
+              </Box>
               <TextInput
                 placeholder="Enter Value"
                 id="source_shell"
                 name="source_shell"
+                required={true}
               />
-            </FormField>
-            <FormField
-              label="Source Shell Version"
-              htmlFor="source_shell_version"
-              name="source_shell_version"
-            >
+            </Box>
+
+            <Box htmlFor="source_shell_version" direction='row' margin={{ bottom: 'medium' }}>
+              <Box width='medium'>
+                <label htmlFor="source_shell_version">Source Shell Version</label>
+              </Box>
               <TextInput
                 placeholder="Enter Value"
                 id="source_shell_version"
                 name="source_shell_version"
               />
-            </FormField>
-            <FormField
-              label="Target Shell"
-              htmlFor="target_shell"
-              name="target_shell"
-              required={true}
-            >
+            </Box>
+
+
+            <Box htmlFor="target_shell" direction='row' margin={{ bottom: 'medium' }}>
+              <Box width='medium'>
+                <label htmlFor="target_shell">Target Shell*</label>
+              </Box>
               <TextInput
                 placeholder="Enter Value"
                 id="target_shell"
                 name="target_shell"
+                required={true}
               />
-            </FormField>
-            <FormField
-              label="Target Shell Version"
-              htmlFor="target_shell_version"
-              name="target_shell_version"
-            >
+            </Box>
+
+            <Box htmlFor="target_shell_version" direction='row' margin={{ bottom: 'medium' }}>
+              <Box width='medium'>
+                <label htmlFor="target_shell_version">Target Shell Version</label>
+              </Box>
               <TextInput
                 placeholder="Enter Value"
                 id="target_shell_version"
                 name="target_shell_version"
               />
-            </FormField>
+            </Box>
           </Box>
         )}
 
         {/* Div after C/Pro*C selected */}
         {showhide === 'C/Pro*C' && (
           <Box>
-            <FormField
-              label="Source Compiler"
-              htmlFor="source_compiler"
-              name="source_compiler"
-              required={true}
-            >
+            <Box htmlFor="source_compiler" direction='row' margin={{ bottom: 'medium' }}>
+              <Box width='medium'>
+                <label htmlFor="source_compiler">Source Compiler*</label>
+              </Box>
               <TextInput
                 placeholder="Enter Value"
                 id="source_compiler"
                 name="source_compiler"
+                required={true}
               />
-            </FormField>
-            <FormField
-              label="Source Compiler version"
-              htmlFor="source_compiler_version"
-              name="source_compiler_version"
-            >
+            </Box>
+            <Box htmlFor="source_compiler_version" direction='row' margin={{ bottom: 'medium' }}>
+              <Box width='medium'>
+                <label htmlFor="source_compiler_version">Source Compiler version</label>
+              </Box>
               <TextInput
                 placeholder="Enter Value"
                 id="source_compiler_version"
                 name="source_compiler_version"
               />
-            </FormField>
-            <FormField
-              label="Target Compiler"
-              htmlFor="target_compiler"
-              name="target_compiler"
-              required={true}
-            >
+            </Box>
+            <Box htmlFor="target_compiler" direction='row' margin={{ bottom: 'medium' }}>
+              <Box width='medium'>
+                <label htmlFor="target_compiler">Target Compiler*</label>
+              </Box>
               <TextInput
                 placeholder="Enter Value"
                 id="target_compiler"
                 name="target_compiler"
+                required={true}
               />
-            </FormField>
-            <FormField
-              label="Target Compiler version"
-              htmlFor="target_compiler_version"
-              name="target_compiler_version"
-            >
+            </Box>
+
+            <Box htmlFor="target_compiler_version" direction='row' margin={{ bottom: 'medium' }}>
+              <Box width='medium'>
+                <label htmlFor="target_compiler_version">Target Compiler version</label>
+              </Box>
               <TextInput
                 placeholder="Enter Value"
                 id="target_compiler_version"
                 name="target_compiler_version"
               />
-            </FormField>
-            <FormField
-              label="Source pre-compiler"
-              htmlFor="source_pre_compiler"
-              name="source_pre_compiler"
-              required={true}
-            >
+            </Box>
+
+            <Box htmlFor="source_pre_compiler" direction='row' margin={{ bottom: 'medium' }}>
+              <Box width='medium'>
+                <label htmlFor="source_pre_compiler">Source pre-compiler*</label>
+              </Box>
               <TextInput
                 placeholder="Enter value"
                 id="source_pre_compiler"
                 name="source_pre_compiler"
+                required={true}
               />
-            </FormField>
+            </Box>
 
-            <FormField
-              label="Source pre-compiler version"
-              htmlFor="source_pre_compiler_version"
-              name="source_pre_compiler_version"
-              required={true}
-            >
+            <Box htmlFor="source_pre_compiler_version" direction='row' margin={{ bottom: 'medium' }}>
+              <Box width='medium'>
+                <label htmlFor="source_pre_compiler_version">Source pre-compiler version*</label>
+              </Box>
               <TextInput
                 placeholder="Enter value"
                 id="source_pre_compiler_version"
                 name="source_pre_compiler_version"
+                required={true}
               />
-            </FormField>
+            </Box>
 
-            <FormField
-              label="Target pre-compiler"
-              htmlFor="target_pre_compiler"
-              name="Target_pre_compiler"
-            >
+            <Box htmlFor="target_pre_compiler" direction='row' margin={{ bottom: 'medium' }}>
+              <Box width='medium'>
+                <label htmlFor="target_pre_compiler">Target pre-compiler</label>
+              </Box>
               <TextInput
                 placeholder="Enter value"
                 id="target_pre_compiler"
                 name="target_pre_compiler"
               />
-            </FormField>
+            </Box>
 
-            <FormField
-              label="Target pre-compiler version"
-              htmlFor="target_pre_compiler_version"
-              name="target_pre_compiler_version"
-              required={true}
-            >
+            <Box htmlFor="target_pre_compiler_version" direction='row' margin={{ bottom: 'medium' }}>
+              <Box width='medium'>
+                <label htmlFor="target_pre_compiler_version">Target pre-compiler version</label>
+              </Box>
               <TextInput
                 placeholder="Enter value"
                 id="target_pre_compiler_version"
                 name="target_pre_compiler_version"
+                required={true}
               />
-            </FormField>
+            </Box>
+
           </Box>
         )}
 
         {/* Div after C++/Pro*C selected */}
         {showhide === 'C++/Pro*C' && (
           <Box>
-            <FormField
-              label="Source Compiler"
-              htmlFor="source_compiler"
-              name="source_compiler"
-              required={true}
-            >
+            <Box htmlFor="source_compiler" direction='row' margin={{ bottom: 'medium' }}>
+              <Box width='medium'>
+                <label htmlFor="source_compiler">Source Compiler*</label>
+              </Box>
               <TextInput
                 placeholder="Enter Value"
                 id="source_compiler"
                 name="source_compiler"
+                required={true}
               />
-            </FormField>
-            <FormField
-              label="Source Compiler version"
-              htmlFor="source_compiler_version"
-              name="source_compiler_version"
-            >
+            </Box>
+
+            <Box htmlFor="source_compiler_version" direction='row' margin={{ bottom: 'medium' }}>
+              <Box width='medium'>
+                <label htmlFor="source_compiler_version">Source Compiler version</label>
+              </Box>
               <TextInput
                 placeholder="Enter Value"
                 id="source_compiler_version"
                 name="source_compiler_version"
               />
-            </FormField>
-            <FormField
-              label="Target Compiler"
-              htmlFor="target_compiler"
-              name="target_compiler"
-              required={true}
-            >
+            </Box>
+
+            <Box htmlFor="target_compiler" direction='row' margin={{ bottom: 'medium' }}>
+              <Box width='medium'>
+                <label htmlFor="target_compiler">Target Compiler*</label>
+              </Box>
               <TextInput
                 placeholder="Enter Value"
                 id="target_compiler"
                 name="target_compiler"
+                required={true}
               />
-            </FormField>
-            <FormField
-              label="Target Compiler version"
-              htmlFor="target_compiler_version"
-              name="target_compiler_version"
-            >
+            </Box>
+
+            <Box htmlFor="target_compiler_version" direction='row' margin={{ bottom: 'medium' }}>
+              <Box width='medium'>
+                <label htmlFor="target_compiler_version">Target Compiler version</label>
+              </Box>
               <TextInput
                 placeholder="Enter Value"
                 id="target_compiler_version"
                 name="target_compiler_version"
               />
-            </FormField>
-            <FormField
-              label="Source pre-compiler"
-              htmlFor="source_pre_compiler"
-              name="source_pre_compiler"
-              required={true}
-            >
+            </Box>
+            <Box htmlFor="source_pre_compiler" direction='row' margin={{ bottom: 'medium' }}>
+              <Box width='medium'>
+                <label htmlFor="source_pre_compiler">Source pre-compiler*</label>
+              </Box>
               <TextInput
                 placeholder="Enter value"
                 id="source_pre_compiler"
                 name="source_pre_compiler"
+                required={true}
               />
-            </FormField>
+            </Box>
 
-            <FormField
-              label="Source pre-compiler version"
-              htmlFor="source_pre_compiler_version"
-              name="source_pre_compiler_version"
-              required={true}
-            >
+            <Box htmlFor="source_pre_compiler_version" direction='row' margin={{ bottom: 'medium' }}>
+              <Box width='medium'>
+                <label htmlFor="source_pre_compiler_version">Source pre-compiler version*</label>
+              </Box>
               <TextInput
                 placeholder="Enter value"
                 id="source_pre_compiler_version"
                 name="source_pre_compiler_version"
+                required={true}
               />
-            </FormField>
+            </Box>
 
-            <FormField
-              label="Target pre-compiler"
-              htmlFor="target_pre_compiler"
-              name="Target_pre_compiler"
-            >
+            <Box htmlFor="target_pre_compiler" direction='row' margin={{ bottom: 'medium' }}>
+              <Box width='medium'>
+                <label htmlFor="target_pre_compiler">Target pre-compiler</label>
+              </Box>
               <TextInput
                 placeholder="Enter value"
                 id="target_pre_compiler"
                 name="target_pre_compiler"
               />
-            </FormField>
+            </Box>
 
-            <FormField
-              label="Target pre-compiler version"
-              htmlFor="target_pre_compiler_version"
-              name="target_pre_compiler_version"
-              required={true}
-            >
+            <Box htmlFor="target_pre_compiler_version" direction='row' margin={{ bottom: 'medium' }}>
+              <Box width='medium'>
+                <label htmlFor="target_pre_compiler_version">Target pre-compiler version</label>
+              </Box>
               <TextInput
                 placeholder="Enter value"
                 id="target_pre_compiler_version"
                 name="target_pre_compiler_version"
+                required={true}
               />
-            </FormField>
+            </Box>
+
           </Box>
         )}
 
-        <FormField
-          htmlFor="framework"
-          name="framework"
-          label="Framework"
-        >
+        <Box htmlFor="framework" direction='row' margin={{ bottom: 'medium' }}>
+          <Box width='68%'>
+            <label htmlFor="framework">Framework</label>
+          </Box>
           <Select
             placeholder="Select"
             id="framework"
@@ -1163,34 +1135,37 @@ export const StepThree = (nextId) => {
             ]}
             onChange={(e) => handleFramework(e)}
           />
-        </FormField>
- 
-        <FormField
-          label="Source Framework Version"
-          htmlFor="source_framework_version"
-          name="source_framework_version"
-        >
+        </Box>
+
+        <Box htmlFor="source_framework_version" direction='row' margin={{ bottom: 'medium' }}>
+          <Box width='medium'>
+            <label htmlFor="source_framework_version">Source Framework Version</label>
+          </Box>
           <TextInput
             placeholder="Enter value"
             id="source_framework_version"
             name="source_framework_version"
           />
-        </FormField>
+        </Box>
 
-        <FormField
-          label="Target Framework Version"
-          htmlFor="target_framework_version"
-          name="target_framework_version"
-        >
+        <Box htmlFor="target_framework_version" direction='row' margin={{ bottom: 'medium' }}>
+          <Box width='medium'>
+            <label htmlFor="target_framework_version">Target Framework Version</label>
+          </Box>
           <TextInput
             placeholder="Enter value"
             id="target_framework_version"
             name="target_framework_version"
           />
-        </FormField>
+        </Box>
 
-        <Box data-testid="test-4" width="medium" margin="0" pad="small">
-          <Text>Source Code</Text>
+        {/* <Box data-testid="test-4" width="medium" margin="0" pad="small" >
+          <Text>Source Code</Text> */}
+          <Box htmlFor="source_code" direction='row' margin={{ bottom: 'medium' }}>
+          <Box width='small'>
+            <label htmlFor="source_code">Source Code</label>
+          </Box>
+          <Box flex>
           <FileInput
             id="file_name"
             name="file_name"
@@ -1206,16 +1181,8 @@ export const StepThree = (nextId) => {
               setProceedButtonDisabled(false);
             }}
           />
+          </Box>
 
-          {/* <Box
-        margin={{ top: "small", left: "small" }}
-        direction="row"
-        gap="large"
-      >
-        <Button>Previous</Button>
-        <Button href="/review">Review + Create</Button>
-        <Button onClick={(e) => handleSpinner(e)}>Proceed</Button>
-      </Box> */}
           {showSpinner && (
             <Box>
               <Layer model>

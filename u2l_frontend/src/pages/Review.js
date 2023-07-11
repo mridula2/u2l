@@ -170,7 +170,7 @@ const Review = () => {
               </Text>
             </Box>
             <Text margin={{ left: 'medium' }}>
-              {location.state.formValues.target_os}
+              {location.state.formValues.target_os_version}
             </Text>
           </Box>
         </Box>
