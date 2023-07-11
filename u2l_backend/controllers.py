@@ -11,7 +11,6 @@ import re
 import numpy as np
 import zipfile
 import openpyxl
-# from tasks import *
 
 authentication_controller = Blueprint('authentication', __name__)
 analysis_bp = Blueprint('analysis', __name__)
@@ -197,8 +196,8 @@ def upload():
                 dest_path = os.path.join(dest_dir, 'java_inventory_report.xlsx')
                 shutil.copy(source_path, dest_path)
 
-                source_path = os.path.join(source_dir_report, 'java_remediation_report_new.xlsx')
-                dest_path = os.path.join(dest_dir, 'java_remediation_report_new.xlsx')
+                source_path = os.path.join(source_dir_report, 'java_remediation_report.xlsx')
+                dest_path = os.path.join(dest_dir, 'java_remediation_report.xlsx')
                 shutil.copy(source_path, dest_path)
 
                 source_path = os.path.join(source_dir_report, 'java_high_level_report.xlsx')
@@ -391,20 +390,6 @@ def upload():
             except Exception as e:
                 return jsonify({'error': str(e)})   
 
-            # Run javaFrameworkScan.sh script
-            try:
-                script_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/Java/javaFrameworkScan.sh'
-                code_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/java-vfunction_'+ yMD + '_' + hMS +'/work/javaanalysis/'
-                framework_type = 'Jsf'
-                command = ['sh', script_path, code_path, framework_type]
-                process = subprocess.Popen(command, stdout=subprocess.PIPE)
-                output = process.communicate()[0].decode().strip()
-                lines = output.split('\n')
-                print(lines)
-                print('\nCompleted running javaFrameworkScan.sh\n')
-            except Exception as e:
-                return jsonify({'error': str(e)})
-        
             # Run javaRulesRemedy.sh script
             try:
                 script_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/Java/javaRulesRemedy.sh'
@@ -416,6 +401,20 @@ def upload():
                 print('Completed running javaRulesRemedy.sh')
             except Exception as e:
                 return jsonify({'error': str(e)})
+            
+            # Run javaFrameworkScan.sh script
+            try:
+                script_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/Java/javaFrameworkScan.sh'
+                code_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/java-vfunction_'+ yMD + '_' + hMS +'/work/javaanalysis/'
+                framework_type = 'Jsf'
+                command = subprocess.Popen(['bash', script_path, code_path, framework_type], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                output = command.communicate()[0].decode().strip()
+                lines = output.split('\n')
+                print(lines)
+                print('\nCompleted running javaFrameworkScan.sh\n')
+            except Exception as e:
+                return jsonify({'error': str(e)})
+                    
             try:
 
                 print("Moving texts files !!!")
@@ -536,7 +535,8 @@ def upload():
             if(tool_analysis_type == 'javaanalysis'):
 
                 yyyy_mmdd = yMD[:4] + '-' + yMD[4:]
-                java_remediation_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/java_remediation_report_new.xlsx'
+                java_remediation_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/java_remediation_report.xlsx'
+                java_high_level_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/java_high_level_report.xlsx'
                 
                 # Convert javaSourceScanRemedy into .csv
                 print("Start 1")
@@ -557,10 +557,15 @@ def upload():
                     df = pd.read_csv(javaSourceCode2Remedy, sep='\t|:', engine='python', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
                     if(len(df.columns) == 5):
                         df.columns = ['RULE ID', 'FILE NAME', 'LINE NUMBER', 'Column4', 'AFFECTED CODE']
-                        df = df.drop(columns=['Column4'])
+                        print('E2')
+                        # df = df.drop(columns=['Column4'])
+                        print('E3')
                         print(df)
-                    df.columns = ['RULE ID', 'FILE NAME', 'LINE NUMBER', 'AFFECTED CODE']
-                    df.index = df.index + 1
+                        print('E4')
+                    df.columns = ['RULE ID', 'FILE NAME', 'LINE NUMBER', 'Column4', 'AFFECTED CODE']
+                    print('E5')
+                    # df.index = df.index + 1
+                    print('E6')
                     save_location = '/usr/u2l/u2l_backend/projects/' + file_name + '/java_report.xlsx'
                     
                     generate_workbook(df, save_location,'javaSourceCode2Remedy')
@@ -568,6 +573,7 @@ def upload():
                 df1 = pd.read_excel(save_location, engine='openpyxl', sheet_name='javaSourceScanRemedy', skiprows=0)
                 df1 = df1.drop(df1.columns[0], axis=1)
                 df1 = df1.iloc[:, 3]
+                print(df1)
                 
                 writer = pd.ExcelWriter(save_location, engine='openpyxl', mode='a')
                 book = load_workbook(save_location)
@@ -707,8 +713,9 @@ def upload():
 
                     save_location_2 = '/usr/u2l/u2l_backend/projects/' + file_name + '/java_inventory_report.xlsx'
 
-                    generate_workbook(result_df, save_location_2,'Source Code Inventory')
+                    sheet_transfer('Source Code Inventory', 'Source Code Inventory', 1, 0, save_location_1, save_location_2)
                     sheet_transfer('Source Code Inventory', 'Source Code Inventory', 6, 1, save_location_1, java_remediation_path)
+                    sheet_transfer('Source Code Inventory', 'Source Code Inventory', 6, 1, save_location_1, java_high_level_path)
                 print("End 11")
 
                 # Convert OS_diff.out
@@ -728,7 +735,6 @@ def upload():
                         print(df)
                     df.columns = ['Column1', 'FILE NAME', 'LINE NUMBER', 'SOURCE CODE']
                     df = df.drop(columns=['Column1'])
-                    df.index = df.index + 1
                     save_location = '/usr/u2l/u2l_backend/projects/' + file_name + '/java_report.xlsx'
 
                     generate_workbook(df, save_location,'OS Analysis Details')
@@ -748,7 +754,7 @@ def upload():
                     sheet_transfer('JDK Anaylsis Details', '3. JDK Analysis Detail', 6, 1, save_location, java_remediation_path)
                 print("End 13")
 
-                #java_high_level_report.xlsx
+                #java_high_level_report.xlsx - Source Code Impacted
 
                 excel_file = java_remediation_path
                 sheet_configs = {
@@ -790,6 +796,14 @@ def upload():
                 writer.sheets = dict((ws.title, ws) for ws in book.worksheets)
                 df_combined.to_excel(writer, sheet_name='Source Code Impacted', index=False, startrow=6, startcol=1, header=False)
                 writer.save()
+
+                print('Done 1')
+                filepath = '/usr/u2l/u2l_backend/projects/' + file_name + '/java_report.xlsx'
+                print('Done 2')
+                filepath_percentage = '/usr/u2l/u2l_backend/projects/' + file_name + '/java_report.xlsx'
+                print('Done 3')
+                fetch_store_java_data(form_project_name, form_application_name, filepath, filepath_percentage)
+                print('Done 4')
 
             elif(tool_analysis_type == 'canalysis'):
 
@@ -1045,9 +1059,10 @@ def report(query_project_name):
     analysisType = query.first().analysis_type
     print(analysisType)
 
-    if analysisType == 'javaanalysis':      
-        file1_path = '/usr/u2l/u2l_backend/projects/'+ fileName +'/java_inventory_report.xlsx'
-        file2_path = '/usr/u2l/u2l_backend/projects/'+ fileName +'/java_report.xlsx'
+    if analysisType == 'javaanalysis':
+        file1_path = '/usr/u2l/u2l_backend/projects/'+ fileName +'/java_remediation_report.xlsx'
+        file2_path = '/usr/u2l/u2l_backend/projects/'+ fileName +'/java_inventory_report.xlsx'
+        file3_path = '/usr/u2l/u2l_backend/projects/'+ fileName +'/java_high_level_report.xlsx'
     elif analysisType == 'canalysis':
         file1_path = '/usr/u2l/u2l_backend/projects/'+ fileName +'/c_inventory_report.xlsx'
         file2_path = '/usr/u2l/u2l_backend/projects/'+ fileName +'/c_report.xlsx'
@@ -1059,10 +1074,13 @@ def report(query_project_name):
         return 'File 1 not found', 404
     if not os.path.exists(file2_path):
         return 'File 2 not found', 404
+    if not os.path.exists(file3_path):
+        return 'File 3 not found', 404
     
     zip_buffer = zipfile.ZipFile('files.zip', 'w', zipfile.ZIP_DEFLATED)
     zip_buffer.write(file1_path, os.path.basename(file1_path))
     zip_buffer.write(file2_path, os.path.basename(file2_path))
+    zip_buffer.write(file3_path, os.path.basename(file3_path))
     zip_buffer.close()
 
     os.chmod('files.zip', 0o777)
@@ -1113,19 +1131,27 @@ def pdf(query_project_name):
     selected_cols = ['Actual Nr of Lines', 'Nr Blank Lines', 'Nr Commented Lines', 'Total Nr LoC']
 
     if analysisType == 'javaanalysis':      
-        filepath = '/usr/u2l/u2l_backend/projects/'+ fileName +'/java_inventory_report.xlsx'
+        filepath = '/usr/u2l/u2l_backend/projects/'+ fileName +'/java_report.xlsx'
         filepath_percentage = '/usr/u2l/u2l_backend/projects/'+ fileName +'/java_report.xlsx'
 
         sheet_names = ['OS Analysis Details', 'Compilation Error Report', 'Import Class Report', 'JDK Anaylsis Details', 'Import JSP Report', 'Compilation Warning Report']
         wb = load_workbook(filename=filepath_percentage, read_only=True, data_only=True)
-        sheets = [wb[sheet_name] for sheet_name in sheet_names]
+
+        no_of_artefacts = []
         count_of_ids = 0
-        for sheet in sheets:
+        total_count_of_ids = 0
+        for sheet_name in sheet_names:
+            sheet = wb[sheet_name]
+            count_of_ids = 0
             if sheet.max_row < 2:
                 continue
             for row in sheet.iter_rows(min_row=2, values_only=True):
                 if row[0] is not None:
                     count_of_ids += 1
+                    total_count_of_ids +=1
+
+            no_of_artefacts.append({sheet_name: count_of_ids})
+        print(no_of_artefacts)
 
     elif analysisType == 'canalysis':
         filepath = '/usr/u2l/u2l_backend/projects/'+ fileName +'/c_inventory_report.xlsx'
@@ -1181,9 +1207,9 @@ def pdf(query_project_name):
     percentage = (count_of_ids/total_no_of_lines) * 100
     rounded_percentage = round(percentage, 2)
 
-    return jsonify({'project_details': json_project_details, 'os_details': json_os_details, 'analysis_type': json_analysis_type, 'chart1': column_sums.to_dict(), 'chart2' : counts_list, 'percent' : rounded_percentage}), 200    
+    return jsonify({'project_details': json_project_details, 'os_details': json_os_details, 'analysis_type': json_analysis_type, 'chart1': column_sums.to_dict(), 'chart2' : counts_list, 'chart3' :  no_of_artefacts, 'percent' : rounded_percentage}), 200    
 
-@authentication_controller.route('/configuration/<query_file_name>', methods=['GET'])
+@authentication_controller.route('/documentation/<query_file_name>', methods=['GET'])
 def export_configuration_file(query_file_name):
     if query_file_name == 'Code Delivery Guidelines-V0.4':      
         file_path = '/usr/u2l/u2l_backend/media/'+ query_file_name +'.docx'
@@ -1204,3 +1230,36 @@ def export_configuration_file(query_file_name):
             'Cache-Control': 'no-cache, no-store, must-revalidate'
         }
     )
+
+@authentication_controller.route('/contact-us', methods=['POST'])
+def contactus():
+    json_data = request.get_json()
+    print(json_data)
+    first_name = json_data['first_name']
+    last_name = json_data['last_name']
+    email = json_data['email']
+    contact_number = json_data['contact_number']
+    message = json_data['message']
+
+    user_info = {
+        'first_name': first_name,
+        'last_name': last_name,
+        'email': email,
+        'message': message,
+        'contact_number': contact_number
+    }
+    print(f"User Info: {user_info}")
+
+    # Save the user information in the "contact-us" table in the database
+    created_at = datetime.datetime.now()
+    db_contact_us = contact_us(user_info['first_name'],user_info['last_name'], user_info['email'], user_info['contact_number'], user_info['message'], created_at)
+    db.session.add(db_contact_us)
+    try:
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'message': 'failed : ' + str(e)}), 409
+
+    send_email(user_info)
+
+    return jsonify({'message': 'Message send successfully. We will contact you !'}), 200
