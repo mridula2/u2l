@@ -247,3 +247,42 @@ class artefacts_summary(db.Model):
         self.migration_area = migration_area
         self.no_of_artefacts = no_of_artefacts
         self.no_of_loc = no_of_loc
+
+class java_data(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    project_name = db.Column(db.String(50))
+    application_name = db.Column(db.String(50))
+    inventory_sums_actual_nr_of_lines = db.Column(db.Integer)
+    inventory_sums_nr_blank_lines = db.Column(db.Integer)
+    inventory_sums_nr_commented_lines = db.Column(db.Integer)
+    inventory_sums_total_nr_loc = db.Column(db.Integer)
+    no_of_artefacts_os_analysis_details = db.Column(db.Integer)
+    no_of_artefacts_compilation_error_report = db.Column(db.Integer)
+    no_of_artefacts_import_class_report = db.Column(db.Integer)
+    no_of_artefacts_jdk_analysis_details = db.Column(db.Integer)
+    no_of_artefacts_import_jsp_report = db.Column(db.Integer)
+    no_of_artefacts_compilation_warning_report = db.Column(db.Integer)
+    artefacts_count_type = db.Column(db.String(50))
+    artefacts_count_number = db.Column(db.Integer)
+    percent = db.Column(db.Float)
+
+    __table_args__ = (
+    UniqueConstraint('project_name', 'application_name'),
+    )
+
+class contact_us(db.Model):
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    first_name = db.Column(db.String(50))
+    last_name = db.Column(db.String(50))
+    email = db.Column(db.String(50))
+    contact_number = db.Column(db.String(50))
+    message = db.Column(db.String(50))
+    created_at = db.Column(db.DateTime)
+
+    def __init__(self, first_name, last_name, email, contact_number, message, created_at):
+        self.first_name = first_name
+        self.last_name = last_name
+        self.email = email
+        self.contact_number = contact_number
+        self.message = message
+        self.created_at = created_at
