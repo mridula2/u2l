@@ -284,7 +284,7 @@ const WizardValidationExample = ({ containerRef }) => {
           }}
         />
       </Box>
-      <StepFooter onNavigate={handleNavigate} />
+      <StepFooter onNavigate={handleNavigate} formValues={formValues} />
 
       {open && (
         <CancellationLayer
@@ -590,7 +590,10 @@ export const StepThree = (nextId) => {
   //   />
   // );
 
-  const saveFile = (files) => {          
+  const saveFile = (files) => {    
+    if (formValues['file_name']){
+        setFileInputDisabled(false);
+      }
   }
 
   return (
@@ -1248,20 +1251,20 @@ export const StepThree = (nextId) => {
           <Box width='small'>
             <label htmlFor="source_code">Source Code</label>
           </Box>
-          <Box flex>
+          <Box flex disabled={true}>
           <FileInput
             id="file_name"
             name="file_name"
             label="Source code"
             accept=".zip"
             messages={{
-              browse: numFiles > 0 ? 'Replace file' : 'Select file',
+              // browse: numFiles > 0 ? 'Replace file' : 'Select file',
+              browse:'Select file',
             }}
             disabled={fileInputDisabled}
             required={true}
             onChange={(event, { files }) => { saveFile(files)
               setNumFiles(files.length);
-              setProceedButtonDisabled(false);           
             }}
           />
           </Box>
