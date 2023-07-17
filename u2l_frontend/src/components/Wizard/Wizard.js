@@ -28,6 +28,7 @@ import { FormNext, FormPreviousLink, FormPrevious } from 'grommet-icons';
 import { getWidth } from './Utils';
 import ProjectService from '../../api/ProjectService';
 import WizardUtils from '../../utils/WizardUtils';
+// import FileReader from 'filereader';
 
 const WizardValidationExample = ({ containerRef }) => {
   const location = useLocation();
@@ -64,6 +65,7 @@ const WizardValidationExample = ({ containerRef }) => {
         framework: '',
         source_framework_version: '',
         target_framework_version: '',
+        file_name: '',
       })
     } else {
       return ({
@@ -95,6 +97,7 @@ const WizardValidationExample = ({ containerRef }) => {
         framework: location.state.formValues.framework,
         source_framework_version: location.state.formValues.source_framework_version,
         target_framework_version: location.state.formValues.target_framework_version,
+        file_name: location.state.formValues.file_name,
       })
     }
   };
@@ -281,7 +284,7 @@ const WizardValidationExample = ({ containerRef }) => {
           }}
         />
       </Box>
-      <StepFooter onNavigate={handleNavigate} />
+      <StepFooter onNavigate={handleNavigate} formValues={formValues} />
 
       {open && (
         <CancellationLayer
@@ -448,6 +451,83 @@ export const StepThree = (nextId) => {
   const [proceedButtonDisabled, setProceedButtonDisabled] = useState(true);
   const [showSpinner, setShowSpinner] = useState(false);
 
+  const location = useLocation();
+
+  const defaultFormValues = () => {
+    console.log(location);
+    if (!location.state) {
+      return ({
+        project_name: '',
+        project_client: '',
+        project_manager: '',
+        application_name: '',
+        source_os: '',
+        source_os_version: '',
+        target_os: '',
+        target_os_version: '',
+        analysis_type: '',
+        source_jdk: '',
+        target_jdk: '',
+        source_jsp: '',
+        target_jsp: '',
+        source_servlet: '',
+        target_servlet: '',
+        source_compiler: '',
+        source_compiler_version: '',
+        target_compiler: '',
+        target_compiler_version: '',
+        source_oracle_version: '',
+        target_oracle_version: '',
+        source_shell: '',
+        source_shell_version: '',
+        target_shell: '',
+        target_shell_version: '',
+        framework: '',
+        source_framework_version: '',
+        target_framework_version: '',
+        file_name: '',
+      })
+    } else {
+      return ({
+        project_name: location.state.formValues.project_name,
+        project_client: location.state.formValues.project_client,
+        project_manager: location.state.formValues.project_manager,
+        application_name: location.state.formValues.application_name,
+        source_os: location.state.formValues.source_os,
+        source_os_version: location.state.formValues.source_os_version,
+        target_os: location.state.formValues.target_os,
+        target_os_version: location.state.formValues.target_os_version,
+        analysis_type: location.state.formValues.analysis_type,
+        source_jdk: location.state.formValues.source_jdk,
+        target_jdk: location.state.formValues.target_jdk,
+        source_jsp: location.state.formValues.source_jsp,
+        target_jsp: location.state.formValues.target_jsp,
+        source_servlet: location.state.formValues.source_servlet,
+        target_servlet: location.state.formValues.target_servlet,
+        source_compiler: location.state.formValues.source_compiler,
+        source_compiler_version: location.state.formValues.source_compiler_version,
+        target_compiler: location.state.formValues.target_compiler,
+        target_compiler_version: location.state.formValues.target_compiler_version,
+        source_oracle_version: location.state.formValues.source_oracle_version,
+        target_oracle_version: location.state.formValues.target_oracle_version,
+        source_shell: location.state.formValues.source_shell,
+        source_shell_version: location.state.formValues.source_shell_version,
+        target_shell: location.state.formValues.target_shell,
+        target_shell_version: location.state.formValues.target_shell_version,
+        framework: location.state.formValues.framework,
+        source_framework_version: location.state.formValues.source_framework_version,
+        target_framework_version: location.state.formValues.target_framework_version,
+        file_name: location.state.formValues.file_name,
+      })
+    }
+  };
+
+  const [formValues, setFormValues] = useState(defaultFormValues);
+
+  // console.log(formValues)
+  // if (formValues['analysis_type']){
+  //   setFileInputDisabled(false);
+  // }
   const handleshowhide = (event) => {
     const getLang = event.target.value;
     setFileInputDisabled(false);
@@ -510,6 +590,12 @@ export const StepThree = (nextId) => {
   //   />
   // );
 
+  const saveFile = (files) => {    
+    if (formValues['file_name']){
+        setFileInputDisabled(false);
+      }
+  }
+
   return (
     <Box align="center">
       <Box width={{ max: 'medium' }}>
@@ -565,7 +651,6 @@ export const StepThree = (nextId) => {
                 required={true}
               />
             </Box>
-
 
             <Box htmlFor="source_jsp" direction='row' margin={{ bottom: 'medium' }}>
               <Box width='medium'>
@@ -833,7 +918,6 @@ export const StepThree = (nextId) => {
                 name="source_pre_compiler"
               />
             </Box>
-
 
             <Box htmlFor="source_pre_compiler_version" direction='row' margin={{ bottom: 'medium' }}>
               <Box width='medium'>
@@ -1165,20 +1249,20 @@ export const StepThree = (nextId) => {
           <Box width='small'>
             <label htmlFor="source_code">Source Code</label>
           </Box>
-          <Box flex>
+
           <FileInput
             id="file_name"
             name="file_name"
             label="Source code"
             accept=".zip"
             messages={{
-              browse: numFiles > 0 ? 'Replace file' : 'Select file',
+              // browse: numFiles > 0 ? 'Replace file' : 'Select file',
+              browse:'Select file',
             }}
             disabled={fileInputDisabled}
             required={true}
-            onChange={(event, { files }) => {
+            onChange={(event, { files }) => { saveFile(files)
               setNumFiles(files.length);
-              setProceedButtonDisabled(false);
             }}
           />
           </Box>

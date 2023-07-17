@@ -1,18 +1,21 @@
-import html2canvas from "html2canvas";
+import html2canvas from 'html2canvas';
 // import Chart from "react-apexcharts";
-import { useState, useEffect, useRef } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-import { Button, Image } from "grommet";
-import PdfDocument from "./PdfDocument";
-import { PDFDownloadLink } from "@react-pdf/renderer";
-import { Hpe } from "grommet-icons";
-import image1 from "../../assets/Images/u2lpdfImg.png";
-import image2 from "../../assets/Images/u2lpdfImg2.png";
-import image3 from "../../assets/Images/U2LMigrationEffort.png";
+import { useState, useEffect, useRef } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { Button, Image } from 'grommet';
+import PdfDocument from './PdfDocument';
+import { PDFDownloadLink } from '@react-pdf/renderer';
+import { Hpe } from 'grommet-icons';
+import image1 from '../../assets/Images/u2lpdfImg.png';
+import image2 from '../../assets/Images/u2lpdfImg2.png';
+import image3 from '../../assets/Images/U2LMigrationEffort.png';
 // import { Chart, LinearScale, registerables } from "chart.js";
-import HPELogo from "../../assets/Images/HPELogo.png";
-import { Chart } from "react-google-charts";
-import PdfUtils from "../../utils/PdfUtils";
+import HPELogo from '../../assets/Images/HPELogo.png';
+import { Chart } from 'react-google-charts';
+import PdfUtils from '../../utils/PdfUtils';
+import AuthenticationUtils from '../../utils/AuthenticationUtils';
+import PdfPreviewPageHeader from './PdfPreviewPageHeader';
+import PdfPreviewPageFooter from './PdfPreviewPageFooter';
 // Chart.register(LinearScale);
 // Chart.register(...registerables);
 
@@ -135,22 +138,21 @@ const PdfPreview = () => {
       // };
       const chartData = [['Type', 'Number']];
       data1.forEach((item) => {
-      chartData.push([item.Type, item.number]);
-      setChartData1(chartData)
-  });
+        chartData.push([item.Type, item.number]);
+        setChartData1(chartData);
+      });
 
-  setChartOptions1({
-    is3D: true,
-    colors: ["#004499", "#005bcc", "#0072ff",'#382eff','#66aaff'],
-    legend: {
-      position: "right",
-      textStyle: { color: "green", fontSize: 16 },
-      alignment: "center",
-    },
-    tooltip: { showColorCode: true },
-    chartArea: { left: "20%", top: 50, width: "60%", height: "60%" },
-  });
-
+      setChartOptions1({
+        is3D: true,
+        colors: ['#004499', '#005bcc', '#0072ff', '#382eff', '#66aaff'],
+        legend: {
+          position: 'right',
+          textStyle: { color: 'green', fontSize: 16 },
+          alignment: 'center',
+        },
+        tooltip: { showColorCode: true },
+        chartArea: { left: '20%', top: 50, width: '60%', height: '60%' },
+      });
     }
   }, [data1]);
 
@@ -206,31 +208,31 @@ const PdfPreview = () => {
       //   chart2.destroy();
       // };
       setChartData2([
-        ["Type", "number"],
+        ['Type', 'number'],
         [
-          `Actual Nr of Lines : ${data2["Actual Nr of Lines"]}`,
-          data2["Actual Nr of Lines"],
+          `Actual Nr of Lines : ${data2['Actual Nr of Lines']}`,
+          data2['Actual Nr of Lines'],
         ],
         [
-          `Nr Blank Lines : ${data2["Nr Blank Lines"]}`,
-          data2["Nr Blank Lines"],
+          `Nr Blank Lines : ${data2['Nr Blank Lines']}`,
+          data2['Nr Blank Lines'],
         ],
         [
-          `Nr Commented Lines : ${data2["Nr Commented Lines"]}`,
-          data2["Nr Commented Lines"],
+          `Nr Commented Lines : ${data2['Nr Commented Lines']}`,
+          data2['Nr Commented Lines'],
         ],
       ]);
 
       setChartOptions2({
         is3D: true,
-        colors: ["#00a17a", "#32c29f", "#66d1b7"],
+        colors: ['#00a17a', '#32c29f', '#66d1b7'],
         legend: {
-          position: "right",
-          textStyle: { color: "green", fontSize: 16 },
-          alignment: "center",
+          position: 'right',
+          textStyle: { color: 'green', fontSize: 16 },
+          alignment: 'center',
         },
         tooltip: { showColorCode: true },
-        chartArea: { left: "20%", top: 50, width: "60%", height: "60%" },
+        chartArea: { left: '20%', top: 50, width: '60%', height: '60%' },
       });
     }
   }, [data2]);
@@ -240,14 +242,14 @@ const PdfPreview = () => {
     // //generate image
 
     //{============================================= uncomment start ====================================================}
-    const element1 = document.getElementById("piechart1"),
+    const element1 = document.getElementById('piechart1'),
       canvas1 = await html2canvas(element1),
-      data3 = canvas1.toDataURL("image/png");
+      data3 = canvas1.toDataURL('image/png');
     //{============================================= uncomment end ======================================================}
 
-    const element2 = document.getElementById("piechart2"),
+    const element2 = document.getElementById('piechart2'),
       canvas2 = await html2canvas(element2),
-      data4 = canvas2.toDataURL("image/png");
+      data4 = canvas2.toDataURL('image/png');
 
     // navigate("/pdfview", {
     //   state: {
@@ -256,7 +258,7 @@ const PdfPreview = () => {
     //   },
     // });
     //{============================================= uncomment start ====================================================}
-    navigate("/pdfview", {
+    navigate('/pdfview', {
       state: {
         pieChart1DataURL: data3,
         pieChart2DataURL: data4,
@@ -266,9 +268,8 @@ const PdfPreview = () => {
     //{============================================= uncomment end ======================================================}
   };
 
-
   return (
-    <div className="App">
+    <div className='App'>
       {/* <PDFDownloadLink document={<MyDocument2 />}>
       {({loading}) => (loading ? <button>Loading Document...</button> : <button>Download</button> )}
       </PDFDownloadLink> 
@@ -277,7 +278,7 @@ const PdfPreview = () => {
 
       {/* <button onClick={print}>Print</button> */}
       <div
-        style={{ justifyContent: "right", marginLeft: "80%", marginTop: "3%" }}
+        style={{ justifyContent: 'right', marginLeft: '80%', marginTop: '3%' }}
       >
         {/* <PDFDownloadLink document={<PdfDocument pieChartDataURL={pieChartDataURL}/>}>
           {({ loading }) =>
@@ -288,7 +289,7 @@ const PdfPreview = () => {
             )
           }
         </PDFDownloadLink> */}
-        <Button primary label="Open as pdf" onClick={openPDF} />
+        <Button primary label='Open as pdf' onClick={openPDF} />
       </div>
       <div style={styles.headerDiv}>
         <p style={styles.headerText}>Analysis Report Preview</p>
@@ -306,26 +307,16 @@ const PdfPreview = () => {
       </div> */}
       {/* ============================================== Page 1 ============================================= */}
       {/* =========================== Header Page 1 =====================*/}
-      <div style={{ marginLeft: "15%", marginTop: "3%" }}>
-        <Image src={HPELogo} alt="HPE logo" width="15%" />
-      </div>
-      <div
-        style={{
-          border: "1.5px solid #01A982",
-          marginLeft: "15%",
-          width: "70%",
-          marginTop: 30,
-        }}
-      ></div>
+      <PdfPreviewPageHeader />
       {/* ============================= Body Page 1 ========================== */}
       <div>
         <p
           style={{
-            fontSize: "25px",
-            textAlign: "center",
-            marginTop: "30px",
-            marginBottom: "100px",
-            color: "#01A982",
+            fontSize: '25px',
+            textAlign: 'center',
+            marginTop: '30px',
+            marginBottom: '100px',
+            color: '#01A982',
           }}
         >
           HPE code Assessment
@@ -333,30 +324,30 @@ const PdfPreview = () => {
       </div>
       <div
         style={{
-          textAlign: "left",
+          textAlign: 'left',
           marginBottom: 30,
-          border: "1px solid #01A982",
-          marginLeft: "15%",
-          width: "70%",
+          border: '1px solid #01A982',
+          marginLeft: '15%',
+          width: '70%',
         }}
       >
         <p style={styles.infoText}>
-          Project Name:{" "}
+          Project Name:{' '}
           {location.state.projectDetails.project_details[0].project_name}
         </p>
         <p style={styles.infoText}>
-          Project Client:{" "}
+          Project Client:{' '}
           {location.state.projectDetails.project_details[0].project_client}
         </p>
         <p style={styles.infoText}>
-          Project Manager:{" "}
+          Project Manager:{' '}
           {location.state.projectDetails.project_details[0].project_manager}
         </p>
         <p style={styles.infoText}>
-          Username: {location.state.projectDetails.project_details[0].user_name}
+          Username: {AuthenticationUtils.getUserName()}
         </p>
         <p style={styles.infoText}>
-          Type of Code Assessment:{" "}
+          Type of Code Assessment:{' '}
           {PdfUtils.getAnalysisType(
             location.state.projectDetails.analysis_type[0].analysis_type
           )}
@@ -369,52 +360,20 @@ const PdfPreview = () => {
         </p>
       </div>
       {/* ========================= Footer Page 1 ================== */}
-      <div
-        style={{
-          border: "1.5px solid #01A982",
-          marginLeft: "15%",
-          width: "70%",
-          marginBottom: 20,
-          marginTop: 30,
-        }}
-      ></div>
-      <div style={{ display: "flex", flexDirection: "row" }}>
-        <div style={{ marginRight: "25%", marginLeft: "15%" }}>
-          <span style={{ fontSize: "18px", width: "70%" }}>Summary Report</span>
-        </div>
-        <div style={{ marginRight: "28%" }}>
-          <span style={{ fontSize: "18px", width: "70%" }}>1/5</span>
-        </div>
-        <div>
-          <span style={{ fontSize: "18px", width: "70%" }}>
-            {PdfUtils.getTodaysDate()}
-          </span>
-        </div>
-      </div>
-      <hr style={{ width: "80%" }}></hr>
+      <PdfPreviewPageFooter page='1/5' />
       {/* ============================================== Page 2 ============================================= */}
       {/* ============================= Header Page 2 ========================== */}
-      <div style={{ marginLeft: "15%", marginTop: "3%" }}>
-        <Image src={HPELogo} alt="HPE logo" width="15%" />
-      </div>
-      <div
-        style={{
-          border: "1.5px solid #01A982",
-          marginLeft: "15%",
-          width: "70%",
-          marginTop: 30,
-        }}
-      ></div>
+      <PdfPreviewPageHeader />
       {/* ============================= Body Page 2 ========================== */}
       <div style={styles.sectionTitle}>
-        <p style={{ fontSize: "25px", marginBottom: "5%" }}>Summary Report</p>
+        <p style={{ fontSize: '25px', marginBottom: '5%' }}>Summary Report</p>
       </div>
-      <div style={{ textAlign: "left", margin: "o auto" }}>
-        <p style={{ fontSize: "20px", fontWeight: "bold", marginLeft: "15%" }}>
+      <div style={{ textAlign: 'left', margin: 'o auto' }}>
+        <p style={{ fontSize: '20px', fontWeight: 'bold', marginLeft: '15%' }}>
           HPE Code Assessment
         </p>
       </div>
-      <div style={{ textAlign: "left", marginBottom: "5%" }}>
+      <div style={{ textAlign: 'left', marginBottom: '5%' }}>
         <p style={styles.normalText}>
           HPE Code Assessment Suite is a tool intended to analyse or assess
           existing application code and produce migration checklist points
@@ -425,128 +384,72 @@ const PdfPreview = () => {
       </div>
       <div
         style={{
-          display: "flex",
-          justifyContent: "center",
-          marginBottom: "5%",
+          display: 'flex',
+          justifyContent: 'center',
+          marginBottom: '5%',
         }}
       >
-        <Image src={image1} alt="image1" width="70%" />
+        <Image src={image1} alt='image1' width='70%' />
       </div>
       {/* ========================= Footer Page 2 ===================== */}
-      <div
-        style={{
-          border: "1.5px solid #01A982",
-          marginLeft: "15%",
-          width: "70%",
-          marginBottom: 20,
-        }}
-      ></div>
-      <div style={{ display: "flex", flexDirection: "row" }}>
-        <div style={{ marginRight: "25%", marginLeft: "15%" }}>
-          <span style={{ fontSize: "18px", width: "70%" }}>Summary Report</span>
-        </div>
-        <div style={{ marginRight: "28%" }}>
-          <span style={{ fontSize: "18px", width: "70%" }}>2/5</span>
-        </div>
-        <div>
-          <span style={{ fontSize: "18px", width: "70%" }}>
-            {PdfUtils.getTodaysDate()}
-          </span>
-        </div>
-      </div>
-      <hr style={{ width: "80%" }}></hr>
+      <PdfPreviewPageFooter page='2/5' />
       {/* ============================================== Page 3 ============================================= */}
       {/* ============================= Header Page 3 ========================== */}
-      <div style={{ marginLeft: "15%", marginTop: "3%" }}>
-        <Image src={HPELogo} alt="HPE logo" width="15%" />
-      </div>
-      <div
-        style={{
-          border: "1.5px solid #01A982",
-          marginLeft: "15%",
-          width: "70%",
-          marginTop: 30,
-        }}
-      ></div>
+      <PdfPreviewPageHeader />
       {/* ============================= Body Page 3 ========================== */}
       <div style={styles.sectionTitle}>
-        <p style={{ fontSize: "25px" }}>Code Assessment Process</p>
+        <p style={{ fontSize: '25px' }}>Code Assessment Process</p>
       </div>
       <div
         style={{
-          display: "flex",
-          justifyContent: "center",
-          marginBottom: "10%",
+          display: 'flex',
+          justifyContent: 'center',
+          marginBottom: '10%',
         }}
       >
-        <Image src={image2} alt="image2" width="70%" />
+        <Image src={image2} alt='image2' width='70%' />
       </div>
       {/* ========================= Footer Page 3 ================== */}
-      <div
-        style={{
-          border: "1.5px solid #01A982",
-          marginLeft: "15%",
-          width: "70%",
-          marginBottom: 20,
-        }}
-      ></div>
-      <div style={{ display: "flex", flexDirection: "row" }}>
-        <div style={{ marginRight: "25%", marginLeft: "15%" }}>
-          <span style={{ fontSize: "18px", width: "70%" }}>Summary Report</span>
-        </div>
-        <div style={{ marginRight: "28%" }}>
-          <span style={{ fontSize: "18px", width: "70%" }}>3/5</span>
-        </div>
-        <div>
-          <span style={{ fontSize: "18px", width: "70%" }}>
-            {PdfUtils.getTodaysDate()}
-          </span>
-        </div>
-      </div>
-      <hr style={{ width: "80%" }}></hr>
+      <PdfPreviewPageFooter page='3/5' />
       {/* ============================================== Page 4 ============================================= */}
       {/* ============================= Header Page 4 ========================== */}
-      <div style={{ marginLeft: "15%", marginTop: "3%" }}>
-        <Image src={HPELogo} alt="HPE logo" width="15%" />
-      </div>
-      <div
-        style={{
-          border: "1.5px solid #01A982",
-          marginLeft: "15%",
-          width: "70%",
-          marginTop: 30,
-        }}
-      ></div>
+      <PdfPreviewPageHeader />
       {/* ============================= Body Page 4 ========================== */}
-      <div style={{ textAlign: "left", margin: "o auto" }}>
-        <p style={{ fontSize: "20px", fontWeight: "bold", marginLeft: "15%" }}>
+      <div style={{ textAlign: 'left', margin: 'o auto' }}>
+        <p style={{ fontSize: '20px', fontWeight: 'bold', marginLeft: '15%' }}>
           {`Total Artefacts : ${PdfUtils.getTotalArtefacts(
             location.state.projectDetails.chart2
           )}`}
         </p>
       </div>
-      <div id="piechart1" style={{ width: "70%", marginLeft: "15%", maxHeight:'500px'}}>
-      <Chart
-          graphID="piechart1"
+      <div
+        id='piechart1'
+        style={{ width: '70%', marginLeft: '15%', maxHeight: '500px' }}
+      >
+        <Chart
+          graphID='piechart1'
           data={chartData1}
           options={chartOptions1}
-          chartType="PieChart"
-          width={"100%"}
-          height={"400px"}
+          chartType='PieChart'
+          width={'100%'}
+          height={'400px'}
         />
       </div>
-      <div style={{ textAlign: "left", margin: "o auto" }}>
-        <p style={{ fontSize: "20px", fontWeight: "bold", marginLeft: "15%" }}>
-          {`Total Number of Lines : ${location.state.projectDetails.chart1["Total Nr LoC"]}`}
+      <div style={{ textAlign: 'left', margin: 'o auto' }}>
+        <p style={{ fontSize: '20px', fontWeight: 'bold', marginLeft: '15%' }}>
+          {`Total Number of Lines : ${location.state.projectDetails.chart1['Total Nr LoC']}`}
         </p>
       </div>
-      <div id="piechart2" style={{ width: "70%", marginLeft: "15%", maxHeight:'500px'}}>
+      <div
+        id='piechart2'
+        style={{ width: '70%', marginLeft: '15%', maxHeight: '500px' }}
+      >
         <Chart
-          id={"piechart2"}
+          id={'piechart2'}
           data={chartData2}
           options={chartOptions2}
-          chartType="PieChart"
-          width={"100%"}
+          chartType='PieChart'
+          width={'100%'}
           height={'400px'}
         />
       </div>
@@ -565,65 +468,34 @@ const PdfPreview = () => {
         ></Chart>
       </div> */}
       {/* ========================= Footer Page 4 ================== */}
-      <div
-        style={{
-          border: "1.5px solid #01A982",
-          marginLeft: "15%",
-          width: "70%",
-          marginBottom: 20,
-        }}
-      ></div>
-      <div style={{ display: "flex", flexDirection: "row" }}>
-        <div style={{ marginRight: "25%", marginLeft: "15%" }}>
-          <span style={{ fontSize: "18px", width: "70%" }}>Summary Report</span>
-        </div>
-        <div style={{ marginRight: "28%" }}>
-          <span style={{ fontSize: "18px", width: "70%" }}>4/5</span>
-        </div>
-        <div>
-          <span style={{ fontSize: "18px", width: "70%" }}>
-            {PdfUtils.getTodaysDate()}
-          </span>
-        </div>
-      </div>
-      <hr style={{ width: "80%" }}></hr>
+      <PdfPreviewPageFooter page='4/5' />
       {/* =============================  Page 5  ================================= */}
       {/* ============================= Header Page 5 ========================== */}
-      <div style={{ marginLeft: "15%", marginTop: "3%" }}>
-        <Image src={HPELogo} alt="HPE logo" width="15%" />
-      </div>
-      <div
-        style={{
-          border: "1.5px solid #01A982",
-          marginLeft: "15%",
-          width: "70%",
-          marginTop: 30,
-        }}
-      ></div>
+      <PdfPreviewPageHeader />
       {/* ============================= Body Page 5 ========================== */}
       <div style={styles.sectionTitle}>
-        <p style={{ fontSize: "25px", marginBottom: "5%" }}>Migration Effort</p>
+        <p style={{ fontSize: '25px', marginBottom: '5%' }}>Migration Effort</p>
       </div>
-      <div style={{ textAlign: "left" }}>
+      <div style={{ textAlign: 'left' }}>
         <p style={styles.normalText}>
           The migration shows the key modernization factors of the application.
           The larger the area is covered by graph, the more the application is
           suited for modernization.
         </p>
       </div>
-      <div style={{ textAlign: "left" }}>
+      <div style={{ textAlign: 'left' }}>
         <p style={styles.normalText}>
           While these parameters do not directly indicate the complexity of the
           application itself, they indicate the level of effort that is required
           to re-architect the application.
         </p>
       </div>
-      <div style={{ textAlign: "left", marginBottom: "5%" }}>
+      <div style={{ textAlign: 'left', marginBottom: '5%' }}>
         <p style={styles.normalText}>
           This assessment is based on a specific measurement, and depends on the
           analysis that was done on it.
         </p>
-        <div style={{ textAlign: "left", marginBottom: "5%" }}>
+        <div style={{ textAlign: 'left', marginBottom: '5%' }}>
           <p style={styles.normalText}>
             {`Effort percentage for ${
               location.state.projectDetails.project_details[0].project_name
@@ -637,66 +509,45 @@ const PdfPreview = () => {
       </div>
       <div
         style={{
-          display: "flex",
-          justifyContent: "center",
-          marginBottom: "10%",
-          border: "1px solid #01A982",
-          marginLeft: "15%",
-          width: "70%",
+          display: 'flex',
+          justifyContent: 'center',
+          marginBottom: '10%',
+          border: '1px solid #01A982',
+          marginLeft: '15%',
+          width: '70%',
         }}
       >
         <Image
           src={image3}
-          alt="image3"
-          width="90%"
-          style={{ paddingBottom: "5%", paddingTop: "5%" }}
+          alt='image3'
+          width='90%'
+          style={{ paddingBottom: '5%', paddingTop: '5%' }}
         />
       </div>
       {/* ========================= Footer Page 5 ================== */}
-      <div
-        style={{
-          border: "1.5px solid #01A982",
-          marginLeft: "15%",
-          width: "70%",
-          marginBottom: 20,
-        }}
-      ></div>
-      <div style={{ display: "flex", flexDirection: "row" }}>
-        <div style={{ marginRight: "25%", marginLeft: "15%" }}>
-          <span style={{ fontSize: "18px", width: "70%" }}>Summary Report</span>
-        </div>
-        <div style={{ marginRight: "28%" }}>
-          <span style={{ fontSize: "18px", width: "70%" }}>5/5</span>
-        </div>
-        <div>
-          <span style={{ fontSize: "18px", width: "70%" }}>
-            {PdfUtils.getTodaysDate()}
-          </span>
-        </div>
-      </div>
-      <hr style={{ width: "80%" }}></hr>
+      <PdfPreviewPageFooter page='5/5' />
     </div>
   );
 };
 
 const styles = {
   headerDiv: {
-    justifyContent: "center",
-    textAlign: "center",
-    margin: "0 auto",
+    justifyContent: 'center',
+    textAlign: 'center',
+    margin: '0 auto',
   },
-  headerText: { fontSize: "30px", fontWeight: "bold" },
-  sectionTitle: { textAlign: "center", margin: "0 auto" },
-  infoText: { fontSize: "20px", fontWeight: "bold", marginLeft: "5%" },
+  headerText: { fontSize: '30px', fontWeight: 'bold' },
+  sectionTitle: { textAlign: 'center', margin: '0 auto' },
+  infoText: { fontSize: '20px', fontWeight: 'bold', marginLeft: '5%' },
   normalText: {
-    fontSize: "18px",
-    width: "70%",
-    paddingLeft: "15%",
-    textAlign: "justify",
-    textJustify: "inter-word",
+    fontSize: '18px',
+    width: '70%',
+    paddingLeft: '15%',
+    textAlign: 'justify',
+    textJustify: 'inter-word',
   },
-  imageDiv: { display: "flex", justifyContent: "center" },
-  image: { height: "80%", width: "60%" },
+  imageDiv: { display: 'flex', justifyContent: 'center' },
+  image: { height: '80%', width: '60%' },
 };
 
 export default PdfPreview;

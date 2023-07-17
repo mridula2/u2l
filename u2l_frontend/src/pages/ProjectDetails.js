@@ -1,33 +1,25 @@
 import React, { useState, useContext } from "react";
-import { ThemeContext } from "styled-components";
+
+// import { ThemeContext } from "styled-components";
 import {
   Box,
-  CheckBoxGroup,
   FormField,
-  Grid,
-  List,
   Heading,
-  Form,
   FileInput,
   Button,
-  RadioButtonGroup,
-  ResponsiveContext,
   Select,
   Text,
   Spinner,
   Layer,
-  TextArea,
   TextInput,
-  Notification,
 } from "grommet";
 import HeaderExample from "../components/navbars/AppHeader";
+import classes from './Styling.module.css';
 
 const ProjectDetails = () => {
-  const theme = useContext(ThemeContext);
+  // const theme = useContext(ThemeContext);
   const [numFiles, setNumFiles] = useState(0);
   const [showhide, setShowHide] = useState("");
-  const [show, setShow] = useState(false);
-  const [fileUploaded, setFileUploaded] = useState(true);
   const [fileInputDisabled, setFileInputDisabled] = useState(true);
   const [proceedButtonDisabled, setProceedButtonDisabled] = useState(true);
   const [showProjectDetails, setShowProjectDetails] = useState(true);
@@ -79,27 +71,27 @@ const ProjectDetails = () => {
           <Button
             label="Code Assessment"
             href="/dashboard"
-            style={styles.btn}
+            className={classes.btn}
           />
           <Button
             label="Project Details"
             href="/projectdetails"
-            style={styles.btn}
+            className={classes.btn}
           />
           <Button
             label="OS Details"
             id="os_details"
             onClick={(event) => handleTabs(event)}
-            style={styles.btn}
+            className={classes.btn}
           />
           <Button
             label="Analysis Type"
             id="analysis_type"
             onClick={(event) => handleTabs(event)}
-            style={styles.btn}
+            className={classes.btn}
           />
-          <Button label="Review" style={styles.btn} />
-          <Button margin={{left:"small"}} label="Review and Create" href="/review" style={styles.btn} />
+          <Button label="Review" className={classes.btn} />
+          <Button margin={{left:"small"}} label="Review and Create" href="/review" className={classes.btn} />
         </Box>
 
         <Box align="center" width="60%">
@@ -113,8 +105,6 @@ const ProjectDetails = () => {
                 required={true}
               >
                 <TextInput
-                  // width="240px"
-                  // height="37px"
                   placeholder="Enter Value"
                   id="project_name"
                   name="project_name"
@@ -685,8 +675,5 @@ const ProjectDetails = () => {
   );
 };
 
-const styles = {
-  btn: { width: "100%", textAlign: "left", marginTop: "10px", height: "7%" },
-};
 
 export default ProjectDetails;

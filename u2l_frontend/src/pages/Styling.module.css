@@ -1,0 +1,37 @@
+/* imported in ProjectDetails.js */
+.btn { 
+    width: 100%; 
+    text-align: left; 
+    margin-top: 10px; 
+    height: 7%; 
+}
+
+/* imported in Review.js */
+.alignment { 
+    margin-left: medium;
+}
+
+.textsize {
+    font-weight: bold;
+}
+
+.sideBarbtn {
+    display: flex; 
+    height: 6vh;
+    align-items: center; 
+    border-radius: 0%;
+    border-bottom: 0.1px solid white; 
+    /* font-weight: bold;  */
+    background: #0000000A 0% 0% no-repeat padding-box;
+  }
+
+  .boxWidth {
+    width: 70%;
+  }
+
+  
+
+
+
+
+

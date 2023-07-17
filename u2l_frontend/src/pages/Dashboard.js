@@ -8,7 +8,7 @@ import {
 import styled from 'styled-components';
 import React, { useContext, useEffect, useState } from 'react';
 import { Search as SearchIcon } from 'grommet-icons';
-import ActivitiesNavigationalCards from '../components/cards/Card';
+import Cards from '../components/cards/Cards';
 import FilteringTable from '../components/table/FilteringTable';
 import AppHeader from '../components/navbars/AppHeader';
 import SideBar from '../components/common/SideBar';
@@ -67,6 +67,7 @@ const Dashboard = (containerRef) => {
   const [notificationVisible, setNotificationVisible] = React.useState();
   const [notificationMessage, setNotificationMessage] = React.useState('');
   const [status, setStatus] = React.useState('normal');
+  const [loading, setLoading] = useState(true);
 
   const onNotificationOpen = () => {
     setNotificationVisible(true);
@@ -74,13 +75,14 @@ const Dashboard = (containerRef) => {
   const onNotificationClose = () => {
     setNotificationVisible(false);
   };
-
+  const skeletonAlign = loading ? 'none' : 'start';
   useEffect(() => {
     ProjectService.getProjects(AuthenticationUtils.getEmail())
       .then((response) => {
         // response.data
         console.log(response);
         setProjects(response.data.project_details);
+        setLoading(false);
       })
       .catch((error) => {
         console.log(error);
@@ -96,7 +98,7 @@ const Dashboard = (containerRef) => {
   };
 
   return (
-    <Box responsive={true} flex='shrink'>
+    <Box responsive={true}>
       <Box align='center' gap='small'>
         {notificationVisible && (
           <Notification
@@ -112,17 +114,19 @@ const Dashboard = (containerRef) => {
       <Box direction='row-responsive' responsive={true} flex='shrink'>
         <SideBar data-testid='sidebar' />
         <Box
-          direction='column'
+          // direction='column'
           data-testid='test-1'
           margin='medium'
           responsive={true}
           style={image}
-          flex='shrink'
+          // flex='shrink'
         >
-          <Box direction='row' margin='small' gap='large' responsive={true}>
-            <Box>
-              <ActivitiesNavigationalCards projects={projects} />
-            </Box>
+          <Box justifyContent='center'>
+            <Cards
+              projects={projects}
+              loading={loading}
+              align={skeletonAlign}
+            />
           </Box>
 
           <Box margin={{ top: '10px' }}>

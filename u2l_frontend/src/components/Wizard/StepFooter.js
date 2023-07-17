@@ -4,7 +4,7 @@ import { Box, Button, Footer, ResponsiveContext } from 'grommet';
 import { FormNext, Previous } from 'grommet-icons';
 import WizardContext from '../Wizard/WizardContext';
 
-const StepFooter = ({ nextId, previousId, onNavigate, ...rest }) => {
+const StepFooter = ({ nextId,formValues, previousId, onNavigate, ...rest }) => {
   const size = useContext(ResponsiveContext);
   const [btnDisable, setButtonDisable] = useState(false);
   const { activeIndex, id, steps, width, activeStep, setActiveIndex } =
@@ -26,7 +26,7 @@ const StepFooter = ({ nextId, previousId, onNavigate, ...rest }) => {
     >
       <Footer
         justify="end"
-        // margin={{left:"large"}}
+        margin={{left:"10%"}}
         pad={
           !['xsmall', 'small'].includes(size)
             ? { vertical: 'medium' }
@@ -52,25 +52,16 @@ const StepFooter = ({ nextId, previousId, onNavigate, ...rest }) => {
           />
         )}
 
-        {activeIndex === steps.length - 1 && (
-          <Button
-            id={nextId}
-            primary
-            reverse
-            label="Review + Create"
-            form={`${id}-form`}
-            onClick={onNavigate}
-          />
-        )}
-
         <Button
           id={nextId}
           icon={<FormNext />}
-          // disabled={!btnDisable && (activeStep === 0 || activeStep === 1 || activeStep === 2)}
+          disabled={activeStep === 3 && !formValues.file_name}
           reverse
-          label={activeIndex === steps.length - 1 ? 'Proceed' : 'Next'}
+          label={activeIndex === steps.length - 1 ? 'Review + Create' : 'Next'}
+          // label={decideLable}
           form={`${id}-form`}
           type="submit"
+          onClick={activeIndex === 2 && onNavigate}
         />
       </Footer>
     </Box>

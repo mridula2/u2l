@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Text, Button } from 'grommet';
+import { Box, Text, Button, Notification } from 'grommet';
 import { FormEdit, Previous } from 'grommet-icons';
 import { useLocation, useNavigate } from 'react-router-dom';
 import WizardUtils from '../utils/WizardUtils';
@@ -8,13 +8,19 @@ import ProjectService from '../api/ProjectService';
 const Review = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const [notificationVisible, setNotificationVisible] = React.useState();
+  const [notificationMessage, setNotificationMessage] = React.useState('');
+  const [status, setStatus] = React.useState('normal');
+
+  const onNotificationClose = () => {
+    setNotificationVisible(false);
+  };
 
   function handleSubmit(value) {
     const data = WizardUtils.appendFormData(location.state.formValues)
- 
-    //  setNotificationMessage('Analysis in progress please wait!');
+     setNotificationMessage('Analysis in progress please wait!');
     //  setStatus('info');
-    //  setNotificationVisible(true);
+     setNotificationVisible(true);
  
      ProjectService.postProjectDetails(data)
        .then((response) => {
@@ -41,6 +47,17 @@ const Review = () => {
 
   return (
     <Box direction="row-responsive" responsive={true} flex="shrink">
+      <Box align="center" gap="small">
+        {notificationVisible && (
+          <Notification
+            toast
+            time={8000}
+            status={status}
+            message={notificationMessage}
+            onClose={onNotificationClose}
+          />
+        )}
+      </Box>
       <Box direction="column" width="small" responsive={true} height="91vh">
         <Button label="Code Assessment" href="/dashboard" style={styles.sideBarbtn} />
         <Button
@@ -537,6 +554,19 @@ const Review = () => {
               {location.state.formValues.target_framework_version}
             </Text>
           </Box>
+          
+          <Box direction='row'>
+            <Box width="small">
+              <Text weight="bold">
+              Sorce code:
+              </Text>
+            </Box>
+            <Text margin={{ left: 'medium' }}>
+              {location.state.formValues.file_name[0].name}
+            </Text>
+          </Box>
+
+
         </Box>
 
         <Box direction="row" gap="medium" margin={{ left: "50%", top: "10%" }} >
