@@ -20,7 +20,7 @@ const appendFormData = (formValues) => {
       data.append('target_jsp', formValues.target_jsp);
       data.append('source_servlet', formValues.source_servlet);
       data.append('target_servlet', formValues.target_servlet);
-      // --------------------------------C/C++/Pro*C------------------------------------------ //
+    // --------------------------------C/C++/Pro*C------------------------------------------ //
     } else if (formValues.analysis_type === 'C/C++/Pro*C') {
       data.append('source_compiler', formValues.source_compiler);
       data.append('source_compiler_version', formValues.source_compiler_version);
@@ -30,19 +30,19 @@ const appendFormData = (formValues) => {
       data.append('target_compiler', formValues.source_pre_compiler_version);
       data.append('target_compiler', formValues.target_pre_compiler);
       data.append('target_compiler', formValues.target_pre_compiler_version);
-      // --------------------------------Pro*C------------------------------------------ //
+    // --------------------------------Pro*C------------------------------------------ //
     } else if (formValues.analysis_type === 'Pro*C') {
       data.append('target_compiler', formValues.source_pre_compiler);
       data.append('target_compiler', formValues.source_pre_compiler_version);
       data.append('target_compiler', formValues.target_pre_compiler);
       data.append('target_compiler', formValues.target_pre_compiler_version);
-      // --------------------------------C------------------------------------------ //
+    // --------------------------------C------------------------------------------ //
     } else if (formValues.analysis_type === 'C') {
       data.append('source_compiler', formValues.source_compiler);
       data.append('source_compiler_version', formValues.source_compiler_version);
       data.append('target_compiler', formValues.target_compiler);
       data.append('target_compiler_version', formValues.target_compiler_version);
-      // --------------------------------C------------------------------------------ //
+    // --------------------------------C------------------------------------------ //
     } else if (formValues.analysis_type === 'C++') {
       data.append('source_compiler', formValues.source_compiler);
       data.append('source_compiler_version', formValues.source_compiler_version);

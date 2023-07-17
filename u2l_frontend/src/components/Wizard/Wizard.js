@@ -652,7 +652,6 @@ export const StepThree = (nextId) => {
               />
             </Box>
 
-
             <Box htmlFor="source_jsp" direction='row' margin={{ bottom: 'medium' }}>
               <Box width='medium'>
                 <label htmlFor="source_jsp">Source JSP</label>
@@ -919,7 +918,6 @@ export const StepThree = (nextId) => {
                 name="source_pre_compiler"
               />
             </Box>
-
 
             <Box htmlFor="source_pre_compiler_version" direction='row' margin={{ bottom: 'medium' }}>
               <Box width='medium'>
@@ -1251,7 +1249,7 @@ export const StepThree = (nextId) => {
           <Box width='small'>
             <label htmlFor="source_code">Source Code</label>
           </Box>
-          <Box flex disabled={true}>
+
           <FileInput
             id="file_name"
             name="file_name"
