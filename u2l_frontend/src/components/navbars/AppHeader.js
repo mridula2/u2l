@@ -147,7 +147,7 @@ export const AppHeader = () => {
         </Box>
       </Header>
     );
-  } else if (window.location.pathname === '/dashboard') {
+  } else if (window.location.pathname === '/dashboard' || window.location.pathname === '/wizard' || window.location.pathname === '/documentation') {
     return (
       <Header
         fill='horizontal'
