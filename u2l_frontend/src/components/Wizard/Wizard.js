@@ -177,22 +177,23 @@ const WizardValidationExample = ({ containerRef }) => {
   );
 
   function handleSubmit(value) {
-    const data = WizardUtils.appendFormData(formValues)
+    navigate('/review', { state: { formValues: formValues } });
+    // const data = WizardUtils.appendFormData(formValues)
 
-    setNotificationMessage('Analysis in progress please wait!');
-    setStatus('info');
-    setNotificationVisible(true);
+    // setNotificationMessage('Analysis in progress please wait!');
+    // setStatus('info');
+    // setNotificationVisible(true);
 
-    ProjectService.postProjectDetails(data)
-      .then((response) => {
-        // response.data
-        console.log(response);
-        navigate('/dashboard');
-      })
-      .catch((error) => {
-        setNotificationMessage(error.response.data.message);
-        setNotificationVisible(true);
-      });
+    // ProjectService.postProjectDetails(data)
+    //   .then((response) => {
+    //     // response.data
+    //     console.log(response);
+    //     navigate('/dashboard');
+    //   })
+    //   .catch((error) => {
+    //     setNotificationMessage(error.response.data.message);
+    //     setNotificationVisible(true);
+    //   });
   }
 
   const handleNavigate = () => {
@@ -284,7 +285,7 @@ const WizardValidationExample = ({ containerRef }) => {
           }}
         />
       </Box>
-      <StepFooter onNavigate={handleNavigate} formValues={formValues} />
+      <StepFooter  formValues={formValues} />
 
       {open && (
         <CancellationLayer
@@ -328,7 +329,7 @@ export const StepOne = (nextId) => {
     <Box align="center">
       <Box width={{ max: 'medium' }} align="center">
         <Box>
-          <h3>Project details</h3>       
+          <h3>Project details</h3>
           <Box htmlFor="project_name" direction='row' margin={{ bottom: 'medium', top: 'medium' }}>
             <Box width='80%'>
               <label htmlFor="project_name">Project name*</label>
@@ -340,7 +341,7 @@ export const StepOne = (nextId) => {
               type='text'
               required={true}
             />
-          </Box>       
+          </Box>
 
           <Box htmlFor="project_client" direction='row' margin={{ bottom: 'medium' }}>
             <Box width='80%'>
@@ -350,6 +351,7 @@ export const StepOne = (nextId) => {
               placeholder="Enter Value"
               id="project_client"
               name="project_client"
+              required={true}
             />
           </Box>
 
@@ -361,6 +363,7 @@ export const StepOne = (nextId) => {
               placeholder="Enter Value"
               id="project_manager"
               name="project_manager"
+              required={true}
             />
           </Box>
 
@@ -372,6 +375,7 @@ export const StepOne = (nextId) => {
               placeholder="Enter Value"
               id="application_name"
               name="application_name"
+              required={true}
             />
           </Box>
 
@@ -383,6 +387,7 @@ export const StepOne = (nextId) => {
 };
 
 export const StepTwo = (nextId) => {
+  const { valid, setValid } = useContext(WizardContext);
   return (
     <Box align="center">
       <Box width={{ max: 'medium' }}>
@@ -437,6 +442,7 @@ export const StepTwo = (nextId) => {
         </Box>
 
       </Box>
+      {!valid && <Error>There is an error with one or more inputs.</Error>}
     </Box>
   );
 };
@@ -524,10 +530,6 @@ export const StepThree = (nextId) => {
 
   const [formValues, setFormValues] = useState(defaultFormValues);
 
-  // console.log(formValues)
-  // if (formValues['analysis_type']){
-  //   setFileInputDisabled(false);
-  // }
   const handleshowhide = (event) => {
     const getLang = event.target.value;
     setFileInputDisabled(false);
@@ -590,10 +592,10 @@ export const StepThree = (nextId) => {
   //   />
   // );
 
-  const saveFile = (files) => {    
-    if (formValues['file_name']){
-        setFileInputDisabled(false);
-      }
+  const saveFile = (files) => {
+    if (formValues['file_name']) {
+      setFileInputDisabled(false);
+    }
   }
 
   return (
@@ -1245,48 +1247,56 @@ export const StepThree = (nextId) => {
 
         {/* <Box data-testid="test-4" width="medium" margin="0" pad="small" >
           <Text>Source Code</Text> */}
-          <Box htmlFor="source_code" direction='row' margin={{ bottom: 'medium' }}>
+        <Box htmlFor="source_code" direction='row' margin={{ bottom: 'medium' }}>
           <Box width='small'>
-            <label htmlFor="source_code">Source Code</label>
+            <label htmlFor="source_code">Source Code*</label>
           </Box>
 
-          <FileInput
-            id="file_name"
-            name="file_name"
-            label="Source code"
-            accept=".zip"
-            messages={{
-              // browse: numFiles > 0 ? 'Replace file' : 'Select file',
-              browse:'Select file',
-            }}
-            disabled={fileInputDisabled}
-            required={true}
-            onChange={(event, { files }) => { saveFile(files)
-              setNumFiles(files.length);
-            }}
-          />
+          <Box flex>           
+            <FileInput
+              id="file_name"
+              name="file_name"
+              // label="Source code*"
+              accept=".zip"
+              messages={{
+                dropPrompt: 'Drag and drop',
+                browse: numFiles > 0 ? 'Replace file' : 'Select file',
+              }}
+              disabled={fileInputDisabled}
+              // disabled={fileInputDisabled && !showhide}
+              required={true}
+              onChange={(event, { files }) => {
+                saveFile(files)
+                setNumFiles(files.length);
+              }}
+            />
+            {/* </FormField> */}
+            <input type="file" id="file_name" name="file_name" accept=".zip"></input>
           </Box>
 
-          {showSpinner && (
-            <Box>
-              <Layer model>
-                <Box pad="small">
-                  <Text>File uploading in Process</Text>
-                  <Box align="center">
-                    <Spinner
-                      message={{
-                        start: 'Loading data.',
-                        end: 'Data has been loaded.',
-                      }}
-                    />
-                  </Box>
-                </Box>
-              </Layer>
-            </Box>
-          )}
+          
         </Box>
+
+        {showSpinner && (
+          <Box>
+            <Layer model>
+              <Box pad="small">
+                <Text>File uploading in Process</Text>
+                <Box align="center">
+                  <Spinner
+                    message={{
+                      start: 'Loading data.',
+                      end: 'Data has been loaded.',
+                    }}
+                  />
+                </Box>
+              </Box>
+            </Layer>
+          </Box>
+        )}
       </Box>
     </Box>
+
   );
 };
 

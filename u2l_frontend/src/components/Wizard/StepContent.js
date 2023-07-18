@@ -19,7 +19,7 @@ const StepContent = ({ onSubmit }) => {
   } = useContext(WizardContext);
 
   const handleSubmit = (event) => {
-    setValid(true);
+    // setValid(true);
     if (activeIndex < steps.length - 1) {
       setActiveIndex(activeIndex + 1);
     } else if (onSubmit) {
@@ -77,7 +77,7 @@ const StepContent = ({ onSubmit }) => {
             value={formValues}
             onChange={(nextValue) => setFormValues(nextValue)}
             onSubmit={handleSubmit}
-            // onValidate={onValidate}
+            onValidate={onValidate}
             method="post"
             messages={{
               required: 'This is a required field.',

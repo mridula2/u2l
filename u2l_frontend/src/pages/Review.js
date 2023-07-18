@@ -570,7 +570,6 @@ const Review = () => {
         </Box>
 
         <Box direction="row" gap="medium" margin={{ left: "50%", top: "10%" }} >
-          <Button icon={<Previous />} label="Previous" style={{borderRadius:"0"}}></Button>
           <Button primary label="Create" onClick={handleSubmit} style={{borderRadius:"0"}}></Button>
         </Box>
       </Box>
@@ -586,13 +585,14 @@ const styles = {
     alignItems: 'center', borderRadius: '0',
     borderBottom: '0.1px solid white', fontWeight: 'normal'
   },
+
   sideBarbtnonselect: {
     display: 'flex', height: '6vh',
     alignItems: 'center', borderRadius: '0',
     borderBottom: '0.1px solid white', fontWeight: 'bold',
     background: '#0000000A 0% 0% no-repeat padding-box',
-
   },
+  
   btndisable: {
     display: 'flex', height: '6vh',
     alignItems: 'center', borderRadius: '0',
