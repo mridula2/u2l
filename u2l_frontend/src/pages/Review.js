@@ -15,6 +15,7 @@ const Review = () => {
   const onNotificationClose = () => {
     setNotificationVisible(false);
   };
+  
 
   function handleSubmit(value) {
     const data = WizardUtils.appendFormData(location.state.formValues)
@@ -44,7 +45,7 @@ const Review = () => {
     console.log(location.state.formValues)
     navigate('/wizard', { state: { formValues: location.state.formValues } });
   }
-
+ 
   return (
     <Box direction="row-responsive" responsive={true} flex="shrink">
       <Box align="center" gap="small">
@@ -284,123 +285,147 @@ const Review = () => {
 
           {location.state.formValues.analysis_type === 'C' && (
             <Box gap="small">
-              <Text>
+               <Box direction='row'>
+                <Box width="small">
                 <Text weight="bold">
                   Source Compiler:
                 </Text>
+                </Box>
                 <Text margin={{ left: 'medium' }}>
                   {location.state.formValues.source_compiler}
                 </Text>
-              </Text>
+              </Box>
 
-              <Text>
+              <Box direction='row'>
+                <Box width="small">
                 <Text weight="bold">
                   Source Compiler version:
                 </Text>
+                </Box>
                 <Text margin={{ left: 'medium' }}>
                   {location.state.formValues.source_compiler_version}
                 </Text>
-              </Text>
+              </Box>
 
-              <Text>
+              <Box direction='row'>
+                <Box width="small">
                 <Text weight="bold">
                   Target Compiler:
                 </Text>
+                </Box>
                 <Text margin={{ left: 'medium' }}>
                   {location.state.formValues.target_compiler}
                 </Text>
-              </Text>
+              </Box>
 
-              <Text>
+              <Box direction='row'>
+                <Box width="small">
                 <Text weight="bold">
                   Target Compiler version:
                 </Text>
+                </Box>
                 <Text margin={{ left: 'medium' }}>
                   {location.state.formValues.target_compiler_version}
                 </Text>
-              </Text>
+              </Box>
             </Box>
           )}
 
           {location.state.formValues.analysis_type === 'C++' && (
             <Box gap="small">
-              <Text>
+              <Box direction='row'>
+                <Box width="small">
                 <Text weight="bold">
                   Source Compiler:
                 </Text>
+                </Box>
                 <Text margin={{ left: 'medium' }}>
                   {location.state.formValues.source_compiler}
                 </Text>
-              </Text>
+              </Box>
 
-              <Text>
+              <Box direction='row'>
+                <Box width="small">
                 <Text weight="bold">
                   Source Compiler version:
                 </Text>
+                </Box>
                 <Text margin={{ left: 'medium' }}>
                   {location.state.formValues.source_compiler_version}
                 </Text>
-              </Text>
+              </Box>
 
-              <Text>
+              <Box direction='row'>
+                <Box width="small">
                 <Text weight="bold">
                   Target Compiler:
                 </Text>
+                </Box>
                 <Text margin={{ left: 'medium' }}>
                   {location.state.formValues.target_compiler}
                 </Text>
-              </Text>
+              </Box>
 
-              <Text>
+              <Box direction='row'>
+                <Box width="small">
                 <Text weight="bold">
                   Target Compiler version:
                 </Text>
+                </Box>
                 <Text margin={{ left: 'medium' }}>
                   {location.state.formValues.target_compiler_version}
                 </Text>
-              </Text>
+              </Box>
             </Box>
           )}
 
           {location.state.formValues.analysis_type === 'Pro*C' && (
             <Box gap="small">
-              <Text>
+              <Box direction='row'>
+                <Box width="small">
                 <Text weight="bold">
                   Source pre-compiler:
                 </Text>
+                </Box>
                 <Text margin={{ left: 'medium' }}>
-                  {/* {location.state.formValues.source_pre_compiler} */}
-                  {"Oracle"}
+                  {location.state.formValues.source_pre_compiler}
+                  {/* {"Oracle"} */}
                 </Text>
-              </Text>
+              </Box>
 
-              <Text>
+              <Box direction='row'>
+                <Box width="small">
                 <Text weight="bold">
                   Source pre-compiler version:
                 </Text>
+                </Box>
                 <Text margin={{ left: 'medium' }}>
                   {location.state.formValues.source_pre_compiler_version}
 
                 </Text>
-              </Text>
+              </Box>
 
-              <Text>
+              <Box direction='row'>
+                <Box width="small">
                 <Text weight="bold">
                   Target pre-compiler:
                 </Text>
+                </Box>
                 <Text margin={{ left: 'medium' }}>
                   {location.state.formValues.target_pre_compiler}
                 </Text>
-              </Text>
+              </Box>
 
-              <Text>
+              <Box direction='row'>
+                <Box width="small">
                 <Text weight="bold">
                   Target pre-compiler version:
                 </Text>
+                </Box>
                 <Text margin={{ left: 'medium' }}>
                   {location.state.formValues.target_pre_compiler_version}
                 </Text>
-              </Text>
+              </Box>
             </Box>
           )}
 
@@ -563,6 +588,7 @@ const Review = () => {
             </Box>
             <Text margin={{ left: 'medium' }}>
               {location.state.formValues.file_name[0].name}
+              
             </Text>
           </Box>
 

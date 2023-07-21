@@ -34,7 +34,7 @@ const WizardValidationExample = ({ containerRef }) => {
   const location = useLocation();
 
   const defaultFormValues = () => {
-    console.log(location);
+    
     if (!location.state) {
       return ({
         project_name: '',
@@ -62,10 +62,14 @@ const WizardValidationExample = ({ containerRef }) => {
         source_shell_version: '',
         target_shell: '',
         target_shell_version: '',
+        source_pre_compiler: '',
+        source_pre_compiler_version:'',
+        target_pre_compiler:'',
+        target_pre_compiler_version: '',
         framework: '',
         source_framework_version: '',
         target_framework_version: '',
-        file_name: '',
+        
       })
     } else {
       return ({
@@ -94,6 +98,10 @@ const WizardValidationExample = ({ containerRef }) => {
         source_shell_version: location.state.formValues.source_shell_version,
         target_shell: location.state.formValues.target_shell,
         target_shell_version: location.state.formValues.target_shell_version,
+        source_pre_compiler: location.state.formValues.source_pre_compiler,
+        source_pre_compiler_version: location.state.formValues.source_pre_compiler_version,
+        target_pre_compiler: location.state.formValues.target_pre_compiler,
+        target_pre_compiler_version: location.state.formValues.target_pre_compiler_version,
         framework: location.state.formValues.framework,
         source_framework_version: location.state.formValues.source_framework_version,
         target_framework_version: location.state.formValues.target_framework_version,
@@ -285,7 +293,7 @@ const WizardValidationExample = ({ containerRef }) => {
           }}
         />
       </Box>
-      <StepFooter  formValues={formValues} />
+      <StepFooter formValues={formValues} />
 
       {open && (
         <CancellationLayer
@@ -449,18 +457,25 @@ export const StepTwo = (nextId) => {
 
 export const StepThree = (nextId) => {
   const [numFiles, setNumFiles] = useState(0);
-  const [showhide, setShowHide] = useState('');
   const [show, setShow] = useState(false);
   const [fileUploaded, setFileUploaded] = useState(true);
   const { activeIndex, id, steps, width } = useContext(WizardContext);
   const [fileInputDisabled, setFileInputDisabled] = useState(true);
   const [proceedButtonDisabled, setProceedButtonDisabled] = useState(true);
   const [showSpinner, setShowSpinner] = useState(false);
+  // const [saveFileName, setSaveFileName] = useState('');
+  // const [inputValue, setInputValue] = useState("");
 
   const location = useLocation();
 
+
+  const file = useRef();
+  const handlClick = () => {
+    localStorage.setItem("inputValue", file.current.value)
+  }
+
+
   const defaultFormValues = () => {
-    console.log(location);
     if (!location.state) {
       return ({
         project_name: '',
@@ -491,7 +506,11 @@ export const StepThree = (nextId) => {
         framework: '',
         source_framework_version: '',
         target_framework_version: '',
-        file_name: '',
+        source_pre_compiler: '',
+        source_pre_compiler_version:'',
+        target_pre_compiler:'',
+        target_pre_compiler_version: '',
+        file_name:''
       })
     } else {
       return ({
@@ -520,6 +539,10 @@ export const StepThree = (nextId) => {
         source_shell_version: location.state.formValues.source_shell_version,
         target_shell: location.state.formValues.target_shell,
         target_shell_version: location.state.formValues.target_shell_version,
+        source_pre_compiler: location.state.formValues.source_pre_compiler,
+        source_pre_compiler_version: location.state.formValues.source_pre_compiler_version,
+        target_pre_compiler: location.state.formValues.target_pre_compiler,
+        target_pre_compiler_version: location.state.formValues.target_pre_compiler_version,
         framework: location.state.formValues.framework,
         source_framework_version: location.state.formValues.source_framework_version,
         target_framework_version: location.state.formValues.target_framework_version,
@@ -530,16 +553,33 @@ export const StepThree = (nextId) => {
 
   const [formValues, setFormValues] = useState(defaultFormValues);
 
+  const defaultLanguage = () => {
+    if (location.state) {
+      return location.state.formValues.analysis_type
+    } else {
+      return formValues.analysis_type
+    }
+  }
+  const [showhide, setShowHide] = useState(defaultLanguage);
+
+  const languages = [
+    'Java',
+    'Shell',
+    'C',
+    'C++',
+    'Pro*C',
+    'C/Pro*C',
+    'C++/Pro*C',
+  ]
+
   const handleshowhide = (event) => {
     const getLang = event.target.value;
     setFileInputDisabled(false);
-    console.log(getLang);
     setShowHide(getLang);
   };
 
   const handleFramework = (event) => {
     const getFramework = event.target.value;
-    console.log(getFramework);
   }
 
   // const popupSpinner = () => {
@@ -1252,29 +1292,33 @@ export const StepThree = (nextId) => {
             <label htmlFor="source_code">Source Code*</label>
           </Box>
 
-          <Box flex>           
+          <Box flex>
             <FileInput
               id="file_name"
               name="file_name"
               // label="Source code*"
+              // value={inputValue}
               accept=".zip"
               messages={{
                 dropPrompt: 'Drag and drop',
                 browse: numFiles > 0 ? 'Replace file' : 'Select file',
               }}
               disabled={fileInputDisabled}
-              // disabled={fileInputDisabled && !showhide}
-              required={true}
-              onChange={(event, { files }) => {
-                saveFile(files)
+              // disabled={fileInputDisabled && !languages.includes(showhide) }
+              // required={location.state === null && languages.includes(showhide) && formValues.file_name  === null}
+              required={formValues?.file_name ? false : true }
+              // required={!formValues.file_name}
+              onChange={(e, { files }) => {
+                // saveFile(files)
+                // setInputValue(e.target.value);
                 setNumFiles(files.length);
               }}
+              
+              ref={file}
             />
-            {/* </FormField> */}
-            <input type="file" id="file_name" name="file_name" accept=".zip"></input>
-          </Box>
+             </Box>
 
-          
+
         </Box>
 
         {showSpinner && (
