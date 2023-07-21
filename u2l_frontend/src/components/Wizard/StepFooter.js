@@ -55,7 +55,8 @@ const StepFooter = ({ nextId,formValues, previousId, onNavigate, ...rest }) => {
         <Button
           id={nextId}
           icon={<FormNext />}
-          disabled={activeStep === 3 && !formValues.file_name}
+          disabled={activeStep === 3 && !formValues.file_name }
+          // disabled={activeStep === 3}
           reverse
           label={activeIndex === steps.length - 1 ? 'Review + Create' : 'Next'}
           // label={decideLable}

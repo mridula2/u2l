@@ -80,7 +80,7 @@ const appendFormData = (formValues) => {
 
     data.append('file_name', formValues.file_name[0]);
     console.log(formValues);
-    console.log(formValues.file_name[0]);
+    // console.log(formValues.file_name[0]);
 
     return data
 }
