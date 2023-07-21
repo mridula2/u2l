@@ -1339,7 +1339,7 @@ export const StepThree = (nextId) => {
           </Box>
         )}
       </Box>
-    </Box>
+
 
   );
 };
