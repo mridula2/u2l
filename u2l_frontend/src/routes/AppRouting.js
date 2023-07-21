@@ -30,9 +30,7 @@ const AppRouting = () => {
         <Route path="/documentation" element={<Documentation />} />  
         <Route path="/contact" element={<Contact />} />  
         <Route path="/aboutus" element={<AboutUs />} />  
-        
-
-        
+             
       </Routes>
     );
   };

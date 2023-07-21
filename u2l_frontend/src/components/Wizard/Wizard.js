@@ -34,7 +34,7 @@ const WizardValidationExample = ({ containerRef }) => {
   const location = useLocation();
 
   const defaultFormValues = () => {
-    console.log(location);
+    
     if (!location.state) {
       return ({
         project_name: '',
@@ -62,10 +62,14 @@ const WizardValidationExample = ({ containerRef }) => {
         source_shell_version: '',
         target_shell: '',
         target_shell_version: '',
+        source_pre_compiler: '',
+        source_pre_compiler_version:'',
+        target_pre_compiler:'',
+        target_pre_compiler_version: '',
         framework: '',
         source_framework_version: '',
         target_framework_version: '',
-        file_name: '',
+        
       })
     } else {
       return ({
@@ -94,6 +98,10 @@ const WizardValidationExample = ({ containerRef }) => {
         source_shell_version: location.state.formValues.source_shell_version,
         target_shell: location.state.formValues.target_shell,
         target_shell_version: location.state.formValues.target_shell_version,
+        source_pre_compiler: location.state.formValues.source_pre_compiler,
+        source_pre_compiler_version: location.state.formValues.source_pre_compiler_version,
+        target_pre_compiler: location.state.formValues.target_pre_compiler,
+        target_pre_compiler_version: location.state.formValues.target_pre_compiler_version,
         framework: location.state.formValues.framework,
         source_framework_version: location.state.formValues.source_framework_version,
         target_framework_version: location.state.formValues.target_framework_version,
@@ -177,22 +185,23 @@ const WizardValidationExample = ({ containerRef }) => {
   );
 
   function handleSubmit(value) {
-    const data = WizardUtils.appendFormData(formValues)
+    navigate('/review', { state: { formValues: formValues } });
+    // const data = WizardUtils.appendFormData(formValues)
 
-    setNotificationMessage('Analysis in progress please wait!');
-    setStatus('info');
-    setNotificationVisible(true);
+    // setNotificationMessage('Analysis in progress please wait!');
+    // setStatus('info');
+    // setNotificationVisible(true);
 
-    ProjectService.postProjectDetails(data)
-      .then((response) => {
-        // response.data
-        console.log(response);
-        navigate('/dashboard');
-      })
-      .catch((error) => {
-        setNotificationMessage(error.response.data.message);
-        setNotificationVisible(true);
-      });
+    // ProjectService.postProjectDetails(data)
+    //   .then((response) => {
+    //     // response.data
+    //     console.log(response);
+    //     navigate('/dashboard');
+    //   })
+    //   .catch((error) => {
+    //     setNotificationMessage(error.response.data.message);
+    //     setNotificationVisible(true);
+    //   });
   }
 
   const handleNavigate = () => {
@@ -284,7 +293,7 @@ const WizardValidationExample = ({ containerRef }) => {
           }}
         />
       </Box>
-      <StepFooter onNavigate={handleNavigate} formValues={formValues} />
+      <StepFooter formValues={formValues} />
 
       {open && (
         <CancellationLayer
@@ -328,7 +337,7 @@ export const StepOne = (nextId) => {
     <Box align="center">
       <Box width={{ max: 'medium' }} align="center">
         <Box>
-          <h3>Project details</h3>       
+          <h3>Project details</h3>
           <Box htmlFor="project_name" direction='row' margin={{ bottom: 'medium', top: 'medium' }}>
             <Box width='80%'>
               <label htmlFor="project_name">Project name*</label>
@@ -340,7 +349,7 @@ export const StepOne = (nextId) => {
               type='text'
               required={true}
             />
-          </Box>       
+          </Box>
 
           <Box htmlFor="project_client" direction='row' margin={{ bottom: 'medium' }}>
             <Box width='80%'>
@@ -350,6 +359,7 @@ export const StepOne = (nextId) => {
               placeholder="Enter Value"
               id="project_client"
               name="project_client"
+              required={true}
             />
           </Box>
 
@@ -361,6 +371,7 @@ export const StepOne = (nextId) => {
               placeholder="Enter Value"
               id="project_manager"
               name="project_manager"
+              required={true}
             />
           </Box>
 
@@ -372,6 +383,7 @@ export const StepOne = (nextId) => {
               placeholder="Enter Value"
               id="application_name"
               name="application_name"
+              required={true}
             />
           </Box>
 
@@ -383,6 +395,7 @@ export const StepOne = (nextId) => {
 };
 
 export const StepTwo = (nextId) => {
+  const { valid, setValid } = useContext(WizardContext);
   return (
     <Box align="center">
       <Box width={{ max: 'medium' }}>
@@ -437,24 +450,32 @@ export const StepTwo = (nextId) => {
         </Box>
 
       </Box>
+      {!valid && <Error>There is an error with one or more inputs.</Error>}
     </Box>
   );
 };
 
 export const StepThree = (nextId) => {
   const [numFiles, setNumFiles] = useState(0);
-  const [showhide, setShowHide] = useState('');
   const [show, setShow] = useState(false);
   const [fileUploaded, setFileUploaded] = useState(true);
   const { activeIndex, id, steps, width } = useContext(WizardContext);
   const [fileInputDisabled, setFileInputDisabled] = useState(true);
   const [proceedButtonDisabled, setProceedButtonDisabled] = useState(true);
   const [showSpinner, setShowSpinner] = useState(false);
+  // const [saveFileName, setSaveFileName] = useState('');
+  // const [inputValue, setInputValue] = useState("");
 
   const location = useLocation();
 
+
+  const file = useRef();
+  const handlClick = () => {
+    localStorage.setItem("inputValue", file.current.value)
+  }
+
+
   const defaultFormValues = () => {
-    console.log(location);
     if (!location.state) {
       return ({
         project_name: '',
@@ -485,7 +506,11 @@ export const StepThree = (nextId) => {
         framework: '',
         source_framework_version: '',
         target_framework_version: '',
-        file_name: '',
+        source_pre_compiler: '',
+        source_pre_compiler_version:'',
+        target_pre_compiler:'',
+        target_pre_compiler_version: '',
+        file_name:''
       })
     } else {
       return ({
@@ -514,6 +539,10 @@ export const StepThree = (nextId) => {
         source_shell_version: location.state.formValues.source_shell_version,
         target_shell: location.state.formValues.target_shell,
         target_shell_version: location.state.formValues.target_shell_version,
+        source_pre_compiler: location.state.formValues.source_pre_compiler,
+        source_pre_compiler_version: location.state.formValues.source_pre_compiler_version,
+        target_pre_compiler: location.state.formValues.target_pre_compiler,
+        target_pre_compiler_version: location.state.formValues.target_pre_compiler_version,
         framework: location.state.formValues.framework,
         source_framework_version: location.state.formValues.source_framework_version,
         target_framework_version: location.state.formValues.target_framework_version,
@@ -524,20 +553,33 @@ export const StepThree = (nextId) => {
 
   const [formValues, setFormValues] = useState(defaultFormValues);
 
-  // console.log(formValues)
-  // if (formValues['analysis_type']){
-  //   setFileInputDisabled(false);
-  // }
+  const defaultLanguage = () => {
+    if (location.state) {
+      return location.state.formValues.analysis_type
+    } else {
+      return formValues.analysis_type
+    }
+  }
+  const [showhide, setShowHide] = useState(defaultLanguage);
+
+  const languages = [
+    'Java',
+    'Shell',
+    'C',
+    'C++',
+    'Pro*C',
+    'C/Pro*C',
+    'C++/Pro*C',
+  ]
+
   const handleshowhide = (event) => {
     const getLang = event.target.value;
     setFileInputDisabled(false);
-    console.log(getLang);
     setShowHide(getLang);
   };
 
   const handleFramework = (event) => {
     const getFramework = event.target.value;
-    console.log(getFramework);
   }
 
   // const popupSpinner = () => {
@@ -590,10 +632,10 @@ export const StepThree = (nextId) => {
   //   />
   // );
 
-  const saveFile = (files) => {    
-    if (formValues['file_name']){
-        setFileInputDisabled(false);
-      }
+  const saveFile = (files) => {
+    if (formValues['file_name']) {
+      setFileInputDisabled(false);
+    }
   }
 
   return (
@@ -1245,47 +1287,59 @@ export const StepThree = (nextId) => {
 
         {/* <Box data-testid="test-4" width="medium" margin="0" pad="small" >
           <Text>Source Code</Text> */}
-          <Box htmlFor="source_code" direction='row' margin={{ bottom: 'medium' }}>
+        <Box htmlFor="source_code" direction='row' margin={{ bottom: 'medium' }}>
           <Box width='small'>
-            <label htmlFor="source_code">Source Code</label>
+            <label htmlFor="source_code">Source Code*</label>
           </Box>
 
-          <FileInput
-            id="file_name"
-            name="file_name"
-            label="Source code"
-            accept=".zip"
-            messages={{
-              // browse: numFiles > 0 ? 'Replace file' : 'Select file',
-              browse:'Select file',
-            }}
-            disabled={fileInputDisabled}
-            required={true}
-            onChange={(event, { files }) => { saveFile(files)
-              setNumFiles(files.length);
-            }}
-          />
-          </Box>
+          <Box flex>
+            <FileInput
+              id="file_name"
+              name="file_name"
+              // label="Source code*"
+              // value={inputValue}
+              accept=".zip"
+              messages={{
+                dropPrompt: 'Drag and drop',
+                browse: numFiles > 0 ? 'Replace file' : 'Select file',
+              }}
+              disabled={fileInputDisabled}
+              // disabled={fileInputDisabled && !languages.includes(showhide) }
+              // required={location.state === null && languages.includes(showhide) && formValues.file_name  === null}
+              required={formValues?.file_name ? false : true }
+              // required={!formValues.file_name}
+              onChange={(e, { files }) => {
+                // saveFile(files)
+                // setInputValue(e.target.value);
+                setNumFiles(files.length);
+              }}
+              
+              ref={file}
+            />
+             </Box>
 
-          {showSpinner && (
-            <Box>
-              <Layer model>
-                <Box pad="small">
-                  <Text>File uploading in Process</Text>
-                  <Box align="center">
-                    <Spinner
-                      message={{
-                        start: 'Loading data.',
-                        end: 'Data has been loaded.',
-                      }}
-                    />
-                  </Box>
-                </Box>
-              </Layer>
-            </Box>
-          )}
+
         </Box>
+
+        {showSpinner && (
+          <Box>
+            <Layer model>
+              <Box pad="small">
+                <Text>File uploading in Process</Text>
+                <Box align="center">
+                  <Spinner
+                    message={{
+                      start: 'Loading data.',
+                      end: 'Data has been loaded.',
+                    }}
+                  />
+                </Box>
+              </Box>
+            </Layer>
+          </Box>
+        )}
       </Box>
+
 
   );
 };
