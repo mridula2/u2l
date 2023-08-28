@@ -17,6 +17,8 @@ const PdfView = () => {
         <PdfDocument
           pieChart1DataURL={location.state.pieChart1DataURL}
           pieChart2DataURL={location.state.pieChart2DataURL}
+          radarChartDataURL={location.state.radarChartDataURL}
+          barChartDataURL={location.state.barChartDataURL}
           projectDetails={location.state.projectDetails}
         />
       </PDFViewer>

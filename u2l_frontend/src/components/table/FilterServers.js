@@ -9,29 +9,14 @@ import {
   ResponsiveContext,
   Text,
   Layer,
-  Heading,
-  FormField,
 } from 'grommet';
-import { FormClose } from 'grommet-icons';
-import {
-  StatusWarningSmall,
-  StatusCriticalSmall,
-  StatusGoodSmall,
-  StatusUnknownSmall,
-} from 'grommet-icons';
-import { FilterControls } from './FilterControls';
-import { useFilters } from './FiltersContext';
-import { FiltersProvider } from './FiltersContext';
-// import dummyData from '../../Views/dummyData';
-import ProjectService from '../../api/ProjectService';
-import InProgress from "../../assets/Images/InProgress.png";
 
-const statusIcons = {
-  Warning: <StatusWarningSmall color="status-warning" size="small" />,
-  OK: <StatusGoodSmall color="status-ok" size="small" />,
-  Critical: <StatusCriticalSmall color="status-critical" size="small" />,
-  Started: <StatusUnknownSmall color="status-unknown" size="small" />,
-};
+import { FilterControls } from './FilterControls';
+import { useFilters, FiltersProvider } from './FiltersContext';
+import ProjectService from '../../api/ProjectService';
+import AuthenticationUtils from '../../utils/AuthenticationUtils';
+import ProjectUtils from '../../utils/ProjectUtils';
+import statusIcons from '../../config/constants';
 
 const filtersConfig = [
   {
@@ -47,15 +32,13 @@ const filtersConfig = [
   },
 ];
 
-// const data = dummyData;
-
-const SelectionSummary = ({ selected, projects }) => {
+const SelectionSummary = ({ projects }) => {
   return (
-    <Box direction="row" gap="xxsmall">
-      <Text size="small" weight="bold">
+    <Box direction='row' gap='xxsmall'>
+      <Text size='small' weight='bold'>
         {projects.length}
       </Text>
-      <Text size="small">items</Text>
+      <Text size='small'>items</Text>
     </Box>
   );
 };
@@ -64,41 +47,31 @@ SelectionSummary.propTypes = {
   selected: PropTypes.array,
 };
 
-export const FilterServers = ({
-  bestPractice = true,
-  containerRef,
-  height,
-  projects,
-}) => (
+export const FilterServers = ({ height, projects }) => (
   <FiltersProvider>
-    <Box gap="medium">
-      <Box direction="row">
+    <Box gap='medium'>
+      <Box direction='row'>
         <Box>
           <FilterControls
-            // data={data}
             data={projects}
-            // data={}
             filters={filtersConfig}
-            primaryKey="id"
+            primaryKey='id'
             searchFilter={{ placeholder: 'Search' }}
           />
         </Box>
         <Box flex></Box>
-        <Box justify="end">
+        <Box justify='end'>
           <Button
             primary
-            label="Start Assessment"
-            //onClick={}
-            // href="/projectdetails"
-            href="/wizard"
+            label='Start Assessment'
+            href='/wizard'
             modal={true}
-            data-testid="next"
+            data-testid='next'
           ></Button>
         </Box>
       </Box>
       <Box>
         <SelectionSummary projects={projects} />
-        {/* <SelectionSummary projects={data} /> */}
       </Box>
       <ServerResults height={height} />
     </Box>
@@ -111,12 +84,11 @@ FilterServers.propTypes = {
   height: PropTypes.string,
 };
 
-const ServerResults = ({ height, containerRef }) => {
+const ServerResults = () => {
   const size = useContext(ResponsiveContext);
-  const { filteredResults, selected, setSelected } = useFilters();
+  const { filteredResults } = useFilters();
   const [show, setShow] = useState(false);
   const [projectDetails, setProjectDetails] = useState();
-  const [datumState, setDatumState] = useState();
 
   const navigate = useNavigate();
 
@@ -124,31 +96,13 @@ const ServerResults = ({ height, containerRef }) => {
     setShow(false);
   };
 
-  const findSummary = (datum) => {
-    if (datum.analysis_status === 'analysis started') {
-      return 'Assessment In Progress';
-    } else if (datum.analysis_status === 'analysis successful') {
-      return 'Successful Assessment';
-    } else if (datum.analysis_status === 'analysis failed') {
-      return 'Failed Assessment';
-    }else{
-      return 'Analysis status unknown';
-    }
-  };
-
-  const iconMapping = (analysis_status) => {
-    if (analysis_status === 'analysis successful') {
-      return 'OK';
-    } else if (analysis_status === 'analysis failed') {
-      return 'Critical';
-    } else if (analysis_status === 'analysis started') {
-      return 'Started';
-    }
-  };
-
-  const viewPdf = (project_name) => {
+  const viewPdf = (project_name, application_name) => {
     //axios call to send api call to get info about project with ProjectID
-    ProjectService.getProjectDetails(project_name)
+    ProjectService.getProjectDetails(
+      project_name,
+      application_name,
+      AuthenticationUtils.getEmail()
+    )
       .then((response) => {
         console.log(response.data);
         setProjectDetails(response.data);
@@ -160,18 +114,18 @@ const ServerResults = ({ height, containerRef }) => {
   };
 
   const logDetails = (datum, e) => {
-    // setDatumState(datum);
-    // setShow(true);
     e.preventDefault();
     navigate('/logdetails', { state: { data: datum } });
   };
 
   return (
-    <Box height="100%" overflow="auto" width="100%" responsive={true}>
+    <Box height='100%' overflow='auto' width='100%' responsive={true}>
       <DataTable
         responsive={true}
-        aria-describedby="servers-heading"
+        aria-describedby='servers-heading'
         data={filteredResults}
+        paginate
+        step={10}
         columns={[
           {
             property: 'id',
@@ -207,8 +161,8 @@ const ServerResults = ({ height, containerRef }) => {
             render: (datum) =>
               datum.analysis_status ? (
                 <Text>
-                  {statusIcons[iconMapping(datum.analysis_status)]}{' '}
-                  {findSummary(datum)}
+                  {statusIcons[ProjectUtils.iconMapping(datum.analysis_status)]}{' '}
+                  {ProjectUtils.findSummary(datum)}
                 </Text>
               ) : (
                 '-'
@@ -221,21 +175,21 @@ const ServerResults = ({ height, containerRef }) => {
             header: 'Reports',
             render: (datum) =>
               datum.analysis_status === 'analysis successful' ? (
-                  <Anchor
-                  style={{color:'rgb(111, 111, 111)', fontSize:'16px'}}
-                    onClick={() => {
-                      viewPdf(datum.project_name);
-                    }}
-                  >
-                    View
-                  </Anchor>
+                <Anchor
+                  style={{ color: 'rgb(111, 111, 111)', fontSize: '16px' }}
+                  onClick={() => {
+                    viewPdf(datum.project_name, datum.application_name);
+                  }}
+                >
+                  View
+                </Anchor>
               ) : (
-                <Text style={{color:'rgb(167,167,167)'}}>View</Text>
+                <Text style={{ color: 'rgb(167,167,167)' }}>View</Text>
               ),
           },
         ]}
         pin
-        primaryKey="id"
+        primaryKey='id'
       />
     </Box>
   );
