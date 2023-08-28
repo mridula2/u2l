@@ -1,120 +1,99 @@
-import React, { useState } from "react";
-import { Box, Button, Text } from "grommet";
-import {
-  FormClose,
-  StatusWarningSmall,
-  StatusCriticalSmall,
-  StatusGoodSmall,
-  StatusUnknownSmall,
-} from "grommet-icons";
-import { useNavigate, useLocation } from "react-router-dom";
-import url from "../config/url";
-
-const statusIcons = {
-  Warning: <StatusWarningSmall color="status-warning" size="small" />,
-  OK: <StatusGoodSmall color="status-ok" size="small" />,
-  Critical: <StatusCriticalSmall color="status-critical" size="small" />,
-  Unknown: <StatusUnknownSmall color="status-unknown" size="small" />,
-};
+import React, { useState } from 'react';
+import { Box, Button, Text } from 'grommet';
+import { FormClose } from 'grommet-icons';
+import { useNavigate, useLocation } from 'react-router-dom';
+import url from '../config/url';
+import AuthenticationUtils from '../utils/AuthenticationUtils';
+import CommonUtils from '../utils/CommonUtils';
+import ProjectUtils from '../utils/ProjectUtils';
+import statusIcons from '../config/constants';
 
 const LogDetails = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
 
-  const findSummary = (datum) => {
-    if (datum.analysis_status === "analysis unknown") {
-      return "In Progress";
-    } else if (datum.analysis_status === "analysis successful") {
-      return "Successful Assessment";
-    } else if (datum.analysis_status === "analysis failed") {
-      return "Failed Assessment";
-    }
-  };
-
-  const iconMapping = (analysis_status) => {
-    if (analysis_status === "analysis successful") {
-      return "OK";
-    } else if (analysis_status === "analysis failed") {
-      return "Critical";
-    } else if (analysis_status === "analysis unknown") {
-      return "Unknown";
-    }
-  };
+  const projectDetails = location.state.data;
 
   const downloadReport = async () => {
     try {
       setLoading(true);
-      const url_backend = url
+      const url_backend = url;
       const response = await fetch(
-        `${url_backend}/report/${location.state.data.project_name}`,
+        `${url_backend}/report/${projectDetails.project_name}/${
+          projectDetails.application_name
+        }/${AuthenticationUtils.getEmail()}`,
         {
-          method: "GET",
+          method: 'GET',
         }
       );
-      const blob = await response.blob();
-      const url_blob = window.URL.createObjectURL(new Blob([blob]));
-      const link = document.createElement("a");
-      link.href = url_blob;
-      link.setAttribute("download", `${location.state.data.project_name}.zip`);
-      document.body.appendChild(link);
-      link.click();
+
+      CommonUtils.downloadFile(response, projectDetails.project_name);
       setLoading(false);
+      setSuccess(true);
+      setTimeout(() => setSuccess(false), 2000);
     } catch (error) {
       console.error(error);
     }
   };
 
   const returnDashboard = () => {
-    navigate("/dashboard");
+    navigate('/dashboard');
   };
 
   return (
     <Box
-      width="80%"
-      margin="10%"
+      width='80%'
+      margin='10%'
       // alignContent="center"
 
       // border="all"
-      direction="column"
+      direction='column'
     >
-      <Box align="end">
-        <Button icon={<FormClose />} onClick={returnDashboard} />
+      <Box align='end'>
+        <Button tip='Close' icon={<FormClose />} onClick={returnDashboard} />
       </Box>
       <h3>Log Details</h3>
-      <Box direction="row" width="80%" height="60%" pad="10px">
-        <Box width="60%">
+      <Box direction='row' width='80%' height='60%' pad='10px'>
+        <Box width='60%'>
           <h4>File Details</h4>
-          <Text>File Name: {location.state.data.project_name} </Text>
-          <Text>Project ID: {location.state.data.id}</Text>
+          <Text>File Name: {projectDetails.project_name} </Text>
+          <Text>Project ID: {projectDetails.id}</Text>
           <Text>
-            Status:{" "}
-            {statusIcons[iconMapping(location.state.data.analysis_status)]}{" "}
-            {findSummary(location.state.data)}{" "}
+            Status:{' '}
+            {
+              statusIcons[
+                ProjectUtils.iconMapping(projectDetails.analysis_status)
+              ]
+            }{' '}
+            {ProjectUtils.findSummary(projectDetails)}{' '}
           </Text>
-          <Text>File Size: {location.state.data.file_size} mb</Text>
+          <Text>File Size: {projectDetails.file_size} kb</Text>
         </Box>
-        <Box width="100%" border="all" margin="0 10" overflow="auto">
+        <Box width='100%' border='all' margin='0 10' overflow='auto'>
           <h5>Data Import Logs</h5>
           <Text>Development in progress</Text>
         </Box>
       </Box>
-      <Box pad="20px" style={{ marginLeft: "auto" }} direction="row" gap="20px">
+      <Box pad='20px' style={{ marginLeft: 'auto' }} direction='row' gap='20px'>
         <Button
-          height="15px"
-          width="small"
-          border="all"
-          label="Cancel"
+          height='15px'
+          width='small'
+          border='all'
+          label='Cancel'
           onClick={returnDashboard}
         ></Button>
         <Button
           onClick={downloadReport}
-          height="50px"
-          width="small"
-          border="all"
+          height='50px'
+          width='small'
+          border='all'
           primary
           disabled={loading}
-          label={loading ? "Downloading..." : "Download Report"}
+          label={'Download Report'}
+          busy={loading}
+          success={success}
         ></Button>
       </Box>
     </Box>

@@ -1,6 +1,12 @@
 const getTodaysDate = () => {
   const date = new Date();
-  return date.toLocaleDateString();
+  return date
+    .toLocaleString('en-GB', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+    })
+    .replace(/ /g, '-');
 };
 
 const getAnalysisType = (analysis) => {
@@ -22,16 +28,16 @@ const getTotalArtefacts = (array) => {
 };
 
 const getEffort = (percent) => {
-  if (0 <= percent <= 19) {
-    return 'Low Effort(It belongs to category 1 from below chart).';
-  } else if (20 <= percent <= 39) {
-    return 'Medium Effort(It belongs to category 2 from below chart).';
-  } else if (40 <= percent <= 59) {
-    return 'Average Effort(It belongs to category 3 from below chart).';
-  } else if (60 <= percent <= 79) {
-    return 'High Effort(It belongs to category 4 from below chart).';
+  if (0 <= percent <= 10) {
+    return 'Vert Low Effort';
+  } else if (11 <= percent <= 30) {
+    return 'Low Effort';
+  } else if (31 <= percent <= 60) {
+    return 'Medium Effort';
+  } else if (61 <= percent <= 80) {
+    return 'High Effort';
   } else if (80 <= percent <= 100) {
-    return 'Very High Effort(It belongs to category 5 from below chart).';
+    return 'Very High Effort';
   }
 };
 
