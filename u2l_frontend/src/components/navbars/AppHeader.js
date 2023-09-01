@@ -15,11 +15,11 @@ import {
   HelpOption,
   Projects,
   Search,
-  Link,
   Language,
 } from 'grommet-icons';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import classes from './AppHeader.module.css';
+import AuthenticationUtils from '../../utils/AuthenticationUtils';
 
 export const AppHeader = () => {
   const size = useContext(ResponsiveContext);
@@ -31,16 +31,19 @@ export const AppHeader = () => {
     {
       label: 'Home',
       path: '/dashboard',
-      onClick: () => { navigate(headerLinks[0].path) }
+      onClick: () => {
+        navigate(headerLinks[0].path);
+      },
     },
-    {
+  ];
+  AuthenticationUtils.getUserRole() !== 'Delivery' &&
+    headerLinks.push({
       label: 'Documentation',
       path: '/documentation',
       onClick: () => {
         navigate(headerLinks[1].path);
       },
-    },
-  ];
+    });
 
   const loginPageHeaderLinks = [
     {
@@ -71,7 +74,7 @@ export const AppHeader = () => {
         window.location.replace(loginPageHeaderLinks[3].path);
       },
     },
-     {
+    {
       label: 'About us',
       path: '/aboutus',
       onClick: () => {
@@ -96,22 +99,31 @@ export const AppHeader = () => {
   //   border: '24',
   // };
 
-  const name = 'Jalt Kohlar';
   const getInitials = function () {
-    // const name = AuthenticationService.getUserName();
-    let parts = name.split(' ');
+    const name = AuthenticationUtils.getUserName();
+    const parts = name.split(' ');
     let initials = '';
-    for (let i = 0; i < parts.length; i++) {
-      if (parts[i].length > 0 && parts[i] !== '') {
-        initials += parts[i][0].toUpperCase();
+    for (const element of parts) {
+      if (element.length > 0 && element !== '') {
+        initials += element[0].toUpperCase();
       }
     }
     return initials;
+    // return "A A"
   };
 
-  if (window.location.pathname === '/' || window.location.pathname === '/aboutus' || window.location.pathname === '/contact') {
+  if (
+    window.location.pathname === '/' ||
+    window.location.pathname === '/aboutus' ||
+    window.location.pathname === '/contact'
+  ) {
     return (
-      <Header margin={{ top: 'xsmall' }}>
+      <Header
+        margin={{ top: 'xsmall' }}
+        style={{
+          boxShadow: '0 3px 6px rgba(0,0,0,0.16)',
+        }}
+      >
         <Box direction='column' gap='none' margin={{ left: 'medium' }}>
           <Hpe color='plain' size='large' />
           <Box>
@@ -123,23 +135,31 @@ export const AppHeader = () => {
             </Text>
           </Box>
         </Box>
-        {!['xsmall', 'small'].includes(size) ? (
-          <Nav direction='row' gap='small'>
-            {loginPageHeaderLinks.map((item) => (
-              <Button style={{ borderRadius: '0' }} label={item.label} key={item.label} href={item.path} />
-            ))}
-          </Nav>
-        ) : (
-          <Menu label='Menu' items={loginPageHeaderLinks} />
-        )}
+        <Box direction='row' align='center' justify='center'>
+          {!['xsmall', 'small'].includes(size) ? (
+            <Nav direction='row' gap='small'>
+              {loginPageHeaderLinks.map((item) => (
+                <Button
+                  style={{ borderRadius: '0' }}
+                  label={item.label}
+                  key={item.label}
+                  href={item.path}
+                  active={window.location.pathname === item.path}
+                />
+              ))}
+            </Nav>
+          ) : (
+            <Menu label='Menu' items={loginPageHeaderLinks} />
+          )}
+        </Box>
         <Box direction='row'>
           <Box margin={{ right: 'medium' }}>
             <Search />
           </Box>
           <Box margin={{ right: 'medium' }}>
-            <a href='/projects'>
+            <Link to='/projects' aria-current='page'>
               <Projects />
-            </a>
+            </Link>
           </Box>
           <Box margin={{ right: 'medium' }}>
             <Language />
@@ -147,17 +167,21 @@ export const AppHeader = () => {
         </Box>
       </Header>
     );
-  } else if (window.location.pathname === '/dashboard' || window.location.pathname === '/wizard' || window.location.pathname === '/documentation') {
+  } else if (
+    window.location.pathname === '/dashboard' ||
+    window.location.pathname === '/wizard' ||
+    window.location.pathname === '/documentation'
+  ) {
     return (
       <Header
         fill='horizontal'
         pad={{ horizontal: 'medium', vertical: 'small' }}
         style={{
-          boxShadow: '0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23)',
+          boxShadow: '0 3px 6px rgba(0,0,0,0.16)',
         }}
       >
         <Box direction='row' gap='medium' align='start' flex>
-          <Box direction='row' gap='medium' align='start' margin='auto'>
+          <Box direction='row' gap='small' align='center' margin='auto'>
             <Hpe size='medium' color='plain' />
             <Box>
               <Text color='text-strong' size='medium' weight='bold'>
@@ -180,6 +204,7 @@ export const AppHeader = () => {
                     key={item.label}
                     href={item.path}
                     style={{ borderRadius: '0' }}
+                    active={window.location.pathname === item.path}
                   />
                 ))}
               </Nav>
@@ -206,7 +231,7 @@ export const AppHeader = () => {
               <Projects style={{ width: '100%', height: 20 }}></Projects>
             </Button>
             <Button>
-              <Avatar className={classes.mystyle} >{getInitials()}</Avatar>
+              <Avatar className={classes.mystyle}>{getInitials()}</Avatar>
             </Button>
           </Box>
         </Box>

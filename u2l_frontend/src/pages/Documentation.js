@@ -21,6 +21,7 @@ const Documentation = () => {
         method: 'GET',
       });
       CommonUtils.downloadFile(response, fileName);
+      console.log(fileName + ' downloaded');
     } catch (error) {
       console.error(error);
     }
