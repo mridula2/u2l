@@ -1,5 +1,5 @@
 RulesID	Packages
-IC_RSRVPKG_001	com.arjuna.mw.wsas
+IC_RSRVPKG_001  com.arjuna.mw.wsas
 IC_RSRVPKG_002	com.arjuna.mw.wsas.activity
 IC_RSRVPKG_003	com.arjuna.mw.wsas.common
 IC_RSRVPKG_004	com.arjuna.mw.wsas.completionstatus

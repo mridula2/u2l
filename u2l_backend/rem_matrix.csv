@@ -1,0 +1,144 @@
+authdes_seccreate,Default GNU
+bgets,Default GNU
+bigcrypt,Default GNU
+blopen,Default GNU
+blread,Default GNU
+blset,Default GNU
+byte_status,Default GNU
+chatr,Default GNU
+chownacl,Default GNU
+chroot,Default GNU
+compile,Default GNU
+copylist,Default GNU
+cpacl,Default GNU
++DA model,-b machine -m
+datalock,Default GNU
+DC apptype,Default GNU
+DD32,-mpa-risc-1-1
+DD64,-mpa-risc-2-1
+devnm,Default GNU
+df,Default GNU
+dld_getenv,Default GNU
+dlget,Default GNU
+dlmodinfo,Default GNU
+DO osname,Default GNU
+D_POSIX_C_,-D_REENTRANT
+DSmodel,Default GNU
+dynamic,-Wl-Bdynamic
+EAGAIN,Macro has similar value as EWOULDBLOCK Use either of them
+elfdump,objdump
+endnetpath,Default GNU
+endusershell,Default GNU
+ESconstlit,Default GNU
+ESfic,Default GNU
+ESlit,Default GNU
+ESnolit,Default GNU
+ESnoparmreloc,Default GNU
+ESsfc,Default GNU
+EWOULDBLOCK,Macro has similar value as EWOULDBLOCK Use either of them
+fast,Default GNU
+fcpacl,Default GNU
+fgetacl,Default GNU
+FILENAME,ARGV[1]
+FPflags,Default GNU
+freenetconfigent,Default GNU
+fsctl,Default GNU
+fseek_unlocked,Default GNU
+fsetacl,Default GNU
+fstatfsdev,Default GNU
+getaccess,Default GNU
+getacl,Default GNU
+getaudproc,Default GNU
+getclock,Default GNU
+getevent,Default GNU
+getfh,Default GNU
+getipnodebyaddr,Default GNU
+getipnodebyname,Default GNU
+getlocale,Default GNU
+getlocale_r,Default GNU
+getnetbyaddr_r,Default GNU
+getnetbyname_r,Default GNU
+getpublickey,Default GNU
+getsecretkey,Default GNU
+gettimer,Default GNU
+getusershell,Default GNU
+HUP,SIGHUP
+INSTALL,Default GNU
+libnsl,libc
+librpcsvc,libc
+libsec,libc
+libxcurses,libncurses
+loadmod,Default GNU
+lorder,Default GNU
+mkmf,Refactor it accordingly with cpp -M
+modpath,Default GNU
+modstat,Default GNU
+moduload,Default GNU
+monitor,Default GNU
+mpctl,Default GNU
+msem_init,Default GNU
+msem_lock,Default GNU
+msem_remove,Default GNU
+msem_unlock,Default GNU
+odump,objdump
+.pcc,Older version modify to .pc
+pgmname,Default GNU
+pg,Modify with less
+prealloc64,Default GNU
+prealloc,Default GNU
+pset_assign,Default GNU
+pset_bind,Default GNU
+pset_create,Default GNU
+pset_ctl,Default GNU
+pset_destroy,Default GNU
+pset_getattr,Default GNU
+pset_setattr,Default GNU
+pstat,Default GNU
+pstat_getcommandline,Default GNU
+pstat_getcrashdev,Default GNU
+pstat_getcrashinfo,Default GNU
+pstat_getdisk,Default GNU
+pstat_getdynamic,Default GNU
+pstat_getfile,Default GNU
+publickey,Default GNU
+putmsg,Default GNU
+pw_getukid,Default GNU
+pw_getvmax,Default GNU
+pw_post,Default GNU
+pw_postv,Default GNU
+pw_wait,Default GNU
+quotactl,Default GNU
+RTMAX,SIGRTMAX
+RTMIN,SIGRTMIN
+rtprio,libc
+sb,-fsigned
+sendfile64,Default GNU
+sendfile,Default GNU
+sendmsg,Default GNU
+serialize,Default GNU
+setacl,Default GNU
+setaudproc,Default GNU
+setprivgrp,Default GNU
+settune,Default GNU
+setuname,Default GNU
+setusershell,Default GNU
+sigsend,Default GNU
+sigsendset,Default GNU
+sigvector,Default GNU
+.sl,ld linker to be replaced with  .so
+stream,Default GNU
+ttrace,ptrac
+ttrace_wait,Default GNU
+tuneinfo2,Default GNU
+unp.h,#include <sys/socket.h>
+va_alist,No.of parameters use "…" instead 
+va_arg,points the next argument recheck single parameter
+va_dcl,A declaration for va_alist remove this
+va_end,End of parameter Process recheck single parameter
+va_list,type defined for the variable used to traverse the list recheck single parameter
+varargs.h,stdargs.h
+va_start,Add the second parameter - va_start(first parameter 1 and second parameter 2)
+vfsmount,Default GNU
++vnocompatwarnings,Default GNU
++z,-fpic
++Z,-fPIC

@@ -286,3 +286,37 @@ class contact_us(db.Model):
         self.contact_number = contact_number
         self.message = message
         self.created_at = created_at
+
+class analysis_summary_java(db.Model):
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    project_name = db.Column(db.String(50))
+    application_name = db.Column(db.String(50))
+    compilation_warning_na = db.Column(db.Integer)
+    compilation_warning_nl = db.Column(db.Integer)
+    os_analysis_na = db.Column(db.Integer)
+    os_analysis_nl = db.Column(db.Integer)
+    source_scan_remedy_na = db.Column(db.Integer)
+    source_scan_remedy_nl = db.Column(db.Integer)
+    affected_framework_na = db.Column(db.Integer)
+    affected_framework_nl = db.Column(db.Integer)
+    nr_of_artefacts = db.Column(db.Integer)
+    imapacted_artefacts = db.Column(db.Integer)
+    nr_of_loc = db.Column(db.Integer)
+    impacted_nr_of_loc = db.Column(db.Integer)
+
+    def __init__(self, project_name, application_name, compilation_warning_na, compilation_warning_nl, os_analysis_na, os_analysis_nl, source_scan_remedy_na, source_scan_remedy_nl, affected_framework_na, affected_framework_nl, nr_of_artefacts, imapacted_artefacts, nr_of_loc, impacted_nr_of_loc):
+        self.project_name = project_name
+        self.application_name = application_name
+        self.compilation_warning_na = compilation_warning_na
+        self.compilation_warning_nl = compilation_warning_nl
+        self.os_analysis_na = os_analysis_na
+        self.os_analysis_nl = os_analysis_nl
+        self.source_scan_remedy_na = source_scan_remedy_na
+        self.source_scan_remedy_nl = source_scan_remedy_nl
+        self.affected_framework_na = affected_framework_na
+        self.affected_framework_nl = affected_framework_nl
+        self.nr_of_artefacts = nr_of_artefacts
+        self.imapacted_artefacts = imapacted_artefacts
+        self.nr_of_loc = nr_of_loc
+        self.impacted_nr_of_loc = impacted_nr_of_loc
+    

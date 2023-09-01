@@ -23,17 +23,18 @@ sourceFolder="${1%/}"
 scanType="$2"
 echo
 CommonRules="$PJHOME/JavaRules/JavaCommonRules"
-if [ "$scanType" = "Spring" ]; then
-    rulesPath="$PJHOME/JavaRules/SpringRules"
-elif [ "$scanType" = "Struts" ]; then
-    rulesPath="$PJHOME/JavaRules/StrutsRules"
-elif [ "$scanType" = "Jsf" ]; then
-    rulesPath="$PJHOME/JavaRules/JSFRules"
-else
-    echo "Framework Type should be either Spring, Struts, or Jsf"
-    exit 1
+if [ $scanType = "Spring" ];
+   then
+      rulesPath="$PJHOME/JavaRules/SpringRules"
+   else
+      if [ $scanType =  "Struts" ];
+        then
+                rulesPath="$PJHOME/JavaRules/StrutsRules"
+        else
+                echo "Framework Type should be either Spring or Struts"
+                exit
+      fi
 fi
-
 if [ -f keywords2scan ];
 	then 
 		rm -rf keywords2scan
@@ -73,7 +74,6 @@ if [ -f sourceCode2Remedy ];
         then
                 rm -rf sourceCode2Remedy 
 fi
-
 if [ -f sourceScanRemedy ];
         then
                 rm -rf sourceScanRemedy
@@ -93,7 +93,7 @@ done
 cat sourceScanImports.txt | cut -d ' ' -f2 | cut  -d ';' -f1 | sed 's/[ ]//g'| sort | uniq >uniqSourceScanImports.txt
 
 
-for i in `cat uniqSourceScanImports.txt`
+for i in `cat uniqSourceScanImports.txt `
 do
 Apiflag=0
 if [ `grep $i $rulesPath/*.rules | wc -l` -gt 0 ];
@@ -133,13 +133,12 @@ do
                                    then
 					for k in `grep -inH $word2Grep $j | grep -v "import" | grep -v "*" | grep -v "//" `
 				  	 do
-						echo -e $rule2Grep '\t' $k >> sourceCode2Remedy
+	     			  		echo -e $rule2Grep '\t' $k >>sourceCode2Remedy
 					done
 				fi
 		fi  
 	done
 done
-if [ -s sourceCode2Remedy ]; then
 for i in `cat sourceCode2Remedy`
 do 
 	ruleId=`echo $i | cut -f1`
@@ -151,8 +150,6 @@ do
 echo -e $ruleId '\t' $fileName '\t' $lineNumber '\t' $remedyStep >> sourceScanRemedy 
 echo -e $fileName '\t' $lineNumber '\t' $affectedSource >> affectedSourceInformation
 done
-else
-    echo "No affected source code found."
-fi        
+        
 IFS=$SAVEIFS
 
