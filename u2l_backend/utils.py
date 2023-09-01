@@ -5,6 +5,13 @@ from openpyxl import load_workbook
 from models import *
 from datetime import datetime
 import smtplib
+import logging
+from celery_setup import celery
+from celery.utils.log import get_task_logger
+from celery import Task
+import subprocess
+
+logger = get_task_logger(__name__)
 
 def validate_email(email):
     pattern = r'^[\w\.-]+@[\w\.-]+\.\w+$'
@@ -19,32 +26,42 @@ def generate_workbook(df, save_location,sheet):
     writer.save()
 
 def sheet_transfer(source_sheet, target_sheet, startrow, startcol, source_file, dest_file):
-    file = source_file
-    df = pd.read_excel(file, sheet_name=source_sheet, engine='openpyxl')
-    output_file = dest_file
-    book = load_workbook(output_file)
-    writer = pd.ExcelWriter(output_file, engine='openpyxl', mode='a')
+    df = pd.read_excel(source_file, sheet_name=source_sheet, engine='openpyxl')
+    book = load_workbook(dest_file)
+    writer = pd.ExcelWriter(dest_file, engine='openpyxl', mode='a')
     writer.book = book
     writer.sheets = dict((ws.title, ws) for ws in book.worksheets)
     df.to_excel(writer, sheet_name=target_sheet, index=False, startrow=startrow, startcol=startcol, header=False)
     writer.save()
 
-def insert_user_details(email, password, first_name, last_name, user_role):
+def insert_user_details_task(email, password, first_name, last_name, user_role):
+    # user = user_details.query.filter_by(email=email).first()
+    # if user:
+    #     return
+    # current_time = datetime.utcnow()
+    # new_user = user_details(email, password, first_name, last_name, user_role, current_time, current_time)
+    # db.session.add(new_user)
+    # db.session.commit()
+
+    # Your task implementation here...
+    logger.info(f"Inserting user details for email: {email}")
+
     user = user_details.query.filter_by(email=email).first()
     if user:
+        logger.warning("User already exists.")
         return
+
     current_time = datetime.utcnow()
     new_user = user_details(email, password, first_name, last_name, user_role, current_time, current_time)
     db.session.add(new_user)
     db.session.commit()
 
-def fetch_store_java_data(form_project_name, form_application_name, filepath, filepath_percentage):
+    logger.info("User details inserted successfully.")
 
-    # filepath = './java_inventory_report.xlsx'
-    # filepath_percentage = './java_report.xlsx'
+def fetch_store_java_data(form_project_name, form_application_name, filepath):
 
     sheet_names = ['OS Analysis Details', 'Compilation Error Report', 'Import Class Report', 'JDK Anaylsis Details', 'Import JSP Report', 'Compilation Warning Report']
-    wb = load_workbook(filename=filepath_percentage, read_only=True, data_only=True)
+    wb = load_workbook(filename=filepath, read_only=True, data_only=True)
 
     no_of_artefacts = []
     count_of_ids = 0
@@ -65,23 +82,14 @@ def fetch_store_java_data(form_project_name, form_application_name, filepath, fi
     print(no_of_artefacts)    
 
     sheetName = 'Source Code Inventory'
-    print('F1')
     selected_cols = ['Actual Nr of Lines', 'Nr Blank Lines', 'Nr Commented Lines', 'Total Nr LoC']
-    print('F2')
     wb = openpyxl.load_workbook(filepath)
-    print('F3')
     ws = wb[sheetName]
-    print('F4')
     data = ws.values
-    print('F5')
     cols = next(data)[0:]
-    print('F6')
     df = pd.DataFrame(data, columns=cols)[selected_cols]
-    print('Before Numeric')
     df = df.apply(pd.to_numeric, errors='coerce')
     column_sums = df.sum()
-    print('After Numeric')
-    print(df)
 
     sheetName = 'Source Code Inventory'
     selected_cols = ['Type']
@@ -142,3 +150,40 @@ def send_email(user_info):
     server.sendmail('pratikjwani@gmail.com', 'pratik-jayawant.wani@hpe.com', email_message)
 
     server.quit()
+
+def summary_sheet_generation(source_excel_file, sheet_name_1, sheet_name_2, skiprows, column_index, target_excel_file, start_row, start_col):
+
+    sheet_configs = {
+        sheet_name_1: {'usecols': lambda x: x != 1, 'skiprows': skiprows, 'column_index': column_index}
+    }
+
+    for sheet_name_1, config in sheet_configs.items():
+        df = pd.read_excel(source_excel_file, engine='openpyxl', sheet_name=sheet_name_1, usecols=config['usecols'], skiprows=config['skiprows'])
+        df = df.drop(df.columns[0], axis=1)
+        df = df.iloc[:, config['column_index']]
+
+    row_counts = df.value_counts()
+    unique_rows_df = pd.DataFrame({'Row': row_counts.index, 'Occurrences': row_counts.values})
+
+    writer = pd.ExcelWriter(target_excel_file, engine='openpyxl', mode='a')
+    book = load_workbook(target_excel_file)
+    writer.book = book
+    writer.sheets = dict((ws.title, ws) for ws in book.worksheets)
+    unique_rows_df.to_excel(writer, sheet_name=sheet_name_2, index=False, startrow=start_row, startcol=start_col, header=False)
+    writer.save()
+
+@celery.task
+def testing_task(num1, num2):
+
+    logger.info("Adding numbers !! Please wait !!")
+    return (num1 + num2)
+
+def run_cppcheck(source_path):
+    command = ["cppcheck", "--force", source_path]
+    result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    return result.stdout.decode(), result.stderr.decode()
+
+def process_content(lines):
+    modified_lines = lines[0]
+    print(modified_lines)
+    return modified_lines

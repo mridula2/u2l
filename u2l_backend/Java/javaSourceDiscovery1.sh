@@ -135,27 +135,6 @@ if [ "$first" == "org" ];
                 fi
 fi
 
-if [ "$first" == "javax" ] && [ "$second" == "faces" ]; then
-    if [ `grep $i $rulesPath/JSFAPIs.rules | wc -l` -gt 0 ]; then
-        grep $i $rulesPath/JSFAPIs.rules | cut -d ':' -f2 >> jsfRulesGrepped.txt
-        Apiflag=1
-        break
-    else
-        jsfCheckRulestoCount=$(echo "$i" | awk -F'.' '{ print NF }')
-        k=0
-	echo  $k $jsfCheckRulestoCount
-        while [ $k -lt $jsfCheckRulestoCount ]; do
-            Apitocheck=$(echo $i | rev | cut -d '.' -f2- | rev)
-            if [ `grep $Apitocheck $rulesPath/JSFAPIs.rules | wc -l` -gt 0 ]; then
-                grep $Apitocheck $rulesPath/JSFAPIs.rules | cut -d ':' -f2 >> jsfRulesGrepped.txt
-                Apiflag=1
-                break
-            fi
-            k=`expr $k + 1`
-        done
-    fi
-fi
-
  if [ `grep $i $rulesPath/JDKAPIs.rules | wc -l` -gt 0 ];
         then
              grep  $i $rulesPath/JDKAPIs.rules | cut -d ':' -f2 >> JDKRulesGrepped.txt

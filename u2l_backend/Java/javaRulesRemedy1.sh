@@ -14,7 +14,7 @@ do
                                        while read k
                                          do
                                                 echo -e $rule2Grep '\t' $k >>javaSourceCode2Remedy
-				         done < <(grep -inH $word2Grep $j | grep -v "import" | grep -v "*" | grep -v "//")
+                                        done < <(grep -inH $word2Grep $j | grep -v "import" | grep -v "*" | grep -v "//")
                                 fi
                 fi
         done < javaRuleslist.txt
