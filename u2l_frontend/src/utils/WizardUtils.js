@@ -48,6 +48,7 @@ const appendFormData = (formValues) => {
       data.append('source_compiler_version', formValues.source_compiler_version);
       data.append('target_compiler', formValues.target_compiler);
       data.append('target_compiler_version', formValues.target_compiler_version);
+      data.append('middleware', formValues.middleware);
     }
     else if (formValues.analysis_type === 'Shell') {
       data.append('source_shell', formValues.source_shell);
