@@ -137,22 +137,24 @@ const LoginForm = () => {
   };
 
   const onSubmit = ({ value }) => {
+    console.log(value);
     AuthenticationService.signIn({
       email: `${value.email}`,
       password: `${CommonUtils.convertStringToBase64(value.password)}`,
     })
       .then((response) => {
-        // console.log(response);
+        console.log(response);
         if (response.data.message === 'authentication success') {
           AuthenticationUtils.storeUserDetails({
-            jwt: 'jwt',
-            email: value.email,
-            firstName:response.data['first_name'],
-            lastName:response.data['last_name'],
-            userRole:response.data['user_role'],
-            checked
+            // jwt: 'jwt',
+            jwt: response.data['token'],
+            // email: value.email,
+            // firstName: response.data['first_name'],
+            // lastName: response.data['last_name'],
+            // userRole: response.data['user_role'],
+            checked,
           });
-          console.log(AuthenticationUtils.getEmail());
+
           navigate('/dashboard');
         } else {
           setNotificationMessage('Email or Password is wrong');
@@ -207,7 +209,7 @@ const LoginForm = () => {
         pad={{ horizontal: 'xxsmall' }}
         width='90%'
         margin={{ top: '3%' }}
-        className="links"
+        className='links'
       >
         <Form
           validate='blur'
@@ -271,7 +273,12 @@ const LoginForm = () => {
         </Form>
         <Box align='start'>
           <Link onClick={onForgotPassword}>Forgot password?</Link>
-          <Text>Don't have an account? <Link to='/signup' aria-current='page'>Sign-up</Link></Text>
+          <Text>
+            Don't have an account?{' '}
+            <Link to='/signup' aria-current='page'>
+              Sign-up
+            </Link>
+          </Text>
           {showForgotPassword && (
             <Layer modal onClickOutside={onClose} onEsc={onClose}>
               <ResetPassword
