@@ -328,6 +328,18 @@ const Review = () => {
                   {location.state.formValues.target_compiler_version}
                 </Text>
               </Box>
+
+             <Box direction='row'>
+                <Box width="small">
+                <Text weight="bold">
+                  Middleware:
+                </Text>
+                </Box>
+                <Text margin={{ left: 'medium' }}>
+                  {location.state.formValues.middleware}
+                </Text>
+              </Box>
+
             </Box>
           )}
 

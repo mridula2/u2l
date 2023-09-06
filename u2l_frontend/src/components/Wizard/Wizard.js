@@ -68,7 +68,12 @@ const WizardValidationExample = ({ containerRef }) => {
         framework: '',
         source_framework_version: '',
         target_framework_version: '',
+
+        middleware:''
+      })
+
       };
+
     } else {
       return {
         project_name: location.state.formValues.project_name,
@@ -110,7 +115,12 @@ const WizardValidationExample = ({ containerRef }) => {
         target_framework_version:
           location.state.formValues.target_framework_version,
         file_name: location.state.formValues.file_name,
+
+        middleware: location.state.formValues.middleware,
+      })
+
       };
+
     }
   };
 
@@ -547,8 +557,13 @@ export const StepThree = (nextId) => {
         source_pre_compiler_version: '',
         target_pre_compiler: '',
         target_pre_compiler_version: '',
-        file_name: '',
+
+        file_name:'',
+        middleware:''
+      })
+
       };
+
     } else {
       return {
         project_name: location.state.formValues.project_name,
@@ -590,11 +605,21 @@ export const StepThree = (nextId) => {
         target_framework_version:
           location.state.formValues.target_framework_version,
         file_name: location.state.formValues.file_name,
+
+        middleware: location.state.formValues.middleware,
+      })
+
       };
+
     }
   };
 
   const [formValues, setFormValues] = useState(defaultFormValues);
+
+  const handleMiddleware = (event) => {
+    const getMiddleware = event.target.value;
+    console.log(getMiddleware);
+  }
 
   const defaultLanguage = () => {
     if (location.state) {
@@ -879,6 +904,26 @@ export const StepThree = (nextId) => {
                 name='target_compiler_version'
               />
             </Box>
+
+
+            <Box htmlFor="middleware" direction='row' margin={{ bottom: 'medium' }}>
+            <Box width='68%'>
+            <label htmlFor="middleware">Middleware</label>
+          </Box>
+          <Select
+            placeholder="Select"
+            id="middleware"
+            name="middleware"
+            options={[
+              'Tuxedo',
+              
+            ]}
+            onChange={(e) => handleMiddleware(e)}
+          />
+            </Box>
+
+
+
           </Box>
         )}
 
@@ -1612,8 +1657,13 @@ export const StepThree = (nextId) => {
           </Box>
         )}
       </Box>
+
+</Box>
+
     </Box>
+
   );
+  
 };
 
 const data = [

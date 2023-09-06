@@ -52,12 +52,14 @@ const appendFormData = (formValues) => {
     data.append('target_compiler', formValues.target_compiler);
     data.append('target_compiler_version', formValues.target_compiler_version);
     // --------------------------------C------------------------------------------ //
-  } else if (formValues.analysis_type === 'C++') {
-    data.append('source_compiler', formValues.source_compiler);
-    data.append('source_compiler_version', formValues.source_compiler_version);
-    data.append('target_compiler', formValues.target_compiler);
-    data.append('target_compiler_version', formValues.target_compiler_version);
-  } else if (formValues.analysis_type === 'Shell') {
+
+    } else if (formValues.analysis_type === 'C++') {
+      data.append('source_compiler', formValues.source_compiler);
+      data.append('source_compiler_version', formValues.source_compiler_version);
+      data.append('target_compiler', formValues.target_compiler);
+      data.append('target_compiler_version', formValues.target_compiler_version);
+      data.append('middleware', formValues.middleware);
+    } else if (formValues.analysis_type === 'Shell') {
     data.append('source_shell', formValues.source_shell);
     data.append('source_shell_version', formValues.source_shell_version);
     data.append('target_shell', formValues.target_shell);
@@ -81,7 +83,6 @@ const appendFormData = (formValues) => {
     data.append('target_compiler', formValues.target_pre_compiler);
     data.append('target_compiler', formValues.target_pre_compiler_version);
   }
-
   data.append('file_name', formValues.file_name[0]);
   console.log(formValues);
   console.log(formValues.file_name[0]);
