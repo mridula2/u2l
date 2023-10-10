@@ -15,6 +15,7 @@ app.config["SQLALCHEMY_DATABASE_URI"] = SQLALCHEMY_DATABASE_URI
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = SQLALCHEMY_TRACK_MODIFICATIONS
 
 app.config["JWT_SECRET_KEY"] = "u2l-secret-key"
+app.config['JWT_ACCESS_TOKEN_EXPIRES'] = 3600 # 30 minutes in seconds
 
 db.init_app(app)
 
