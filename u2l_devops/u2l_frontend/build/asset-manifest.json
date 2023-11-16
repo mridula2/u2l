@@ -1,0 +1,25 @@
+{
+  "files": {
+    "main.css": "/static/css/main.2872e587.css",
+    "main.js": "/static/js/main.e6884b29.js",
+    "static/js/787.5f5a82c4.chunk.js": "/static/js/787.5f5a82c4.chunk.js",
+    "static/media/HomePageBG.png": "/static/media/HomePageBG.bbf295cc0200708b3d24.png",
+    "static/media/u2lpdfImg2.png": "/static/media/u2lpdfImg2.dc6e951240bb69939f47.png",
+    "static/media/Poppins-Regular.ttf": "/static/media/Poppins-Regular.4211496d0e075ffe7c2f.ttf",
+    "static/media/Poppins-Bold.ttf": "/static/media/Poppins-Bold.300a4da54f1e6258b6f7.ttf",
+    "static/media/Picture1.png": "/static/media/Picture1.74accb1b894e7ece28ab.png",
+    "static/media/Picture2.png": "/static/media/Picture2.6e48c050c24eb6b94d38.png",
+    "static/media/u2lpdfImg.png": "/static/media/u2lpdfImg.36ac910a3f963b8d02f2.png",
+    "static/media/HPELogo.png": "/static/media/HPELogo.7f46e84fdca90ee0c551.png",
+    "static/media/Readthedocs.svg": "/static/media/Readthedocs.c530e389dabc52cd672ff994515a1b96.svg",
+    "static/media/Question.svg": "/static/media/Question.81d2b3d3fc2f88203c40d252847aa992.svg",
+    "index.html": "/index.html",
+    "main.2872e587.css.map": "/static/css/main.2872e587.css.map",
+    "main.e6884b29.js.map": "/static/js/main.e6884b29.js.map",
+    "787.5f5a82c4.chunk.js.map": "/static/js/787.5f5a82c4.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.2872e587.css",
+    "static/js/main.e6884b29.js"
+  ]
+}

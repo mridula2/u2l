@@ -1,0 +1,24 @@
+Rule Id	Deprecated Classes 	Library to Search	Entity to Search	Remedy
+IC_STC_1.4.3SA_001	fr.improve.struts.taglib.layout.policy.AbstractPolicy 	fr.improve.struts.taglib.layout.policy	AbstractPolicy 	           Replaced by interface FieldPolicy  
+IC_STC_1.4.3SA_002	fr.improve.struts.taglib.layout.collection.BaseCollectionTag.Header 	fr.improve.struts.taglib.layout.collection.BaseCollectionTag	Header 	           use ItemContext instead.  
+IC_STC_1.4.3SA_003	fr.improve.struts.taglib.layout.BaseFieldTag 	fr.improve.struts.taglib.layout	BaseFieldTag 	Need to verify
+IC_STC_1.4.3SA_004	fr.improve.struts.taglib.layout.policy.DispatchPolicy 	fr.improve.struts.taglib.layout.policy	DispatchPolicy 	           Replaced by DispatchFieldPolicy  
+IC_STC_1.4.3SA_005	fr.improve.struts.taglib.layout.FieldTag 	fr.improve.struts.taglib.layout	FieldTag 	Need to verify
+IC_STC_1.4.3SA_006	fr.improve.struts.taglib.layout.FormActions 	fr.improve.struts.taglib.layout	FormActions 	           Can also auto generate the needed buttons;  
+IC_STC_1.4.3SA_007	fr.improve.struts.taglib.layout.MenuItemTag 	fr.improve.struts.taglib.layout	MenuItemTag 	Need to verify
+IC_STC_1.4.3SA_008	fr.improve.struts.taglib.layout.PanelTag2 	fr.improve.struts.taglib.layout	PanelTag2 	Need to verify
+	Deprecated Fields 			
+IC_STF_1.4.3SA_001	fr.improve.struts.taglib.layout.FormTag.CREATE_MODE 	fr.improve.struts.taglib.layout.FormTag	CREATE_MODE 	Need to verify
+IC_STF_1.4.3SA_002	fr.improve.struts.taglib.layout.FormTag.EDIT_MODE 	fr.improve.struts.taglib.layout.FormTag	EDIT_MODE 	Need to verify
+IC_STF_1.4.3SA_003	fr.improve.struts.taglib.layout.FormTag.INSPECT_MODE 	fr.improve.struts.taglib.layout.FormTag	INSPECT_MODE 	Need to verify
+	Deprecated Methods 			
+IC_STM_1.4.3SA_001	fr.improve.struts.taglib.layout.field.ChoiceTag.addChoice(StringBuffer, String, String) 	fr.improve.struts.taglib.layout.field.ChoiceTag	addChoice(StringBuffer, String, String) 	Need to verify
+IC_STM_1.4.3SA_002	fr.improve.struts.taglib.layout.datagrid.DatagridSelectTag.addChoice(StringBuffer, String, String) 	fr.improve.struts.taglib.layout.datagrid.DatagridSelectTag	addChoice(StringBuffer, String, String) 	Need to verify
+IC_STM_1.4.3SA_003	fr.improve.struts.taglib.layout.util.LayoutUtils.computeURL(PageContext, String, String, String, Map, String, boolean, String) 	fr.improve.struts.taglib.layout.util.LayoutUtils	computeURL(PageContext, String, String, String, Map, String, boolean, String) 	Need to verify
+IC_STM_1.4.3SA_004	fr.improve.struts.taglib.layout.util.LayoutUtils.computeURL(PageContext, String, String, String, String, Map, String, boolean, String) 	fr.improve.struts.taglib.layout.util.LayoutUtils	computeURL(PageContext, String, String, String, String, Map, String, boolean, String) 	Need to verify
+IC_STM_1.4.3SA_005	fr.improve.struts.taglib.layout.util.LayoutUtils.getDouble(Object) 	fr.improve.struts.taglib.layout.util.LayoutUtils	getDouble(Object) 	Need to verify
+IC_STM_1.4.3SA_006	fr.improve.struts.taglib.layout.pager.PagerTag.getPagerId() 	fr.improve.struts.taglib.layout.pager.PagerTag	getPagerId() 	Need to verify
+IC_STM_1.4.3SA_007	fr.improve.struts.taglib.layout.skin.Skin.getPolicy() 	fr.improve.struts.taglib.layout.skin.Skin	getPolicy() 	           Replaced bu getFieldPolicy()  
+IC_STM_1.4.3SA_008	fr.improve.struts.taglib.layout.collection.BaseCollectionTag.renderHeader(StringBuffer, BaseCollectionTag.Header) 	fr.improve.struts.taglib.layout.collection.BaseCollectionTag	renderHeader(StringBuffer, BaseCollectionTag.Header) 	Need to verify
+IC_STM_1.4.3SA_009	fr.improve.struts.taglib.layout.util.LayoutUtils.retrieveErrors(PageContext, String, String) 	fr.improve.struts.taglib.layout.util.LayoutUtils	retrieveErrors(PageContext, String, String) 	           Use MessagesUtils instead.  
+

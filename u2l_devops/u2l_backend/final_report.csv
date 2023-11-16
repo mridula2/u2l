@@ -1,0 +1,4 @@
+/usr/u2l/u2l_backend/UNIX_HPE/UNIX_HPE/scripts/system/mk,39,#|    -s : indique qu'il ne faut pas afficher (pg) les fichiers .error &       |,
+/usr/u2l/u2l_backend/UNIX_HPE/UNIX_HPE/scripts/system/mk,477,        pg $make_name.lis,
+/usr/u2l/u2l_backend/UNIX_HPE/UNIX_HPE/scripts/system/mk,483,        pg $make_name.error,
+/usr/u2l/u2l_backend/UNIX_HPE/UNIX_HPE/source/TRAFIC/GN_ERRCAR.pc,4242,          "in <trafic_PriseEvacuation_one_layer> car=%d pg=%s pd=%s mis(%d-%d)",,

@@ -1,0 +1,15 @@
+# Use the official MySQL image as the base image
+FROM mysql:8.0
+
+# Copy the SQL initialization script into the container
+COPY data.sql /docker-entrypoint-initdb.d/data.sql
+
+# Copy the entrypoint script to set environment variables and execute SQL script
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+# Expose the MySQL port (this is just a hint)
+EXPOSE 3306
+
+# Define entrypoint
+ENTRYPOINT ["/entrypoint.sh"]
