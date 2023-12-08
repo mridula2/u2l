@@ -1,5 +1,5 @@
-from flask import Blueprint, jsonify, request, Response, Flask
-from utils import validate_email, generate_workbook, sheet_transfer, fetch_store_java_data, send_email, summary_sheet_generation, testing_task, run_cppcheck
+from flask import Blueprint, jsonify, request, Response, Flask, stream_with_context
+from utils import validate_email, generate_workbook, sheet_transfer, fetch_store_java_data, send_email, summary_sheet_generation, testing_task, run_cppcheck, get_task_queue_name
 from models import *
 import datetime
 import os
@@ -12,7 +12,7 @@ import numpy as np
 import zipfile
 import openpyxl
 import logging
-# from app import celery
+from celery_setup import celery
 
 from flask_jwt_extended import create_access_token #, get_jwt_claims
 from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
@@ -21,12 +21,14 @@ import json
 import time
 from celery.result import AsyncResult
 
+from flask_sse import sse
+import redis
+
+redis_client = redis.StrictRedis(host='localhost', port=6379, db=0)
+
 
 authentication_controller = Blueprint('authentication', __name__)
 analysis_bp = Blueprint('analysis', __name__)
-
-# logging.basicConfig(filename='app.log', level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-# logger = logging.getLogger(__name__)
 
 tool_analysis_type = ''
 PJHOME = ''
@@ -47,11 +49,6 @@ def signup():
     form_last_name = json_data['last_name']
     form_role = json_data['user_role']
     roles = ["delivery", "pursuit", "customer", "admin"]
-    result = testing_task.delay(100, 100)  # Use .delay() to call the Celery task asynchronously
-    result1 = testing_task.delay(200, 200)  # Use .delay() to call the Celery task asynchronously
-    result2 = testing_task.delay(300, 300)  # Use .delay() to call the Celery task asynchronously
-    print("'task_id': result.id, 'task_id1': result1.id, 'task_id2': result2.id")
-    return jsonify({'message': 'SignUp Successful'}), 200
 
     if form_role.lower() not in roles:
       error_message = {'error' :"Invalid role type"}
@@ -168,7 +165,8 @@ def upload():
     form_target_os = request.form['target_os']
     form_target_os_version = request.form['target_os_version']
     c_analysis_types = ['C', 'C++', 'Pro*C', 'C/Pro*C', 'C++/Pro*C']
-    framework_type = request.form['framework']
+    # framework_type = request.form['framework']
+    framework_type = ''
 
     form_source_jdk = ''
     form_target_jdk = ''
@@ -217,6 +215,7 @@ def upload():
         form_target_jsp = request.form['target_jsp']
         form_source_servlet = request.form['source_servlet']
         form_target_servlet = request.form['target_servlet']
+        framework_type = request.form['framework']
     elif(tool_analysis_type in c_analysis_types):
         if(tool_analysis_type == 'Pro*C'):
             tool_analysis_type = 'canalysis'
@@ -229,6 +228,7 @@ def upload():
             form_source_compiler_version = ''
             form_target_compiler_version = ''
         elif(tool_analysis_type == 'C' or tool_analysis_type == 'C++'):
+            print('Accepting C Parameters!')
             tool_analysis_type = 'canalysis'
             form_source_compiler = request.form['source_compiler']
             form_target_compiler = request.form['target_compiler']
@@ -238,7 +238,8 @@ def upload():
             form_target_pre_compiler = ''
             form_source_pre_compiler_version = ''
             form_target_pre_compiler_version = ''
-            # form_middleware_type = request.form['middleware_type']
+            form_middleware_type = request.form['middleware_type']
+            print(form_middleware_type)
         elif(tool_analysis_type == 'C/Pro*C' or tool_analysis_type == 'C++/Pro*C'):
             tool_analysis_type = 'canalysis'
             form_source_pre_compiler = request.form['source_pre_compiler']
@@ -281,7 +282,7 @@ def upload():
     hMS = hour_min_sec[0].replace(":", "")
 
     file_name = file_name + "_" + yMD + "_" + hMS 
-    directory = './projects/' + file_name
+    directory = '/usr/u2l/u2l_backend/projects/' + file_name
     os.makedirs(directory)
     file.save(os.path.join(directory, file_name +'.zip'))
 
@@ -355,6 +356,10 @@ def upload():
             dest_path = os.path.join(dest_dir, 'c_report.xlsx')
             shutil.copy(source_path, dest_path)
 
+            source_path = os.path.join(source_dir_report, 'c_report_old.xlsx')
+            dest_path = os.path.join(dest_dir, 'c_report_old.xlsx')
+            shutil.copy(source_path, dest_path)
+
             source_path = os.path.join(source_dir_report, 'c_inventory_report.xlsx')
             dest_path = os.path.join(dest_dir, 'c_inventory_report.xlsx')
             shutil.copy(source_path, dest_path)
@@ -397,7 +402,7 @@ def upload():
         db.session.rollback()
         return jsonify({'message': 'analysis_status : Project name already exists'}), 409
 
-    script_path = './projects/' + file_name + '/U2L/U2LTool_Install.sh'
+    script_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/U2LTool_Install.sh'
 
     if(tool_analysis_type == 'javaanalysis'):
         db_analysis_java = analysis_java(form_project_name, form_application_name, db_analysis_type.id, form_source_jdk, form_target_jdk, form_source_jsp, form_target_jsp, form_source_servlet, form_target_servlet)
@@ -419,8 +424,6 @@ def upload():
 
     task_id = task.id
     task_status = task.status
-    task_log = 'ASSESSMENT STARTED'
-
     #storing values in db project_details table
     db_project_details = project_details(form_project_name, form_application_name, task_id, 'admin@hpe.com', 1, form_project_client, form_project_manager, file_name, file_size_mb, task_status, cur_date)
     db.session.add(db_project_details)
@@ -435,10 +438,147 @@ def upload():
 
     return jsonify({'message': 'Request processing started', 'task_id': task.id}), 202
 
+@authentication_controller.route('/stream_logs/<task_id>', methods=['GET'])
+def stream_logs(task_id):
+    query = project_details.query.filter_by(task_id=task_id)
+    stream_task_status = query.first().analysis_status  # {'PENDING', 'SUCCESS'}
+
+    total_logs = celery_logs.query.filter_by(task_id=task_id).count()
+    redis_queue_name = get_task_queue_name(task_id)  # {'logs : {task_id}'}
+
+    def event_stream():
+        if stream_task_status == 'SUCCESS':
+            print('Status: SUCCESS')
+            logs = celery_logs.query.filter_by(task_id=task_id).all()
+            log_message = []
+            for log in logs:
+                log = log.task_log
+                log_message.append(log)
+            x = {
+                "logs" : log_message,
+                "progress" : 100
+            }
+            y = json.dumps(x)
+            yield f"data: {y}\n\n"
+
+        while stream_task_status == 'PENDING':
+            print('Status: PENDING')
+            log_message = redis_client.lpop(redis_queue_name)
+            if log_message:
+                progress_info, message = log_message.decode('utf-8').split('::', 1)
+                progress = int(progress_info.split('/')[0])
+                total_progress = int(progress_info.split('/')[1])
+                print(progress)
+                print(total_progress)
+                print(message)
+
+                db_celery_logs = celery_logs(task_id, stream_task_status, message)
+                db.session.add(db_celery_logs)
+                try:
+                    db.session.commit()
+                except Exception as e:
+                    db.session.rollback()
+                    return jsonify({'message': 'Celery logs db error'}), 409
+                
+                prog = (progress / total_progress) * 100
+                print('prog={}'.format(prog))
+
+                x = {
+                    "logs" : message,
+                    "progress" : prog
+                }
+                y = json.dumps(x)
+                yield f"data: {y}\n\n"
+
+            logs = celery_logs.query.filter_by(task_id=task_id).all()
+            log_message = []
+            for log in logs:
+                log = log.task_log
+                log_message.append(log)
+            prog = (progress / total_progress) * 100    
+            x = {
+                "logs" : log_message,
+                "progress" : prog
+            }
+            y = json.dumps(x)
+            yield f"data: {y}\n\n"
+            time.sleep(20)
+
+        print('event end !')
+        yield "event: end\n\n"
+
+    return Response(stream_with_context(event_stream()), content_type='text/event-stream')
+
+
+
+@authentication_controller.route('/stream_logs1/<task_id>', methods=['GET'])
+def stream_logs1(task_id):
+    query = project_details.query.filter_by(task_id=task_id)
+    stream_task_status = query.first().analysis_status      # {'PENDING', 'SUCCESS'}
+
+    redis_queue_name = get_task_queue_name(task_id)         # {'logs : {task_id}'}
+    
+    def event_stream():
+        if stream_task_status == 'SUCCESS':
+            print('Status: SUCCESS')
+            logs = celery_logs.query.filter_by(task_id=task_id).all()
+            log_message = []
+            for log in logs:
+                log = log.task_log
+                log_message.append(log)
+
+            yield f"data: {log_message}\n\n"
+
+        while stream_task_status == 'PENDING':
+            print('Status: PENDING')
+            log_message = redis_client.lpop(redis_queue_name)
+            if log_message:
+                db_celery_logs = celery_logs(task_id, stream_task_status, log_message)
+                db.session.add(db_celery_logs)
+                try:
+                    db.session.commit()
+                except Exception as e:
+                    db.session.rollback()
+                    return jsonify({'message':'Celery logs db error'}), 409
+
+            logs = celery_logs.query.filter_by(task_id=task_id).all()
+            log_message = []
+            for log in logs:
+                log = log.task_log
+                log_message.append(log)
+
+            yield f"data: {log_message}\n\n"
+            
+            time.sleep(20)
+
+        print('event end !')    
+        yield f"event: end"
+
+    return Response(stream_with_context(event_stream()), content_type='text/event-stream')
+
 @authentication_controller.route('/projects/<query_email>', methods=['GET']) #{email}
 @jwt_required()
 def projects(query_email):
     
+    query = project_details.query.with_entities(project_details.task_id).filter_by(email=query_email)
+
+    task_status_details = [task_id[0] for task_id in query.all()]
+
+    task_statuses = []
+
+    for task_id in task_status_details:
+        result = AsyncResult(task_id, app=celery)
+        task_statuses.append({
+            'task_id': task_id,
+            'status': result.state
+        })
+
+    for task_analysis_status in task_statuses:
+        if(task_analysis_status['status'] == 'SUCCESS'):
+            query = project_details.query.filter_by(task_id=task_analysis_status['task_id'])
+            query.update({"analysis_status": "SUCCESS"})
+            db.session.commit()
+
     query = project_details.query.filter_by(email=query_email)
     json_project_details = []
     for row in query.all():
@@ -468,6 +608,7 @@ def report(query_project_name, query_application_name, query_email):
     elif analysisType == 'canalysis':
         file1_path = '/usr/u2l/u2l_backend/projects/'+ fileName +'/c_inventory_report.xlsx'
         file2_path = '/usr/u2l/u2l_backend/projects/'+ fileName +'/c_report.xlsx'
+        file3_path = '/usr/u2l/u2l_backend/projects/'+ fileName +'/c_report_old.xlsx'
     elif analysisType == 'shellanalysis':
         file1_path = '/usr/u2l/u2l_backend/projects/'+ fileName +'/shell_inventory_report.xlsx'
         file2_path = '/usr/u2l/u2l_backend/projects/'+ fileName +'/shell_report.xlsx'
@@ -2447,12 +2588,34 @@ def clogs():
 @authentication_controller.route('/apitest', methods=['POST'])
 def apitest():
 
-    print('Testing celery on an endpoint !!!')
-    first = 10
-    second = 20
-    third = 30
-    fourth = 40
+    # Convert javaUniqRulesGrepped.txt
+    
+    javaUniqRulesGrepped_dir_path = '/usr/u2l/u2l_backend/javaUniqRulesGrepped.txt'
+    if os.path.isfile(javaUniqRulesGrepped_dir_path) and os.path.getsize(javaUniqRulesGrepped_dir_path) > 0:
+        ic_lines = []
+        with open(javaUniqRulesGrepped_dir_path, 'r') as file:
+            for line in file:
+                cleaned_line = re.sub(r'\t*$', '', line)
+                if cleaned_line.strip().startswith('IC_'):
+                    ic_lines.append(cleaned_line)
 
-    task = testing_task.apply_async(args=[first, second])
+        with open(javaUniqRulesGrepped_dir_path, 'w') as file:
+            file.write(''.join(ic_lines))
 
-    return jsonify({'message': 'Request processing started', 'task_id': task.id}), 202
+        with open(javaUniqRulesGrepped_dir_path, 'r') as file:
+            lines = [re.sub(r'\t*$', '', line) for line in file]
+
+        with open(javaUniqRulesGrepped_dir_path, 'w') as file:
+            file.write(''.join(lines))
+        df = pd.read_csv(javaUniqRulesGrepped_dir_path, sep='\t', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
+        df.index = df.index + 1
+        df.columns = ['RULE ID', 'ENTITY', 'PACKAGE', 'OBJECT', 'REMEDY']
+        print(df)
+    #     generate_workbook(df, java_report_path,'Possible Import Remediations')
+    #     sheet_transfer('Possible Import Remediations', '7. Possible Import Remediation', 6, 1, java_report_path, java_remediation_path)
+    #     summary_sheet_generation(java_remediation_path, '7. Possible Import Remediation', '7. Import Remediation Summary', 5, 6, java_remediation_path, 8, 2)
+    # logger.info("SHEET : 7. Possible Import Remediation : CREATED")
+    # logger.info("SHEET : 7. Import Remediation Summary : CREATED")
+    # logger.info("END 5 : javaUniqRulesGrepped.txt\n")
+
+    return 'success'
