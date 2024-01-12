@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { Box, Button, Text, Notification } from 'grommet';
-import { FormClose } from 'grommet-icons';
+import React, { useState, useEffect, useRef } from 'react';
+import { Box, Button, Text, Notification, Meter } from 'grommet';
+import { Copy, Download, FormClose } from 'grommet-icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 import url from '../config/url';
 import AuthenticationUtils from '../utils/AuthenticationUtils';
@@ -8,6 +8,8 @@ import CommonUtils from '../utils/CommonUtils';
 import ProjectUtils from '../utils/ProjectUtils';
 import statusIcons from '../config/constants';
 import ProjectService from '../api/ProjectService';
+import './LogDetails.css';
+import Colors from '../config/colors';
 
 const LogDetails = () => {
   const navigate = useNavigate();
@@ -16,8 +18,9 @@ const LogDetails = () => {
   const [success, setSuccess] = useState(false);
   const [notificationVisible, setNotificationVisible] = React.useState();
   const [notificationMessage, setNotificationMessage] = React.useState('');
-  const [logs, setLogs] = useState(null);
-
+  const [logs, setLogs] = useState([]);
+  const [successState, setSuccessState] = useState()
+  const logRef = useRef(null);
   const onNotificationOpen = () => {
     setNotificationVisible(true);
   };
@@ -25,10 +28,10 @@ const LogDetails = () => {
     setNotificationVisible(false);
   };
 
-  const [data, setData] = useState('Initializing.....') //added on 18/10/2023
+  const [progressPercent, setProgressPercent] = useState();
 
+  const projectDetails = location.state.data;
   useEffect(() => {
-
     //   const fetchData = () => {ProjectService.getLogs(AuthenticationUtils.getEmail())
     //      .then((response) => {
     //        // response.data
@@ -39,7 +42,7 @@ const LogDetails = () => {
     //        console.log(error);
     //        setNotificationMessage('Error while fetching projects');
     //        setNotificationVisible(true);
-    //      });   
+    //      });
     //  }
 
     //  fetchData();
@@ -48,29 +51,67 @@ const LogDetails = () => {
     //    return () => clearInterval(intervalId);
     // }, []);
 
-
-
     ///////////////////////////////////// added on 18/10/2023
 
-    const sse = new EventSource(url + '/stream')
+    const sse = new EventSource(`/stream_logs/${projectDetails.task_id}`);
 
-    function handleStream(e) {
-      console.log(e)
-      setData(e.data)
-    }
+    const handleStream = (e) => {
+      // ['### CODE ASSESSMENT STARTED ###', 'Tool Installation Completed.', 
+      // 'Executing U2LTool_Analysis.sh script', 'Completed executing U2LTool_Analysis.sh']
+      // console.log(typeof(e.data));
+      // Replace single quotes with double quotes
 
-    sse.onemessage = e => { handleStream(e) }
+      const data = JSON.parse(e.data);
+      console.log(data)
 
-    sse.onerror = e => {
-      sse.close()
-    }
+      // var correctedStr = data.logs.replace(/'/g, '"');
+      // var correctedStr = e.data.replace(/'/g, '"');
+
+      // Parse the corrected string into an array
+      // var array = JSON.parse(correctedStr);
+
+      // console.log(array);
+      setLogs(data.logs);
+      setProgressPercent(data.progress)
+      if (data.progress == 100) {
+        setSuccessState(true);
+      }
+    };
+
+    sse.onmessage = (e) => {
+      handleStream(e);
+    };
+
+    sse.onerror = (e) => {
+      console.log('Error occured.');
+      sse.close();
+    };
+
+    // sse.addEventListener(
+    //   'open',
+    //   function (event) {
+    //     console.log('Connection was opened.', event.readyState);
+    
+    //     setInterval(() => {
+    //       sse.send('ping');
+    //     }, 3000);
+    //   },
+    //   false
+    // );
+    
+    sse.addEventListener('end', function () {
+      console.log('Closing SSE connection upon server request.');
+      sse.close();
+    });
 
     return () => {
-      sse.close()
-    }
-  },); ///////////////////////////////////// added on 18/10/2023
+      sse.close();
+    };
+  }, []);
 
-  const projectDetails = location.state.data;
+  useEffect(() => {
+    logRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [logs]);
 
   // const downloadReport = async () => {
   //   try {
@@ -94,13 +135,17 @@ const LogDetails = () => {
   // };
 
   const downloadReport = async () => {
-    ProjectService.getReport(projectDetails.project_name,projectDetails.application_name,AuthenticationUtils.getEmail()).then(
+    ProjectService.getReport(
+      projectDetails.project_name,
+      projectDetails.application_name,
+      AuthenticationUtils.getEmail()
+    ).then(
       (response) => {
         CommonUtils.downloadFileAxios(response, projectDetails.project_name);
         // console.log(fileName + ' downloaded');
         setLoading(false);
-      setSuccess(true);
-      setTimeout(() => setSuccess(false), 2000);
+        setSuccess(true);
+        setTimeout(() => setSuccess(false), 2000);
       },
       (error) => {
         console.log(error);
@@ -108,18 +153,30 @@ const LogDetails = () => {
     );
   };
 
+  const copyToClipboard = () => {
+    const modifiedData = logs.toString().replaceAll(',', '\n');
+    // console.log(modifiedData);
+    navigator.clipboard.writeText(modifiedData);
+  };
+
+  const downloadLogs = () => {
+    const modifiedData = logs.toString().replaceAll(',', '\n');
+    JSON.stringify(modifiedData);
+    const txtFile = new Blob([modifiedData], { type: 'text/plain' });
+    const url = URL.createObjectURL(txtFile);
+    const link = document.createElement('a');
+    link.download = `Logs_${projectDetails.project_name}_${projectDetails.application_name}`;
+    link.href = url;
+    link.click();
+    link.remove();
+  };
+
   const returnDashboard = () => {
     navigate('/dashboard');
   };
 
   return (
-    <Box
-      width='80%'
-      margin='10%'
-      // alignContent="center"
-      // border="all"
-      direction='column'
-    >
+    <Box width='80%' margin={{ left: '10%', top: '5px' }} direction='column'>
       <Box align='center' gap='small'>
         {notificationVisible && (
           <Notification
@@ -131,32 +188,124 @@ const LogDetails = () => {
           />
         )}
       </Box>
-      <Box align='end'>
+      <Box align='end' direction='row' justify='between'>
+        <Text size='25px' style={{ fontWeight: 'bold', marginLeft: '10px' }}>
+          Log Details
+        </Text>
         <Button tip='Close' icon={<FormClose />} onClick={returnDashboard} />
       </Box>
-      <h3>Log Details</h3>
-      <Box direction='row' width='80%' height='60%' pad='10px'>
-        <Box width='60%'>
-          <h4>File Details</h4>
-          <Text>File Name: {projectDetails.project_name} </Text>
-          <Text>Project ID: {projectDetails.id}</Text>
-          <Text>
-            Status:{' '}
-            {
-              statusIcons[
-              ProjectUtils.iconMapping(projectDetails.analysis_status)
-              ]
-            }{' '}
-            {ProjectUtils.findSummary(projectDetails)}{' '}
-          </Text>
-          <Text>File Size: {projectDetails.file_size} kb</Text>
-        </Box>
-        <Box width='100%' border='all' margin='0 10' overflow='auto'>
-          <h5>Data Import Logs</h5>
-          {/* <Text>{projectDetails}</Text> */}
-          <div>Streaming : {data} </div>   {/* added on 18/10/2023 */}
+      <Box width='80%' height='60%' pad='10px'>
+        <Box direction='row' flex='grow'>
+          <Box direction='column' style={{ minWidth: '300px', width: '300px' }}>
+            <Box direction='row' justify='between' width={'80%'} >
+              <Meter
+                margin={{ top: '3%' }}
+                values={[{
+                  value: progressPercent,
+                  label: 'progress',
+                  onClick: () => { },
+                  color: `${Colors.primaryBrand}`
+                }]}
+                background='dark-2'
+                aria-label="meter"
+              // type={'circle'}
+              // size={'xsmall'}
+              // thickness='small'
+              />
+              <Text style={{ alignSelf: 'end', paddingLeft: '5%' }}>{progressPercent}%</Text>
+            </Box>
+            <h4>File Details</h4>
+            <Text>File Name: {projectDetails.project_name} </Text>
+            <Text>Project ID: {projectDetails.id}</Text>
+            {!successState && <Text>
+              Status:{' '}
+              {
+                statusIcons[
+                ProjectUtils.iconMapping(projectDetails.analysis_status)
+                ]
+              }{' '}
+              {ProjectUtils.findSummary(projectDetails)}{' '}
+            </Text>}
+            {successState && <Text>
+              Status:{' '}
+              {
+                statusIcons[
+                ProjectUtils.iconMapping('SUCCESS')
+                ]
+              }{' '}
+              {"Successful Assessment"}{' '}
+            </Text>}
+            <Text>File Size: {CommonUtils.getSize(projectDetails.file_size)}</Text>
 
-
+          </Box>
+          <Box direction='column' margin={{ left: '10%' }}>
+            <Box
+              direction='row'
+              style={{
+                maxHeight: '40px',
+                minHeight: '40px',
+                backgroundColor: 'grey',
+                maxWidth: '550px',
+                minWidth: '550px',
+                justifyContent: 'between',
+                borderBottom: '1px solid white',
+              }}
+            >
+              <h5
+                style={{
+                  color: 'white',
+                  fontSize: '16px',
+                  margin: '10px 15px 4px',
+                  fontWeight: 'bold',
+                }}
+              >
+                Data Import Logs
+              </h5>
+              <Box direction='row'>
+                <Button
+                  icon={<Download color='white' />}
+                  onClick={downloadLogs}
+                  tip={'Download'}
+                  margin={{ right: '10px' }}
+                  style={{ borderRadius: '0px' }}
+                />
+                <Button
+                  icon={<Copy color='white' />}
+                  onClick={copyToClipboard}
+                  tip={'Copy'}
+                  margin={{ right: '10px' }}
+                  style={{ borderRadius: '0px' }}
+                />
+              </Box>
+            </Box>
+            <Box
+              width='100%'
+              border='all'
+              style={{
+                maxHeight: '400px',
+                overflow: 'auto',
+                minHeight: '400px',
+                backgroundColor: 'black',
+                maxWidth: '550px',
+                minWidth: '550px',
+              }}
+              id='logs'
+            >
+              {logs?.map((log, index) => (
+                <Text
+                  key={index}
+                  style={{
+                    color: 'white',
+                    fontSize: '14px',
+                    margin: '4px 15px 4px',
+                  }}
+                >
+                  {`log > ${log}`}
+                </Text>
+              ))}
+              <Box ref={logRef} />
+            </Box>
+          </Box>
         </Box>
       </Box>
       <Box pad='20px' style={{ marginLeft: 'auto' }} direction='row' gap='20px'>
@@ -174,7 +323,7 @@ const LogDetails = () => {
           border='all'
           primary
           disabled={loading}
-          label={'Download Report'}
+          label={'Download Excel'}
           busy={loading}
           success={success}
         ></Button>

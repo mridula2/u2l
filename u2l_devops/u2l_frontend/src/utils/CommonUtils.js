@@ -40,11 +40,21 @@ const useFocus = () => {
   return [htmlElRef, setFocus];
 };
 
+const getSize = (size)=>{
+  if(size<1024){
+    return `${Math.round(size)} kb`
+  }else{
+    const num = size/1024;
+    return `${Math.round((num + Number.EPSILON) * 100) / 100} mb`
+  }
+}
+
 const CommonUtils = {
   convertStringToBase64,
   downloadFile,
   findItem,
   downloadFileAxios,
   useFocus,
+  getSize
 };
 export default CommonUtils;

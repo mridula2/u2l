@@ -368,10 +368,10 @@ const PdfDocument = (props) => {
           src={props.barChartDataURL}
         />
 
-        <Image
+        {/* <Image
           style={{ height: 250, width: 400, left: 87 }}
           src={props.radarChartDataURL}
-        />
+        /> */}
         {/* =============================Page 5================================= */}
         <Text
           style={{
