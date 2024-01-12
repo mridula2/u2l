@@ -6,6 +6,7 @@ from controllers import authentication_controller
 from flask_jwt_extended import JWTManager
 from utils import insert_user_details_task
 from flask_sse import sse
+from sqlalchemy.pool import QueuePool
 
 app = Flask(__name__)
 CORS(app)
@@ -17,6 +18,13 @@ app.register_blueprint(sse, url_prefix="/stream")
 
 app.config["SQLALCHEMY_DATABASE_URI"] = SQLALCHEMY_DATABASE_URI
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = SQLALCHEMY_TRACK_MODIFICATIONS
+
+app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+    'pool_size': 20,
+    'max_overflow': 30,
+    'poolclass': QueuePool,
+    'pool_recycle': 3600,  # Optional: Set a recycling period
+}
 
 app.config["JWT_SECRET_KEY"] = "u2l-secret-key"
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = 3600 # 30 minutes in seconds

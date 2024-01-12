@@ -21,7 +21,7 @@ const Review = () => {
     setNotificationMessage('Analysis in progress please wait!');
     //  setStatus('info');
     setNotificationVisible(true);
-    // console.log(data);
+    console.log(data);
     ProjectService.postProjectDetails(data)
       .then((response) => {
         // response.data
@@ -29,8 +29,8 @@ const Review = () => {
         navigate('/dashboard');
       })
       .catch((error) => {
-        //  setNotificationMessage(error.response.data.message);
-        //  setNotificationVisible(true);
+         setNotificationMessage(error.response.data.message);
+         setNotificationVisible(true);
       });
   }
 
@@ -295,6 +295,14 @@ const Review = () => {
                 </Box>
                 <Text margin={{ left: 'medium' }}>
                   {location.state.formValues.target_compiler_version}
+                </Text>
+              </Box>
+              <Box direction='row'>
+                <Box width='small'>
+                  <Text weight='bold'>Middleware:</Text>
+                </Box>
+                <Text margin={{ left: 'medium' }}>
+                  {location.state.formValues.middleware_type}
                 </Text>
               </Box>
             </Box>

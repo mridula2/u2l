@@ -51,12 +51,14 @@ const appendFormData = (formValues) => {
     data.append('source_compiler_version', formValues.source_compiler_version);
     data.append('target_compiler', formValues.target_compiler);
     data.append('target_compiler_version', formValues.target_compiler_version);
+    data.append('middleware_type', formValues.middleware_type);
     // --------------------------------C++------------------------------------------ //
   } else if (formValues.analysis_type === 'C++') {
     data.append('source_compiler', formValues.source_compiler);
     data.append('source_compiler_version', formValues.source_compiler_version);
     data.append('target_compiler', formValues.target_compiler);
     data.append('target_compiler_version', formValues.target_compiler_version);
+    data.append('middleware_type', formValues.middleware_type);
   }
     // --------------------------------Shell---------------------------------------- // 
   else if (formValues.analysis_type === 'Shell') {
@@ -75,6 +77,7 @@ const appendFormData = (formValues) => {
     data.append('source_pre_compiler_version', formValues.source_pre_compiler_version);
     data.append('target_pre_compiler', formValues.target_pre_compiler);
     data.append('target_pre_compiler_version', formValues.target_pre_compiler_version);
+    data.append('middleware_type', formValues.middleware_type);
   }
    // ---------------------------------C++/Pro*C------------------------------------ // 
   else if (formValues.analysis_type === 'C++/Pro*C') {
