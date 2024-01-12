@@ -78,7 +78,8 @@ const Dashboard = (containerRef) => {
       .then((response) => {
         // response.data
         console.log(response);
-        setProjects(response.data.project_details);
+        const reverseArrayProjectDetails = response.data.project_details.reverse();
+        setProjects(reverseArrayProjectDetails);
         setLoading(false);
       })
       .catch((error) => {

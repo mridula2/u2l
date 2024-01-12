@@ -69,6 +69,7 @@ const WizardValidationExample = ({ containerRef }) => {
         framework: '',
         source_framework_version: '',
         target_framework_version: '',
+        middleware_type:''
       };
     } else {
       return {
@@ -111,6 +112,7 @@ const WizardValidationExample = ({ containerRef }) => {
         target_framework_version:
           location.state.formValues.target_framework_version,
         file_name: location.state.formValues.file_name,
+        middleware_type: location.state.formValues.middleware_type
       };
     }
   };
@@ -444,6 +446,7 @@ export const StepTwo = (nextId) => {
             id='source_os'
             name='source_os'
             options={sourceOS}
+            required={true}
           />
         </Box>
 
@@ -550,6 +553,7 @@ export const StepThree = (nextId) => {
         target_pre_compiler: '',
         target_pre_compiler_version: '',
         file_name: '',
+        middleware_type:''
       };
     } else {
       return {
@@ -592,6 +596,7 @@ export const StepThree = (nextId) => {
         target_framework_version:
           location.state.formValues.target_framework_version,
         file_name: location.state.formValues.file_name,
+        middleware_type:location.state.formValues.middleware_type
       };
     }
   };

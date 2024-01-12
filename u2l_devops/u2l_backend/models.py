@@ -336,4 +336,15 @@ class celery_job_details(db.Model):
         self.task_id = task_id
         self.task_status = task_status
         self.task_logs = task_logs
+
+class celery_logs(db.Model):
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    task_id = db.Column(db.String(100))
+    task_status = db.Column(db.String(20))
+    task_log = db.Column(db.String(500))
+
+    def __init__(self, task_id, task_status, task_log):
+        self.task_id = task_id
+        self.task_status = task_status
+        self.task_log = task_log        
     

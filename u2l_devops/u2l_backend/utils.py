@@ -193,11 +193,17 @@ def summary_sheet_generation(source_excel_file, sheet_name_1, sheet_name_2, skip
     unique_rows_df.to_excel(writer, sheet_name=sheet_name_2, index=False, startrow=start_row, startcol=start_col, header=False)
     writer.save()
 
+def get_task_queue_name(task_id):
+    return f'logs:{task_id}'
+
 @celery.task
 def testing_task(yMD, hMS, tool_analysis_type, framework_type, file_name, script_path, file_path, form_project_name, form_application_name, form_project_client, form_project_manager, form_source_os, form_source_os_version, form_target_os, form_target_os_version, form_source_jdk, form_target_jdk, form_source_jsp, form_target_jsp, form_source_servlet, form_target_servlet, form_source_compiler, form_target_compiler, form_source_compiler_version, form_target_compiler_version, form_source_pre_compiler, form_target_pre_compiler, form_source_pre_compiler_version, form_target_pre_compiler_version, form_source_shell, form_target_shell, form_source_shell_version, form_target_shell_version):
 
+    task_id = testing_task.request.id
+    redis_queue_name = get_task_queue_name(task_id)
+    
     logger.info("TASK HAS STARTED EXECUTION")
-    redis_client.rpush('logs', 'Task has started execution')
+    redis_client.rpush(redis_queue_name, '1/40::CODE ASSESSMENT STARTED')
     
     # Analysis endpoint logic starts here
     # Execute U2LTool_Install.sh Script
@@ -207,7 +213,7 @@ def testing_task(yMD, hMS, tool_analysis_type, framework_type, file_name, script
         output = process.communicate()[0].decode().strip()
         lines = output.split('\n')
         logger.info("TOOL INSTALLATION COMPLETED")
-        redis_client.rpush('logs', 'Tool Installation Completed.')
+        redis_client.rpush(redis_queue_name, '2/40::Tool Installation Completed.')
     except Exception as e:
         return jsonify({'error': str(e)})
 
@@ -239,11 +245,13 @@ def testing_task(yMD, hMS, tool_analysis_type, framework_type, file_name, script
         if(tool_analysis_type == 'canalysis' or tool_analysis_type == 'shellanalysis'):
             script_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/U2LTool_Analysis.sh'
 
+            redis_client.rpush(redis_queue_name, '3/40::Executing U2LTool_Analysis.sh script')
             command = ['sh', script_path, PJHOME, APNAME]
             process = subprocess.Popen(command, stdout=subprocess.PIPE)
             process.wait()
             output = process.communicate()[0].decode().strip()
             print('\nCompleted running U2LTool_Analysis.sh')
+            redis_client.rpush(redis_queue_name, '4/40::Completed running U2LTool_Analysis.sh')
     
     except Exception as e:
         return jsonify({'error': str(e)})
@@ -253,12 +261,14 @@ def testing_task(yMD, hMS, tool_analysis_type, framework_type, file_name, script
 
             script_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/U2LTool_Analysis.sh'
 
+            redis_client.rpush(redis_queue_name, '5/40::Executing U2LTool_Analysis.sh script')
             command = ['sh', script_path, PJHOME, APNAME]
             process = subprocess.Popen(command, stdout=subprocess.PIPE)
             process.wait()
             output = process.communicate()[0].decode().strip()
 
             logger.info('COMPLETED RUNNING U2LTool_Analysis.sh')
+            redis_client.rpush(redis_queue_name, '6/40::Completed executing U2LTool_Analysis.sh')
         
         except Exception as e:
             return jsonify({'error': str(e)})
@@ -270,6 +280,7 @@ def testing_task(yMD, hMS, tool_analysis_type, framework_type, file_name, script
 
         # Run javaSourceDiscovery.sh script
         try:
+            redis_client.rpush(redis_queue_name, '7/40::Executing javaSourceDiscovery.sh script')
             script_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/Java/javaSourceDiscovery.sh'
             code_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/java-vfunction_'+ yMD + '_' + hMS +'/work/javaanalysis/'
             command = ['sh', script_path, code_path]
@@ -277,11 +288,13 @@ def testing_task(yMD, hMS, tool_analysis_type, framework_type, file_name, script
             output = process.communicate()[0].decode().strip()
             lines = output.split('\n')
             logger.info('COMPLETED RUNNING javaSourceDiscovery.sh')
+            redis_client.rpush(redis_queue_name, '8/40::Completed executing javaSourceDiscovery.sh')
         except Exception as e:
             return jsonify({'error': str(e)})    
 
         # Run javaRulesScan.sh script
         try:
+            redis_client.rpush(redis_queue_name, '9/40::Executing javaRulesScan.sh script')
             script_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/Java/javaRulesScan.sh'
             code_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/java-vfunction_'+ yMD + '_' + hMS +'/work/javaanalysis/'
             command = ['sh', script_path, code_path]
@@ -289,23 +302,27 @@ def testing_task(yMD, hMS, tool_analysis_type, framework_type, file_name, script
             output = process.communicate()[0].decode().strip()
             lines = output.split('\n')
             logger.info('COMPLETED RUNNING javaRulesScan.sh')
+            redis_client.rpush(redis_queue_name, '10/40::Completed running javaRulesScan.sh')
         except Exception as e:
             return jsonify({'error': str(e)})   
 
         # Run javaRulesRemedy.sh script
         try:
+            redis_client.rpush(redis_queue_name, '11/40::Executing javaRulesRemedy.sh script')
             script_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/Java/javaRulesRemedy.sh'
             code_path = '/usr/u2l/u2l_backend/projects/' + file_name + 'U2L/java-vfunction_'+ yMD + '_' + hMS +'/work/javaanalysis/'
             command = subprocess.Popen(['bash', script_path, code_path], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             output = command.communicate()[0].decode().strip()
             lines = output.split('\n')
             logger.info('COMPLETED RUNNING javaRulesRemedy.sh')
+            redis_client.rpush(redis_queue_name, '12/40::Completed running javaRulesRemedy.sh')
         except Exception as e:
             return jsonify({'error': str(e)})
         
         # Run javaFrameworkScan.sh script
         if (framework_type != ''):
             try:
+                redis_client.rpush(redis_queue_name, '13/40::Executing javaFrameworkScan.sh script')
                 script_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/Java/javaFrameworkScan.sh'
                 code_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/java-vfunction_'+ yMD + '_' + hMS +'/work/javaanalysis/'
                 if(framework_type == 'JSF'):
@@ -314,14 +331,17 @@ def testing_task(yMD, hMS, tool_analysis_type, framework_type, file_name, script
                 output = command.communicate()[0].decode().strip()
                 lines = output.split('\n')
                 logger.info('COMPLETED RUNNING javaFrameworkScan.sh')
+                redis_client.rpush(redis_queue_name, '14/40::Completed executing javaFrameworkScan.sh')
             except Exception as e:
                 return jsonify({'error': str(e)})
 
         logger.info("JAVA SCRIPTS EXECUTED SUCCESSFULLY")
+        redis_client.rpush(redis_queue_name, '15/40::Java Scripts Executed Successfully')
 
         try:
 
             logger.info("MOVING TEXT FILES")
+            redis_client.rpush(redis_queue_name, '16/40::Transferring Logs files')
             source_dir = '/usr/u2l/u2l_backend/'
             destination_dir = '/usr/u2l/u2l_backend/projects/' + file_name + '/'
 
@@ -344,8 +364,11 @@ def testing_task(yMD, hMS, tool_analysis_type, framework_type, file_name, script
             return jsonify({'error': str(e)})
 
         extracted_file_name = file_name.split('_')[0]
+
+        redis_client.rpush(redis_queue_name, '17/40::Logs Transferred Successfully')
         
         #Performance
+        redis_client.rpush(redis_queue_name, '18/40::Executing pmd script : Performance')
         run_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/pmd-bin-6.55.0/bin/run.sh'
         pmd = 'pmd'
         d = '-d'
@@ -368,6 +391,7 @@ def testing_task(yMD, hMS, tool_analysis_type, framework_type, file_name, script
             return 'PMD failed'
 
         #Best Practices
+        redis_client.rpush(redis_queue_name, '19/40::Executing pmd script : Best Practice')
         run_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/pmd-bin-6.55.0/bin/run.sh'
         pmd = 'pmd'
         d = '-d'
@@ -390,6 +414,7 @@ def testing_task(yMD, hMS, tool_analysis_type, framework_type, file_name, script
             return 'PMD failed'
 
         #Multithreading
+        redis_client.rpush(redis_queue_name, '20/40::Executing pmd script : Multithreading')
         run_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/pmd-bin-6.55.0/bin/run.sh'
         pmd = 'pmd'
         d = '-d'
@@ -412,6 +437,7 @@ def testing_task(yMD, hMS, tool_analysis_type, framework_type, file_name, script
             return 'PMD failed'
 
         #Security
+        redis_client.rpush(redis_queue_name, '21/40::Executing pmd script : Security')
         run_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/pmd-bin-6.55.0/bin/run.sh'
         pmd = 'pmd'
         d = '-d'
@@ -434,27 +460,357 @@ def testing_task(yMD, hMS, tool_analysis_type, framework_type, file_name, script
             return 'PMD failed'
         
     elif(tool_analysis_type == 'canalysis'):
+        c_report_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/c_report.xlsx'
+        c_remediation_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/c_remediation_report.xlsx'
+        c_inventory_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/c_inventory_report.xlsx'
 
-        form_source_ver = 'AIX'
-
+        form_source_ver = 'Solaris'
+        redis_client.rpush(redis_queue_name, '7/40::Executing Scan Source Script')
         source_versions = ["AIX", "Solaris", "HP-UX"]
         if form_source_ver not in source_versions:
-            error_message = {'error' :"Invalid Source Version"}
-        return jsonify(error_message), 404
-
+            error_message = {'error' :"Invalid Source Vesion"}
+            return jsonify(error_message), 404
+        
+        # file_name = "UNIX_HPE_20231128_054027"
+        file_path = re.sub(r'_\d{8}_\d{6}', '', file_name)
+        print(file_path)
+        source_path = '/usr/u2l/u2l_backend/projects/'+ file_name + '/U2L/c-vfunction_'+ yMD + '_' + hMS +'/work/canalysis/' + file_path
+        print(source_path)
         script_path = '/usr/u2l/u2l_backend/scan_source.sh'
-        file_path = '/usr/u2l/u2l_backend/UNIX_HPE'
         source_ver = form_source_ver
         target_ver = 'RHEL'
-        command = ['sh', script_path, file_path, source_ver, target_ver]
+        command = ['sh', script_path, source_path, source_ver, target_ver]
         process = subprocess.Popen(command, stdout=subprocess.PIPE)
         output = process.communicate()[0].decode().strip()
         lines = output.split('\n')
+        print(lines)
+        redis_client.rpush(redis_queue_name, '8/40::Completed Executing Scan Source Script')
+        redis_client.rpush(redis_queue_name, '9/40::Generating Final Report')
 
-        # cppcheck execution
+        ic_lines = []
+        with open('/usr/u2l/u2l_backend/final_report.csv', 'r') as file:
+            for line in file:
+                if line.strip().startswith('/usr/'):
+                    ic_lines.append(line)
 
-        source_path = "/usr/u2l/u2l_backend/UNIX_HPE"
+        with open('/usr/u2l/u2l_backend/final_report.csv', 'w') as file:
+            file.write(''.join(ic_lines))
+
+        ic_lines = []
+        with open('/usr/u2l/u2l_backend/final_report.csv', 'r') as file:
+            for line in file:
+                modified_line = line.replace(':', ',', 1)
+                ic_lines.append(modified_line)
+
+        with open('/usr/u2l/u2l_backend/final_report.csv', 'w') as file:
+            file.write(''.join(ic_lines))
+
+        final_report_path = '/usr/u2l/u2l_backend/final_report.csv'
+        if os.path.isfile(final_report_path) and os.path.getsize(final_report_path) > 0:
+            df = pd.read_csv(final_report_path, sep=',', engine='python', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
+            df.columns = ["FILE PATH","LINE NUMBER","SOURCE CODE","ERROR MESSAGE","REMEDIATION"]
+            df = df.drop(df.index[0])
+            O28 = df['FILE PATH'].nunique()
+            P28 = df['FILE PATH'].count()
+            print(df)
+
+        generate_workbook(df, c_report_path,'Source Scan Remedy Detail')
+        redis_client.rpush(redis_queue_name, '10/40::Reports almost ready')
+
+        redis_client.rpush(redis_queue_name, '11/40::Performing cppcheck !!')
+
+        source_path = '/usr/u2l/u2l_backend/projects/'+ file_name + '/U2L/c-vfunction_'+ yMD + '_' + hMS +'/work/canalysis/' + file_path
+        # source_path = '/usr/u2l/u2l_backend/projects/' + file_name +'/'+ file_name + '.zip'
         stdout, stderr = run_cppcheck(source_path)
+
+        with open("cppcheck_output.txt", "w") as file:
+            file.write(stderr)
+        
+        with open('cppcheck_output.txt', 'r') as file:
+            content = file.readlines()
+
+        file_paths = []
+        line_numbers = []
+        error_messages = []
+        error_lines = []
+
+        pattern = re.compile(r'^(.*?):(\d+):\d+: (.*?): (.*)$')
+
+        current_error_lines = []
+
+        for line in content:
+            match = pattern.match(line)
+            if match:
+                if current_error_lines:
+                    error_lines.append(current_error_lines)
+                    current_error_lines = []
+                
+                file_paths.append(match.group(1))
+                line_numbers.append(int(match.group(2)))
+                error_messages.append(match.group(4))
+            else:
+                current_error_lines.append(line)
+
+        if current_error_lines:
+            error_lines.append(current_error_lines)
+
+        data = {
+            'File Path': file_paths,
+            'Line Number': line_numbers,
+            'Error Message': error_messages,
+            'Error Lines': [''.join(lines) for lines in error_lines]
+        }
+
+        df = pd.DataFrame(data)
+        df.columns = ['FILE PATH', 'LINE NUMBER', 'ERROR MESSAGE', 'ERROR LINES']
+        O29 = df['FILE PATH'].nunique()
+        P29 = df['FILE PATH'].count()
+
+        df.reset_index(drop=True, inplace=True)
+        df.index = df.index + 1
+
+        book = load_workbook(c_report_path)
+        writer = pd.ExcelWriter(c_report_path, engine='openpyxl')
+        writer.book = book
+        sheet_name = 'Compilation Warning Detail'
+        writer.sheets = dict((ws.title, ws) for ws in book.worksheets)
+        df.to_excel(writer, sheet_name=sheet_name, startcol=0, startrow=1, header=False)
+        writer.save()
+        redis_client.rpush(redis_queue_name, '12/40::Compilation reports are ready')
+
+        sheet_transfer('Source Scan Remedy Detail', '1. Source Scan Remedy Detail', 6, 1, c_report_path, c_remediation_path)
+        sheet_transfer('Compilation Warning Detail', '2. Compilation Warning Detail', 6, 1, c_report_path, c_remediation_path)
+        # sheet_transfer('Source Code Inventory', 'Source Code Inventory', 1, 0, c_report_path, c_inventory_path)
+        # sheet_transfer('Source Code Inventory', 'Source Code Inventory', 6, 1, c_report_path, c_remediation_path)
+
+        print("Start 13 : Source Code Inventory")
+        redis_client.rpush(redis_queue_name, '35/40::Generating logs for Inventory')
+        regex = r'^.*$'
+        source_code_c_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/c-vfunction_'+ yMD + '_' + hMS + '/log/' + tool_analysis_type + '/Log_Source_Analysis_' + yMD + '.log'
+        print(source_code_c_path)
+        if os.path.isfile(source_code_c_path) and os.path.getsize(source_code_c_path) > 0:
+            
+            with open(source_code_c_path, 'r') as f:
+                data = f.read()
+            lines = data.split('\n')
+            log_entries = []
+            for line in lines:
+                match = re.match(regex, line)
+                if match:
+                    log_entries.append(match.group())
+            df = pd.DataFrame(log_entries, columns=['log_message'])
+
+            start_str = '###########  Execution 0001_stepcounter Starts  ###########'
+            end_str = '###########  Execution 0001_stepcounter Ends ###########'
+            start_df = df[df['log_message'].str.contains(start_str)]
+            end_df = df[df['log_message'].str.contains(end_str)]
+
+            start_index = start_df.index[0]
+            end_index = end_df.index[0]
+            extracted_df = df.iloc[start_index+1:end_index]
+
+            result_df = extracted_df[extracted_df['log_message'].str.startswith('./')]
+            result_df[['Directory', 'Type', 'col2', 'Actual Nr of Lines', 'Nr Blank Lines', 'Nr Commented Lines', 'Total Nr LoC']] = result_df['log_message'].str.split(',', expand=True)
+            result_df = result_df.replace(r'^\s*$', np.nan, regex=True)
+            result_df = result_df.dropna(subset=['Actual Nr of Lines', 'Nr Blank Lines', 'Nr Commented Lines', 'Total Nr LoC'])
+            result_df = result_df.drop(['log_message', 'col2'], axis=1)
+            result_df = result_df.reset_index(drop=True)
+            result_df.index += 1
+
+            artefact_type_dict = result_df['Type'].unique()                                     # ['C/C++' 'CShell' 'KShell']
+            type_counts = result_df['Type'].value_counts()
+            type_counts_dict = type_counts.to_dict()                                            # {'C/C++': 690, 'KShell': 107, 'CShell': 1}
+            F6 = sum(type_counts_dict.values())
+            result_df['Actual Nr of Lines'] = result_df['Actual Nr of Lines'].astype(int)
+            autual_by_type = result_df.groupby('Type')['Actual Nr of Lines'].sum().reset_index()
+            autual_by_type_dict = autual_by_type.set_index('Type')['Actual Nr of Lines'].to_dict()    # {'Java': 231, 'KShell': 3716}
+            O6 = sum(autual_by_type_dict.values())
+            result_df['Total Nr LoC'] = result_df['Total Nr LoC'].astype(int)
+            total_by_type = result_df.groupby('Type')['Total Nr LoC'].sum().reset_index()
+            total_by_type_dict = total_by_type.set_index('Type')['Total Nr LoC'].to_dict()      # {'C/C++': 958392, 'CShell': 9, 'KShell': 9689}
+
+            generate_workbook(result_df, c_report_path,'Source Code Inventory')
+
+            sheet_transfer('Source Code Inventory', 'Source Code Inventory', 1, 0, c_report_path, c_inventory_path)
+            sheet_transfer('Source Code Inventory', 'Source Code Inventory', 6, 1, c_report_path, c_remediation_path)
+            print('Transfer Completed !!')
+            redis_client.rpush(redis_queue_name, '36/40::Inventory reports are ready')
+        
+        wb = load_workbook(c_remediation_path)
+        print('1')
+        ws = wb['Environment Information']
+        print('2')
+        start_row = 22
+        start_col = 2
+        col_actual = 2
+        col_total = 3
+
+        for row_idx, artefact_type in enumerate(artefact_type_dict, start=start_row):
+            col_idx = start_col
+            ws.cell(row=row_idx, column=col_idx, value=artefact_type)
+
+            value = type_counts_dict.get(artefact_type, 0)
+            col_idx = start_col + 1
+            ws.cell(row=row_idx, column=col_idx, value=value)
+
+            actual_value = autual_by_type_dict.get(artefact_type, 0)
+            col_idx = start_col + col_actual
+            ws.cell(row=row_idx, column=col_idx, value=actual_value)
+
+            actual_value = total_by_type_dict.get(artefact_type, 0)
+            col_idx = start_col + col_total
+            ws.cell(row=row_idx, column=col_idx, value=actual_value)
+
+        wb.save(c_remediation_path)
+
+        wb = load_workbook(c_inventory_path)
+        print('1')
+        ws = wb['Scope of Artefacts']
+        print('2')
+        start_row = 2
+        start_col = 1
+        col_total = 2
+
+        for row_idx, artefact_type in enumerate(artefact_type_dict, start=start_row):
+            col_idx = start_col
+            ws.cell(row=row_idx, column=col_idx, value=artefact_type)
+
+            value = type_counts_dict.get(artefact_type, 0)
+            col_idx = start_col + 1
+            ws.cell(row=row_idx, column=col_idx, value=value)
+
+            actual_value = total_by_type_dict.get(artefact_type, 0)
+            col_idx = start_col + col_total
+            ws.cell(row=row_idx, column=col_idx, value=actual_value)
+
+        wb.save(c_inventory_path)
+
+        summary_sheet_generation(c_remediation_path, '2. Compilation Warning Detail', '2. Compilation Warning Summary', 5, 3, c_remediation_path, 7, 2)
+        summary_sheet_generation(c_remediation_path, '1. Source Scan Remedy Detail', '1. Source Scan Remedy Summary', 5, 5, c_remediation_path, 7, 2)
+
+        print("Sheet : Source Code Inventory : CREATED")
+        print("End 13 : Source Code Inventory")
+
+        print("Start 17 : Other inventory")
+        redis_client.rpush(redis_queue_name, '37/40::Generating logs for other inventory if present')
+        yyyy_mmdd = yMD[:4] + '-' + yMD[4:]
+
+        # Convert check_files.out
+        check_files_dir_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/c-vfunction_'+ yMD + '_' + hMS + '/log/' + tool_analysis_type + '/srccheck/' + yyyy_mmdd + '/check_files.out'
+        other_inventory_df1 = None
+        if os.path.isfile(check_files_dir_path) and os.path.getsize(check_files_dir_path) > 0:
+            other_inventory_df1 = pd.read_csv(check_files_dir_path, sep='\n', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
+            other_inventory_df1.index = other_inventory_df1.index + 1
+            print(other_inventory_df1)
+
+        # Convert exclude_files.out
+        exclude_files_dir_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/c-vfunction_'+ yMD + '_' + hMS + '/log/' + tool_analysis_type + '/srccheck/' + yyyy_mmdd + '/exclude_files.out'
+        other_inventory_df2 = None
+        if os.path.isfile(exclude_files_dir_path) and os.path.getsize(exclude_files_dir_path) > 0:
+            other_inventory_df2 = pd.read_csv(exclude_files_dir_path, sep='\n', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
+            other_inventory_df2.index = other_inventory_df2.index + 1
+            print(other_inventory_df2)
+
+        # Convert c_files.out
+        c_files_dir_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/c-vfunction_'+ yMD + '_' + hMS + '/log/' + tool_analysis_type + '/srccheck/' + yyyy_mmdd + '/c_files.out'
+        other_inventory_df3 = None
+        if os.path.isfile(c_files_dir_path) and os.path.getsize(c_files_dir_path) > 0:
+            other_inventory_df3 = pd.read_csv(c_files_dir_path, sep='\n', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
+            other_inventory_df3.index = other_inventory_df3.index + 1
+            print(other_inventory_df3)
+
+        # Convert csh_list.out
+        csh_list_dir_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/c-vfunction_'+ yMD + '_' + hMS + '/log/' + tool_analysis_type + '/srccheck/' + yyyy_mmdd + '/csh_list.out'
+        other_inventory_df4 = None
+        if os.path.isfile(csh_list_dir_path) and os.path.getsize(csh_list_dir_path) > 0:
+            other_inventory_df4 = pd.read_csv(csh_list_dir_path, sep='\n', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
+            other_inventory_df4.index = other_inventory_df4.index + 1
+            print(other_inventory_df4)    
+
+        # Convert ksh_list.out
+        ksh_list_dir_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/c-vfunction_'+ yMD + '_' + hMS + '/log/' + tool_analysis_type + '/srccheck/' + yyyy_mmdd + '/ksh_list.out'
+        other_inventory_df5 = None
+        if os.path.isfile(ksh_list_dir_path) and os.path.getsize(ksh_list_dir_path) > 0:
+            other_inventory_df5 = pd.read_csv(ksh_list_dir_path, sep='\n', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
+            other_inventory_df5.index = other_inventory_df5.index + 1
+            print(other_inventory_df5)
+
+        # Convert ot2_list.out
+        ot2_list_dir_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/c-vfunction_'+ yMD + '_' + hMS + '/log/' + tool_analysis_type + '/srccheck/' + yyyy_mmdd + '/ot2_list.out'
+        other_inventory_df6 = None
+        if os.path.isfile(ot2_list_dir_path) and os.path.getsize(ot2_list_dir_path) > 0:
+            other_inventory_df6 = pd.read_csv(ot2_list_dir_path, sep='\n', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
+            other_inventory_df6.index = other_inventory_df6.index + 1
+            print(other_inventory_df6)   
+
+        
+        other_inventory_combined_df = pd.concat([other_inventory_df1, other_inventory_df2, other_inventory_df3, other_inventory_df4, other_inventory_df5, other_inventory_df6], ignore_index=True)
+        other_inventory_combined_df = other_inventory_combined_df.drop_duplicates()
+        print(other_inventory_combined_df)
+
+        writer = pd.ExcelWriter(c_inventory_path, engine='openpyxl', mode='a')
+        book = load_workbook(c_inventory_path)
+        writer.book = book
+        writer.sheets = dict((ws.title, ws) for ws in book.worksheets)
+        other_inventory_combined_df.to_excel(writer, sheet_name='Other Inventory', index=False, startrow=6, startcol=1, header=False)
+        writer.save()
+        print('c_inventory other inventory added')
+
+        writer = pd.ExcelWriter(c_remediation_path, engine='openpyxl', mode='a')
+        book = load_workbook(c_remediation_path)
+        writer.book = book
+        writer.sheets = dict((ws.title, ws) for ws in book.worksheets)
+        other_inventory_combined_df.to_excel(writer, sheet_name='Other Inventory', index=False, startrow=6, startcol=1, header=False)
+        writer.save()
+        print('c_remediation other inventory added')
+
+        print("Sheet : Other Inventory : CREATED")
+        print("End 17 : Other inventory\n")
+        redis_client.rpush(redis_queue_name, '38/40::Other Inventory check is complete')
+
+        middleware_type = 'Tuxedo'
+        if(middleware_type != 'Tuxedo'):
+            filename = c_remediation_path
+            sheet_name = '6. Middleware-Tuxedo'
+            workbook = load_workbook(filename)
+
+            if sheet_name in workbook.sheetnames:
+                sheet_to_delete = workbook[sheet_name]
+                workbook.remove(sheet_to_delete)
+                workbook.save(filename)
+            print('Tuxedo sheet removed !!!')
+
+        print('Migration Summary')
+        wb = load_workbook(c_remediation_path)
+        ws = wb['Migration Summary']
+        start_col_1 = 15
+        start_col_2 = 16
+        start_row_1 = 28
+        start_row_2 = 29
+        if O28 != 0:
+            ws.cell(row=start_row_1, column=start_col_1, value=O28)
+        if O29 != 0:
+            ws.cell(row=start_row_2, column=start_col_1, value=O29)
+        if P28 != 0:
+            ws.cell(row=start_row_1, column=start_col_2, value=P28)
+        if P29 != 0:
+            ws.cell(row=start_row_2, column=start_col_2, value=P29)
+
+        O7 = P28 + P29
+        F7 = O28 + O29
+
+        if O7 != 0:
+            ws.cell(row=7, column=15, value=O7)
+        if O6 != 0:
+            ws.cell(row=6, column=15, value=O6)
+        if F7 != 0:
+            ws.cell(row=7, column=6, value=F7)
+        if F6 != 0:
+            ws.cell(row=6, column=6, value=F6)
+
+        wb.save(c_remediation_path)
+        redis_client.rpush(redis_queue_name, '39/40::Reports are ready')
+        redis_client.rpush(redis_queue_name, '40/40::CODE ASSESSMENT SUCCESSFUL')
 
     # Converting logs into dataframes and generating reports
     try:
@@ -477,6 +833,7 @@ def testing_task(yMD, hMS, tool_analysis_type, framework_type, file_name, script
             
             # Convert javaSourceScanRemedy
             logger.info("START 1 : javaSourceScanRemedy")
+            redis_client.rpush(redis_queue_name, '22/40::Getting report from logs generated : javaSourceScanRemedy')
             javaSourceScanRemedy = '/usr/u2l/u2l_backend/projects/' + file_name + '/javaSourceScanRemedy'
             if os.path.isfile(javaSourceScanRemedy) and os.path.getsize(javaSourceScanRemedy) > 0:
                 df = pd.read_csv(javaSourceScanRemedy, sep='\t', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
@@ -490,6 +847,7 @@ def testing_task(yMD, hMS, tool_analysis_type, framework_type, file_name, script
 
             # Convert javaSourceCode2Remedy
             logger.info("START 2 : javaSourceCode2Remedy")
+            redis_client.rpush(redis_queue_name, '23/40::Getting report from logs generated : javaSourceCode2Remedy')
             javaSourceCode2Remedy = '/usr/u2l/u2l_backend/projects/' + file_name + '/javaSourceCode2Remedy'
             if os.path.isfile(javaSourceCode2Remedy) and os.path.getsize(javaSourceCode2Remedy) > 0:
                 with open(javaSourceCode2Remedy, 'r') as file:
@@ -560,6 +918,7 @@ def testing_task(yMD, hMS, tool_analysis_type, framework_type, file_name, script
 
             # Convert sourceScanRemedy
             logger.info("START 3 : sourceScanRemedy")
+            redis_client.rpush(redis_queue_name, '24/40::Getting report from logs generated : sourceScanRemedy')
             sourceScanRemedy_dir_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/sourceScanRemedy'
             if os.path.isfile(sourceScanRemedy_dir_path) and os.path.getsize(sourceScanRemedy_dir_path) > 0:
                 ic_lines = []
@@ -586,6 +945,7 @@ def testing_task(yMD, hMS, tool_analysis_type, framework_type, file_name, script
 
             # Convert sourceCode2Remedy
             logger.info("START 4 : sourceCode2Remedy")
+            redis_client.rpush(redis_queue_name, '25/40::Getting report from logs generated : sourceCode2Remedy')
             sourceCode2Remedy_dir_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/sourceCode2Remedy'
             if os.path.isfile(sourceCode2Remedy_dir_path) and os.path.getsize(sourceCode2Remedy_dir_path) > 0:
                 with open(sourceCode2Remedy_dir_path, 'r') as file:
@@ -654,37 +1014,39 @@ def testing_task(yMD, hMS, tool_analysis_type, framework_type, file_name, script
             logger.info("END 4 : sourceCode2Remedy")
 
             # Convert javaUniqRulesGrepped.txt
-            logger.info("START 5 : javaUniqRulesGrepped.txt")
-            javaUniqRulesGrepped_dir_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/javaUniqRulesGrepped.txt'
-            if os.path.isfile(javaUniqRulesGrepped_dir_path) and os.path.getsize(javaUniqRulesGrepped_dir_path) > 0:
-                ic_lines = []
-                with open(javaUniqRulesGrepped_dir_path, 'r') as file:
-                    for line in file:
-                        cleaned_line = re.sub(r'\t*$', '', line)
-                        if cleaned_line.strip().startswith('IC_'):
-                            ic_lines.append(cleaned_line)
+            # logger.info("START 5 : javaUniqRulesGrepped.txt")
+            # redis_client.rpush(redis_queue_name, '26/40::Getting report from logs generated : javaUniqRulesGrepped')
+            # javaUniqRulesGrepped_dir_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/javaUniqRulesGrepped.txt'
+            # if os.path.isfile(javaUniqRulesGrepped_dir_path) and os.path.getsize(javaUniqRulesGrepped_dir_path) > 0:
+            #     ic_lines = []
+            #     with open(javaUniqRulesGrepped_dir_path, 'r') as file:
+            #         for line in file:
+            #             cleaned_line = re.sub(r'\t*$', '', line)
+            #             if cleaned_line.strip().startswith('IC_'):
+            #                 ic_lines.append(cleaned_line)
 
-                with open(javaUniqRulesGrepped_dir_path, 'w') as file:
-                    file.write('\n'.join(ic_lines))
+            #     with open(javaUniqRulesGrepped_dir_path, 'w') as file:
+            #         file.write('\n'.join(ic_lines))
 
-                with open(javaUniqRulesGrepped_dir_path, 'r') as file:
-                    lines = [re.sub(r'\t*$', '', line) for line in file]
+            #     with open(javaUniqRulesGrepped_dir_path, 'r') as file:
+            #         lines = [re.sub(r'\t*$', '', line) for line in file]
 
-                with open(javaUniqRulesGrepped_dir_path, 'w') as file:
-                    file.write('\n'.join(lines))
-                df = pd.read_csv(javaUniqRulesGrepped_dir_path, sep='\t', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
-                df.index = df.index + 1
-                df.columns = ['RULE ID', 'ENTITY', 'PACKAGE', 'OBJECT', 'REMEDY']
+            #     with open(javaUniqRulesGrepped_dir_path, 'w') as file:
+            #         file.write('\n'.join(lines))
+            #     df = pd.read_csv(javaUniqRulesGrepped_dir_path, sep='\t', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
+            #     df.index = df.index + 1
+            #     df.columns = ['RULE ID', 'ENTITY', 'PACKAGE', 'OBJECT', 'REMEDY']
 
-                generate_workbook(df, java_report_path,'Possible Import Remediations')
-                sheet_transfer('Possible Import Remediations', '7. Possible Import Remediation', 6, 1, java_report_path, java_remediation_path)
-                summary_sheet_generation(java_remediation_path, '7. Possible Import Remediation', '7. Import Remediation Summary', 5, 6, java_remediation_path, 8, 2)
-            logger.info("SHEET : 7. Possible Import Remediation : CREATED")
-            logger.info("SHEET : 7. Import Remediation Summary : CREATED")
-            logger.info("END 5 : javaUniqRulesGrepped.txt\n")
+            #     generate_workbook(df, java_report_path,'Possible Import Remediations')
+            #     sheet_transfer('Possible Import Remediations', '7. Possible Import Remediation', 6, 1, java_report_path, java_remediation_path)
+            #     summary_sheet_generation(java_remediation_path, '7. Possible Import Remediation', '7. Import Remediation Summary', 5, 6, java_remediation_path, 8, 2)
+            # logger.info("SHEET : 7. Possible Import Remediation : CREATED")
+            # logger.info("SHEET : 7. Import Remediation Summary : CREATED")
+            # logger.info("END 5 : javaUniqRulesGrepped.txt")
 
             # Convert javacWarnings.list
-            print("Start 6 : javacWarnings.list")
+            logger.info("Start 6 : javacWarnings.list")
+            redis_client.rpush(redis_queue_name, '27/40::Getting report from logs generated : javacWarnings')
             javacWarnings_dir_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/java-vfunction_'+ yMD + '_' + hMS + '/log/' + tool_analysis_type + '/java/javacLog/' + yyyy_mmdd + '/javacWarnings.list'
             if os.path.isfile(javacWarnings_dir_path) and os.path.getsize(javacWarnings_dir_path) > 0:
                 df = pd.read_csv(javacWarnings_dir_path, sep='\t', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
@@ -697,12 +1059,13 @@ def testing_task(yMD, hMS, tool_analysis_type, framework_type, file_name, script
                 generate_workbook(df, java_report_path,'Compilation Warning Report')
                 sheet_transfer('Compilation Warning Report', '2. Compilation Warning Detail', 6, 1, java_report_path, java_remediation_path)
                 summary_sheet_generation(java_remediation_path, '2. Compilation Warning Detail', '2. Compilation Warning Summary', 5, 2, java_remediation_path, 9, 2)
-            print("Sheet : 2. Compilation Warning Detail : CREATED")
-            print("Sheet : 2. Compilation Warning Summary : CREATED")
-            print("End 6 : javacWarnings.list\n")
+            logger.info("Sheet : 2. Compilation Warning Detail : CREATED")
+            logger.info("Sheet : 2. Compilation Warning Summary : CREATED")
+            logger.info("End 6 : javacWarnings.list")
 
             # Convert import_lines.out
-            print("Start 7 : import_lines.out")
+            logger.info("Start 7 : import_lines.out")
+            redis_client.rpush(redis_queue_name, '28/40::Getting report from logs generated : import_lines')
             importLines_dir_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/java-vfunction_'+ yMD + '_' + hMS + '/log/' + tool_analysis_type + '/java/import/' + yyyy_mmdd + '/import_lines.out'
             if os.path.isfile(importLines_dir_path) and os.path.getsize(importLines_dir_path) > 0:
                 df = pd.read_csv(importLines_dir_path, sep='\t', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
@@ -711,11 +1074,12 @@ def testing_task(yMD, hMS, tool_analysis_type, framework_type, file_name, script
 
                 generate_workbook(df, java_report_path,'Import Class Report')
                 sheet_transfer('Import Class Report', 'Import Class Detail', 6, 1, java_report_path, java_remediation_path)
-            print("Sheet : Import Class Detail : CREATED")
-            print("End 7 : import_lines.out\n")
+            logger.info("Sheet : Import Class Detail : CREATED")
+            logger.info("End 7 : import_lines.out")
 
             # Convert import_lines_jsp.out
-            print("Start 8 : import_lines_jsp.out")
+            logger.info("Start 8 : import_lines_jsp.out")
+            redis_client.rpush(redis_queue_name, '29/40::Getting report from logs generated : import_lines_jsp')
             importLinesJsp_dir_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/java-vfunction_'+ yMD + '_' + hMS + '/log/' + tool_analysis_type + '/java/import/' + yyyy_mmdd + '/import_lines_jsp.out'
             if os.path.isfile(importLinesJsp_dir_path) and os.path.getsize(importLinesJsp_dir_path) > 0:
                 df = pd.read_csv(importLinesJsp_dir_path, sep=':', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
@@ -725,11 +1089,12 @@ def testing_task(yMD, hMS, tool_analysis_type, framework_type, file_name, script
 
                 generate_workbook(df, java_report_path,'Import JSP Report')
                 sheet_transfer('Import JSP Report', 'Import JSP Detail', 6, 1, java_report_path, java_remediation_path)
-            print("Sheet : Import JSP Detail : CREATED")
-            print("End 8 : import_lines_jsp.out\n")
+            logger.info("Sheet : Import JSP Detail : CREATED")
+            logger.info("End 8 : import_lines_jsp.out")
             
             # Best Practices
-            print("Start 9 : Best Practices")
+            logger.info("Start 9 : Best Practices")
+            redis_client.rpush(redis_queue_name, '30/40::Getting report from logs generated : Best Practices')
             best_pratices_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/pmd-bin-6.55.0/Reports_1/BestPractices_Report.csv'
             if os.path.isfile(best_pratices_path) and os.path.getsize(best_pratices_path) > 0:
                 df = pd.read_csv(best_pratices_path, sep=',', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
@@ -739,11 +1104,12 @@ def testing_task(yMD, hMS, tool_analysis_type, framework_type, file_name, script
 
                 generate_workbook(df, java_report_path,'Best_Practices')
                 sheet_transfer('Best_Practices', '9. Best Practices', 6, 1, java_report_path, java_remediation_path)
-            print("Sheet : 9. Best Practices : CREATED")
-            print("End 9 : Best Practices\n")
+            logger.info("Sheet : 9. Best Practices : CREATED")
+            logger.info("End 9 : Best Practices")
 
             # MultiThreading
-            print("Start 10 : MultiThreading")
+            logger.info("Start 10 : MultiThreading")
+            redis_client.rpush(redis_queue_name, '31/40::Getting report from logs generated : Multithreading')
             multithreading_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/pmd-bin-6.55.0/Reports_1/MultiThreading_Report.csv'
             if os.path.isfile(multithreading_path) and os.path.getsize(multithreading_path) > 0:
                 df = pd.read_csv(multithreading_path, sep=',', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
@@ -753,11 +1119,12 @@ def testing_task(yMD, hMS, tool_analysis_type, framework_type, file_name, script
 
                 generate_workbook(df, java_report_path,'Multithreading')
                 sheet_transfer('Multithreading', '10. MultiThreading', 6, 1, java_report_path, java_remediation_path)
-            print("Sheet : 10. MultiThreading : CREATED")
-            print("End 10 : MultiThreading\n")
+            logger.info("Sheet : 10. MultiThreading : CREATED")
+            logger.info("End 10 : MultiThreading")
 
             # Performance
-            print("Start 11 : Performance")
+            logger.info("Start 11 : Performance")
+            redis_client.rpush(redis_queue_name, '32/40::Getting report from logs generated : Perfromance')
             performance_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/pmd-bin-6.55.0/Reports_1/Performance_Report.csv'
             if os.path.isfile(performance_path) and os.path.getsize(performance_path) > 0:
                 df = pd.read_csv(performance_path, sep=',', engine='python', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
@@ -767,11 +1134,12 @@ def testing_task(yMD, hMS, tool_analysis_type, framework_type, file_name, script
 
                 generate_workbook(df, java_report_path,'Performance')
                 sheet_transfer('Performance', '11. Performance', 6, 1, java_report_path, java_remediation_path)
-            print("Sheet : 11. Performance : CREATED")
-            print("End 11 : Performance")
+            logger.info("Sheet : 11. Performance : CREATED")
+            logger.info("End 11 : Performance")
 
             # Security
-            print("Start 12 : Security")
+            logger.info("Start 12 : Security")
+            redis_client.rpush(redis_queue_name, '33/40::Getting report from logs generated : Security')
             security_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/pmd-bin-6.55.0/Reports_1/Security_Report.csv'
             if os.path.isfile(security_path) and os.path.getsize(security_path) > 0:
                 df = pd.read_csv(security_path, sep=',', engine='python', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
@@ -781,11 +1149,12 @@ def testing_task(yMD, hMS, tool_analysis_type, framework_type, file_name, script
 
                 generate_workbook(df, java_report_path,'Security')
                 sheet_transfer('Security', '12. Security', 6, 1, java_report_path, java_remediation_path)
-            print("Sheet : 12. Security : CREATED")
-            print("End 12 : Security")
+            logger.info("Sheet : 12. Security : CREATED")
+            logger.info("End 12 : Security")
             
             #Source Code Inventory
-            print("Start 13 : Source Code Inventory")
+            logger.info("Start 13 : Source Code Inventory")
+            redis_client.rpush(redis_queue_name, '34/40::Getting report from logs generated : Source Code Inventory')
             regex = r'^.*$'
             source_code_java_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/java-vfunction_'+ yMD + '_' + hMS + '/log/' + tool_analysis_type + '/Log_Source_Analysis_' + yMD + '.log'
             print(source_code_java_path)
@@ -836,6 +1205,7 @@ def testing_task(yMD, hMS, tool_analysis_type, framework_type, file_name, script
                 sheet_transfer('Source Code Inventory', 'Source Code Inventory', 6, 1, java_report_path, java_remediation_path)
                 sheet_transfer('Source Code Inventory', 'Source Code Inventory', 6, 1, java_report_path, java_high_level_path)
                 print('Transfer Completed !!')
+                redis_client.rpush(redis_queue_name, '35/40::Transferring generated sheets to excel workbook')
 
                 wb = load_workbook(java_remediation_path)
                 print('1')
@@ -1054,6 +1424,7 @@ def testing_task(yMD, hMS, tool_analysis_type, framework_type, file_name, script
             wb.save(java_remediation_path)
 
             print('Storing values to database')
+            redis_client.rpush(redis_queue_name, '36/40::Storing required values to db!')
             # db_analysis_summary_java = analysis_summary_java(form_project_name, form_application_name, O29, P29, O32, P32, O33, P33, O35, P35, F6, F7, O6, O7)
             # db.session.add(db_analysis_summary_java)
             # try:
@@ -1097,6 +1468,7 @@ def testing_task(yMD, hMS, tool_analysis_type, framework_type, file_name, script
 
             print("Sheet : Source Code Impacted : CREATED")
             print("End 16 : Source Code Impacted\n")
+            redis_client.rpush(redis_queue_name, '37/40::Source Code Impacted Sheet Added')
 
             print("Start 17 : Other inventory")
             # Convert check_files.out
@@ -1146,239 +1518,102 @@ def testing_task(yMD, hMS, tool_analysis_type, framework_type, file_name, script
 
             print("Sheet : Other Inventory : CREATED")
             print("End 17 : Other inventory\n")
+            redis_client.rpush(redis_queue_name, '38/40::Other Inventory Sheet Added')
+            redis_client.rpush(redis_queue_name, '39/40::Code Assessment Successful')
+            redis_client.rpush(redis_queue_name, '40/40::CODE ASSESSMENT ENDED')
 
-        elif(tool_analysis_type == 'canalysis'):
-            yyyy_mmdd = yMD[:4] + '-' + yMD[4:]
-            # Convert stk-YYYY-MMDD-detail.log
-            stk_dir_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/c-vfunction_' + yMD + '_' + hMS + '/log/' + tool_analysis_type + '/stk/' + yyyy_mmdd + '/stk-' + yyyy_mmdd + '-detail.log'
-            if os.path.isfile(stk_dir_path) and os.path.getsize(stk_dir_path) > 0:
-                df = pd.read_csv(stk_dir_path, sep=':', engine='python', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
-                df.index = df.index + 1
-                save_location = '/usr/u2l/u2l_backend/projects/' + file_name + '/c_report.xlsx'
+        # elif(tool_analysis_type == 'canalysis'):
+        #     # Old C Report
+        #     yyyy_mmdd = yMD[:4] + '-' + yMD[4:]
+        #     # Convert stk-YYYY-MMDD-detail.log
+        #     stk_dir_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/c-vfunction_' + yMD + '_' + hMS + '/log/' + tool_analysis_type + '/stk/' + yyyy_mmdd + '/stk-' + yyyy_mmdd + '-detail.log'
+        #     if os.path.isfile(stk_dir_path) and os.path.getsize(stk_dir_path) > 0:
+        #         df = pd.read_csv(stk_dir_path, sep=':', engine='python', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
+        #         df.index = df.index + 1
+        #         save_location = '/usr/u2l/u2l_backend/projects/' + file_name + '/c_report_old.xlsx'
 
-                generate_workbook(df, save_location,'STK Analysis Detail')
+        #         generate_workbook(df, save_location,'STK Analysis Detail')
 
-            # Convert 64bit_C_reportlog
-            bitC_dir_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/c-vfunction_' + yMD + '_' + hMS + '/log/' + tool_analysis_type + '/checkanalysis/64bit_C_reportlog'
-            if os.path.isfile(bitC_dir_path) and os.path.getsize(bitC_dir_path) > 0:
-                df = pd.read_csv(bitC_dir_path, sep=':', engine='python', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
-                df.columns = ['FILE PATH', 'LINE NUMBER', 'SOURCE CODE', 'Column4', 'Column5']
-                df = df.drop(columns=['Column4', 'Column5'])
-                df.index = df.index + 1
-                save_location = '/usr/u2l/u2l_backend/projects/' + file_name + '/c_report.xlsx'
+        #     # Convert 64bit_C_reportlog
+        #     bitC_dir_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/c-vfunction_' + yMD + '_' + hMS + '/log/' + tool_analysis_type + '/checkanalysis/64bit_C_reportlog'
+        #     if os.path.isfile(bitC_dir_path) and os.path.getsize(bitC_dir_path) > 0:
+        #         df = pd.read_csv(bitC_dir_path, sep=':', engine='python', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
+        #         df.columns = ['FILE PATH', 'LINE NUMBER', 'SOURCE CODE', 'Column4', 'Column5']
+        #         df = df.drop(columns=['Column4', 'Column5'])
+        #         df.index = df.index + 1
+        #         save_location = '/usr/u2l/u2l_backend/projects/' + file_name + '/c_report_old.xlsx'
 
-                generate_workbook(df, save_location,'64-bit Analysis Detail')
+        #         generate_workbook(df, save_location,'64-bit Analysis Detail')
 
-            # Convert endian_C_reportlog
-            endian_dir_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/c-vfunction_' + yMD + '_' + hMS + '/log/' + tool_analysis_type + '/checkanalysis/endian_C_reportlog'
-            if os.path.isfile(endian_dir_path) and os.path.getsize(endian_dir_path) > 0:
-                df = pd.read_csv(endian_dir_path, sep=':', engine='python', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
-                df.columns = ['FILE PATH', 'LINE NUMBER', 'SOURCE CODE']
-                df.index = df.index + 1
-                save_location = '/usr/u2l/u2l_backend/projects/' + file_name + '/c_report.xlsx'
+        #     # Convert endian_C_reportlog
+        #     endian_dir_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/c-vfunction_' + yMD + '_' + hMS + '/log/' + tool_analysis_type + '/checkanalysis/endian_C_reportlog'
+        #     if os.path.isfile(endian_dir_path) and os.path.getsize(endian_dir_path) > 0:
+        #         df = pd.read_csv(endian_dir_path, sep=':', engine='python', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
+        #         df.columns = ['FILE PATH', 'LINE NUMBER', 'SOURCE CODE']
+        #         df.index = df.index + 1
+        #         save_location = '/usr/u2l/u2l_backend/projects/' + file_name + '/c_report_old.xlsx'
 
-                generate_workbook(df, save_location,'Endianness Analysis Detail')
+        #         generate_workbook(df, save_location,'Endianness Analysis Detail')
 
-            # Convert char-array.out
-            charArray_dir_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/c-vfunction_' + yMD + '_' + hMS + '/log/' + tool_analysis_type + '/charinv/' + yyyy_mmdd + '/char-array.out'
-            if os.path.isfile(charArray_dir_path) and os.path.getsize(charArray_dir_path) > 0:
-                df = pd.read_csv(charArray_dir_path, sep='\t', engine='python', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
-                df.columns = ['FILE PATH', 'LINE NUMBER', 'SOURCE CODE']
-                df.index = df.index + 1
-                save_location = '/usr/u2l/u2l_backend/projects/' + file_name + '/c_report.xlsx'
+        #     # Convert char-array.out
+        #     charArray_dir_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/c-vfunction_' + yMD + '_' + hMS + '/log/' + tool_analysis_type + '/charinv/' + yyyy_mmdd + '/char-array.out'
+        #     if os.path.isfile(charArray_dir_path) and os.path.getsize(charArray_dir_path) > 0:
+        #         df = pd.read_csv(charArray_dir_path, sep='\t', engine='python', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
+        #         df.columns = ['FILE PATH', 'LINE NUMBER', 'SOURCE CODE']
+        #         df.index = df.index + 1
+        #         save_location = '/usr/u2l/u2l_backend/projects/' + file_name + '/c_report_old.xlsx'
 
-                generate_workbook(df, save_location,'String-Mem Analysis Detail')
+        #         generate_workbook(df, save_location,'String-Mem Analysis Detail')
 
-            # Convert Log_Envcheck_CFiles_YYYY-MMDD.log
-            envCheck_dir_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/c-vfunction_' + yMD + '_' + hMS + '/log/' + tool_analysis_type + '/Log_Envcheck_CFiles_' + yyyy_mmdd + '.log'
-            if os.path.isfile(envCheck_dir_path) and os.path.getsize(envCheck_dir_path) > 0:
-                df = pd.read_csv(envCheck_dir_path, sep=':', engine='python', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
-                df.columns = ['FILE PATH', 'LINE NUMBER', 'SOURCE CODE']
-                df.index = df.index + 1
-                save_location = '/usr/u2l/u2l_backend/projects/' + file_name + '/c_report.xlsx'
+        #     # Convert Log_Envcheck_CFiles_YYYY-MMDD.log
+        #     envCheck_dir_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/c-vfunction_' + yMD + '_' + hMS + '/log/' + tool_analysis_type + '/Log_Envcheck_CFiles_' + yyyy_mmdd + '.log'
+        #     if os.path.isfile(envCheck_dir_path) and os.path.getsize(envCheck_dir_path) > 0:
+        #         df = pd.read_csv(envCheck_dir_path, sep=':', engine='python', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
+        #         df.columns = ['FILE PATH', 'LINE NUMBER', 'SOURCE CODE']
+        #         df.index = df.index + 1
+        #         save_location = '/usr/u2l/u2l_backend/projects/' + file_name + '/c_report_old.xlsx'
 
-                generate_workbook(df, save_location,'ExecutionEnv Analysis Detail')
-
-
-            #Source Code Inventory
-            regex = r'^.*$'
-            source_code_c_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/c-vfunction_' + yMD + '_' + hMS + '/log/' + tool_analysis_type + '/Log_Source_Analysis_' + yMD + '.log'
-            if os.path.isfile(source_code_c_path) and os.path.getsize(source_code_c_path) > 0:
-                with open(source_code_c_path, 'r') as f:
-                    data = f.read()
-                lines = data.split('\n')
-                log_entries = []
-                for line in lines:
-                    match = re.match(regex, line)
-                    if match:
-                        log_entries.append(match.group())
-                df = pd.DataFrame(log_entries, columns=['log_message'])
-
-                start_str = '###########  Execution 0001_stepcounter Starts  ###########'
-                end_str = '###########  Execution 0001_stepcounter Ends ###########'
-                start_df = df[df['log_message'].str.contains(start_str)]
-                end_df = df[df['log_message'].str.contains(end_str)]
-
-                start_index = start_df.index[0]
-                end_index = end_df.index[0]
-                extracted_df = df.iloc[start_index+1:end_index]
-
-                result_df = extracted_df[extracted_df['log_message'].str.startswith('./')]
-                result_df[['Directory', 'Type', 'col2', 'Actual Nr of Lines', 'Nr Blank Lines', 'Nr Commented Lines', 'Total Nr LoC']] = result_df['log_message'].str.split(',', expand=True)
-                result_df = result_df.replace(r'^\s*$', np.nan, regex=True)
-                result_df = result_df.dropna(subset=['Actual Nr of Lines', 'Nr Blank Lines', 'Nr Commented Lines', 'Total Nr LoC'])
-                result_df = result_df.drop(['log_message', 'col2'], axis=1)
-                result_df = result_df.reset_index(drop=True)
-                result_df.index += 1
-
-                save_location = '/usr/u2l/u2l_backend/projects/' + file_name + '/c_report.xlsx'
-
-                generate_workbook(result_df, save_location,'Source Code Inventory')
+        #         generate_workbook(df, save_location,'ExecutionEnv Analysis Detail')
 
 
-                save_location = '/usr/u2l/u2l_backend/projects/' + file_name + '/c_inventory_report.xlsx'
+        #     #Source Code Inventory
+        #     regex = r'^.*$'
+        #     source_code_c_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/c-vfunction_' + yMD + '_' + hMS + '/log/' + tool_analysis_type + '/Log_Source_Analysis_' + yMD + '.log'
+        #     if os.path.isfile(source_code_c_path) and os.path.getsize(source_code_c_path) > 0:
+        #         with open(source_code_c_path, 'r') as f:
+        #             data = f.read()
+        #         lines = data.split('\n')
+        #         log_entries = []
+        #         for line in lines:
+        #             match = re.match(regex, line)
+        #             if match:
+        #                 log_entries.append(match.group())
+        #         df = pd.DataFrame(log_entries, columns=['log_message'])
 
-                generate_workbook(result_df, save_location,'Source Code Inventory')
+        #         start_str = '###########  Execution 0001_stepcounter Starts  ###########'
+        #         end_str = '###########  Execution 0001_stepcounter Ends ###########'
+        #         start_df = df[df['log_message'].str.contains(start_str)]
+        #         end_df = df[df['log_message'].str.contains(end_str)]
 
+        #         start_index = start_df.index[0]
+        #         end_index = end_df.index[0]
+        #         extracted_df = df.iloc[start_index+1:end_index]
 
-            yyyy_mmdd = yMD[:4] + '-' + yMD[4:]
-            c_report_path = '/usr/u2l/u2l_backend/projects/c_report.xlsx'
-            c_remediation_path = '/usr/u2l/u2l_backend/projects/c_remediation_report.xlsx'
-            c_inventory_path = '/usr/u2l/u2l_backend/projects/c_inventory_report.xlsx'
+        #         result_df = extracted_df[extracted_df['log_message'].str.startswith('./')]
+        #         result_df[['Directory', 'Type', 'col2', 'Actual Nr of Lines', 'Nr Blank Lines', 'Nr Commented Lines', 'Total Nr LoC']] = result_df['log_message'].str.split(',', expand=True)
+        #         result_df = result_df.replace(r'^\s*$', np.nan, regex=True)
+        #         result_df = result_df.dropna(subset=['Actual Nr of Lines', 'Nr Blank Lines', 'Nr Commented Lines', 'Total Nr LoC'])
+        #         result_df = result_df.drop(['log_message', 'col2'], axis=1)
+        #         result_df = result_df.reset_index(drop=True)
+        #         result_df.index += 1
 
-            # Source Scan Remedy Detail
-            ic_lines = []
-            with open('/usr/u2l/u2l_backend/final_report.csv', 'r') as file:
-                for line in file:
-                    if line.strip().startswith('/usr/'):
-                        ic_lines.append(line)
-
-            with open('/usr/u2l/u2l_backend/final_report.csv', 'w') as file:
-                file.write(''.join(ic_lines))
-
-            ic_lines = []
-            with open('/usr/u2l/u2l_backend/final_report.csv', 'r') as file:
-                for line in file:
-                    modified_line = line.replace(':', ',', 1)
-                    ic_lines.append(modified_line)
-
-            with open('/usr/u2l/u2l_backend/final_report.csv', 'w') as file:
-                file.write(''.join(ic_lines))
-
-            final_report_path = '/usr/u2l/u2l_backend/final_report.csv'
-            if os.path.isfile(final_report_path) and os.path.getsize(final_report_path) > 0:
-                df = pd.read_csv(final_report_path, sep=',', engine='python', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
-                df.columns = ["FILE PATH","LINE NUMBER","SOURCE CODE","ERROR MESSAGE","REMEDIATION"]
-                df = df.drop(df.index[0])
-                O28 = df['FILE PATH'].nunique()
-                P28 = df['FILE PATH'].count()
-                print(df)
-
-            generate_workbook(df, c_report_path,'Source Scan Remedy Detail')
-
-            # Compilation Warning
-            with open("cppcheck_output.txt", "w") as file:
-                file.write(stderr)
-            
-            with open('cppcheck_output.txt', 'r') as file:
-                content = file.readlines()
-
-            file_paths = []
-            line_numbers = []
-            error_messages = []
-            error_lines = []
-
-            pattern = re.compile(r'^(.*?):(\d+):\d+: (.*?): (.*)$')
-
-            current_error_lines = []
-
-            for line in content:
-                match = pattern.match(line)
-                if match:
-                    if current_error_lines:
-                        error_lines.append(current_error_lines)
-                        current_error_lines = []
-                    
-                    file_paths.append(match.group(1))
-                    line_numbers.append(int(match.group(2)))
-                    error_messages.append(match.group(4))
-                else:
-                    current_error_lines.append(line)
-
-            if current_error_lines:
-                error_lines.append(current_error_lines)
-
-            data = {
-                'File Path': file_paths,
-                'Line Number': line_numbers,
-                'Error Message': error_messages,
-                'Error Lines': [''.join(lines) for lines in error_lines]
-            }
-
-            df = pd.DataFrame(data)
-            df.columns = ['FILE PATH', 'LINE NUMBER', 'ERROR MESSAGE', 'ERROR LINES']
-            O29 = df['FILE PATH'].nunique()
-            P29 = df['FILE PATH'].count()
-
-            df.reset_index(drop=True, inplace=True)
-            df.index = df.index + 1
-
-            book = load_workbook(c_report_path)
-            writer = pd.ExcelWriter(c_report_path, engine='openpyxl')
-            writer.book = book
-            sheet_name = 'Compilation Warning Detail'
-            writer.sheets = dict((ws.title, ws) for ws in book.worksheets)
-            df.to_excel(writer, sheet_name=sheet_name, startcol=0, startrow=1, header=False)
-            writer.save()
-
-            sheet_transfer('Source Scan Remedy Detail', '1. Source Scan Remedy Detail', 6, 1, c_report_path, c_remediation_path)
-            sheet_transfer('Compilation Warning Detail', '2. Compilation Warning Detail', 6, 1, c_report_path, c_remediation_path)
-            sheet_transfer('Source Code Inventory', 'Source Code Inventory', 1, 0, c_report_path, c_inventory_path)
-            sheet_transfer('Source Code Inventory', 'Source Code Inventory', 6, 1, c_report_path, c_remediation_path)
-            
-            #Source Code Inventory
-            regex = r'^.*$'
-            source_code_c_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/c-vfunction_' + yMD + '_' + hMS + '/log/' + tool_analysis_type + '/Log_Source_Analysis_' + yMD + '.log'
-            if os.path.isfile(source_code_c_path) and os.path.getsize(source_code_c_path) > 0:
-                with open(source_code_c_path, 'r') as f:
-                    data = f.read()
-                lines = data.split('\n')
-                log_entries = []
-                for line in lines:
-                    match = re.match(regex, line)
-                    if match:
-                        log_entries.append(match.group())
-                df = pd.DataFrame(log_entries, columns=['log_message'])
-
-                start_str = '###########  Execution 0001_stepcounter Starts  ###########'
-                end_str = '###########  Execution 0001_stepcounter Ends ###########'
-                start_df = df[df['log_message'].str.contains(start_str)]
-                end_df = df[df['log_message'].str.contains(end_str)]
-
-                start_index = start_df.index[0]
-                end_index = end_df.index[0]
-                extracted_df = df.iloc[start_index+1:end_index]
-
-                result_df = extracted_df[extracted_df['log_message'].str.startswith('./')]
-                result_df[['Directory', 'Type', 'col2', 'Actual Nr of Lines', 'Nr Blank Lines', 'Nr Commented Lines', 'Total Nr LoC']] = result_df['log_message'].str.split(',', expand=True)
-                result_df = result_df.replace(r'^\s*$', np.nan, regex=True)
-                result_df = result_df.dropna(subset=['Actual Nr of Lines', 'Nr Blank Lines', 'Nr Commented Lines', 'Total Nr LoC'])
-                result_df = result_df.drop(['log_message', 'col2'], axis=1)
-                result_df = result_df.reset_index(drop=True)
-                result_df.index += 1
-
-                save_location = '/usr/u2l/u2l_backend/projects/' + file_name + '/c_report.xlsx'
-
-                generate_workbook(result_df, save_location,'Source Code Inventory')
-
-
-                save_location = '/usr/u2l/u2l_backend/projects/' + file_name + '/c_inventory_report.xlsx'
-
-                generate_workbook(result_df, save_location,'Source Code Inventory')
+        #         save_location = '/usr/u2l/u2l_backend/projects/' + file_name + '/c_report_old.xlsx'
+        #         generate_workbook(result_df, save_location,'Source Code Inventory')
 
         elif(tool_analysis_type == 'shellanalysis'):
         
             yyyy_mmdd = yMD[:4] + '-' + yMD[4:]
+            redis_client.rpush(redis_queue_name, '20/40::Converting logs to reports')
 
             # Convert ksh_env_common.txt
             ksh_env_common_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/shell-vfunction_' + yMD + '_' + hMS + '/log/' + tool_analysis_type + '/shell/env/' + yyyy_mmdd + '/ksh_env_common.txt'
@@ -1413,27 +1648,6 @@ def testing_task(yMD, hMS, tool_analysis_type, framework_type, file_name, script
 
                 generate_workbook(df, save_location,'Command and option Details')
 
-            # Convert ksh_shebang.txt
-            ksh_shebang_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/shell-vfunction_' + yMD + '_' + hMS + '/log/' + tool_analysis_type + '/shell/shebang/' + yyyy_mmdd + '/ksh_shebang.txt'
-            if os.path.isfile(ksh_shebang_path) and os.path.getsize(ksh_shebang_path) > 0:
-                with open(ksh_shebang_path, 'r') as f:
-                    lines = f.readlines()
-                data = []
-                prev_column1 = None
-                for line in lines:
-                    split_line = line.strip().split('#!')
-                    if split_line[0].strip():
-                        prev_column1 = split_line[0].strip()
-                    data.append([prev_column1, '#!' + split_line[1].strip() if len(split_line) > 1 else ''])
-                df = pd.DataFrame(data, columns=['column1', 'column2']).dropna()
-                df['column2'] = df.groupby(df.index // 2)['column2'].transform(lambda x: x.iloc[1])
-                df.columns = ['FILE NAME', 'SOURCE CODE']
-                df.index = df.index + 1
-                df = df.drop(df[df.index % 2 == 0].index).reset_index(drop=True)
-
-                save_location = '/usr/u2l/u2l_backend/projects/' + file_name + '/shell_report.xlsx'
-
-                generate_workbook(df, save_location,'Shebang Line Analysis')
 
             # Convert ksh_heredocument.txt
             ksh_heredocument_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/shell-vfunction_' + yMD + '_' + hMS + '/log/' + tool_analysis_type + '/shell/syntax/' + yyyy_mmdd + '/ksh_heredocument.txt'
@@ -1445,6 +1659,9 @@ def testing_task(yMD, hMS, tool_analysis_type, framework_type, file_name, script
                 save_location = '/usr/u2l/u2l_backend/projects/' + file_name + '/shell_report.xlsx'
 
                 generate_workbook(df, save_location,'Heredoc Analysis')
+            
+            redis_client.rpush(redis_queue_name, '25/40::Logs converted to reports')
+            redis_client.rpush(redis_queue_name, '30/40::Generating Inventory report')
 
             # Source Code Inventory
             regex = r'^.*$'
@@ -1477,14 +1694,38 @@ def testing_task(yMD, hMS, tool_analysis_type, framework_type, file_name, script
                 result_df = result_df.reset_index(drop=True)
                 result_df.index += 1
 
-                save_location = '/usr/u2l/u2l_backend/projects/' + file_name + '/shell_report.xlsx'
+                shell_report_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/shell_report.xlsx'
 
-                generate_workbook(result_df, save_location,'Source Code Inventory')
+                generate_workbook(result_df, shell_report_path,'Source Code Inventory')
 
-                save_location = '/usr/u2l/u2l_backend/projects/' + file_name + '/shell_inventory_report.xlsx'
-                
-                generate_workbook(result_df, save_location,'Source Code Inventory')
+                shell_inventory_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/shell_inventory_report.xlsx'
 
+                sheet_transfer('Source Code Inventory', 'Source Code Inventory', 1, 0, shell_report_path, shell_inventory_path)
+                redis_client.rpush(redis_queue_name, '35/40::All reports ready to be published')
+
+                redis_client.rpush(redis_queue_name, '40/40::CODE ASSESSMENT SUCCESSFUL')
+
+            # # Convert ksh_shebang.txt
+            # ksh_shebang_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/shell-vfunction_' + yMD + '_' + hMS + '/log/' + tool_analysis_type + '/shell/shebang/' + yyyy_mmdd + '/ksh_shebang.txt'
+            # if os.path.isfile(ksh_shebang_path) and os.path.getsize(ksh_shebang_path) > 0:
+            #     with open(ksh_shebang_path, 'r') as f:
+            #         lines = f.readlines()
+            #     data = []
+            #     prev_column1 = None
+            #     for line in lines:
+            #         split_line = line.strip().split('#!')
+            #         if split_line[0].strip():
+            #             prev_column1 = split_line[0].strip()
+            #         data.append([prev_column1, '#!' + split_line[1].strip() if len(split_line) > 1 else ''])
+            #     df = pd.DataFrame(data, columns=['column1', 'column2']).dropna()
+            #     df['column2'] = df.groupby(df.index // 2)['column2'].transform(lambda x: x.iloc[1])
+            #     df.columns = ['FILE NAME', 'SOURCE CODE']
+            #     df.index = df.index + 1
+            #     df = df.drop(df[df.index % 2 == 0].index).reset_index(drop=True)
+
+            #     save_location = '/usr/u2l/u2l_backend/projects/' + file_name + '/shell_report.xlsx'
+
+            #     generate_workbook(df, save_location,'Shebang Line Analysis')
     except Exception as e:
         return jsonify({'error': str(e)})
 
@@ -1497,9 +1738,9 @@ def testing_task(yMD, hMS, tool_analysis_type, framework_type, file_name, script
 def testing_tasks(message):
 
     logger.info('STARTED Execution')
-    redis_client.rpush('logs', 'Connection 1 established successfully!!')
+    redis_client.rpush(redis_queue_name, 'Connection 1 established successfully!!')
     time.sleep(30)
-    redis_client.rpush('logs', 'Connection 2 established successfully!!')
+    redis_client.rpush(redis_queue_name, 'Connection 2 established successfully!!')
     return True
 
 
