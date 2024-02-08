@@ -22,9 +22,9 @@ import HPELogo from '../../assets/Images/HPELogo.png';
 import image3 from '../../assets/Images/EffortPercentage.png';
 import PoppinsRegular from '../../assets/fonts/Poppins-Regular.ttf';
 import PoppinsBold from '../../assets/fonts/Poppins-Bold.ttf';
+import AuthenticationUtils from '../../utils/AuthenticationUtils';
 import PdfUtils from '../../utils/PdfUtils';
 import Colors from '../../config/colors';
-import AuthenticationUtils from '../../utils/AuthenticationUtils';
 
 // const gradient = {
 //   x1: '0%',
@@ -368,10 +368,10 @@ const PdfDocument = (props) => {
           src={props.barChartDataURL}
         />
 
-        <Image
+        {/* <Image
           style={{ height: 250, width: 400, left: 87 }}
           src={props.radarChartDataURL}
-        />
+        /> */}
         {/* =============================Page 5================================= */}
         <Text
           style={{

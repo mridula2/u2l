@@ -1,25 +1,29 @@
 import html2canvas from 'html2canvas';
 // import Chart from "react-apexcharts";
+import JSZip from 'jszip';
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Button, Image, Text } from 'grommet';
+import { Button, Image, Text, Notification, Box } from 'grommet';
 import PdfDocument from './PdfDocument';
-import { PDFDownloadLink } from '@react-pdf/renderer';
+import { PDFDownloadLink, pdf } from '@react-pdf/renderer';
 import { Hpe } from 'grommet-icons';
+import { Chart } from 'react-google-charts';
+import { Chart as Chart2, RadialLinearScale, registerables } from 'chart.js';
+
 import image1 from '../../assets/Images/u2lpdfImg.png';
 import image2 from '../../assets/Images/u2lpdfImg2.png';
 import image3 from '../../assets/Images/EffortPercentage.png';
-import { Chart as Chart2, RadialLinearScale, registerables } from 'chart.js';
 import HPELogo from '../../assets/Images/HPELogo.png';
-import { Chart } from 'react-google-charts';
-import PdfUtils from '../../utils/PdfUtils';
-import AuthenticationUtils from '../../utils/AuthenticationUtils';
-import PdfPreviewPageHeader from './PdfPreviewPageHeader';
-import PdfPreviewPageFooter from './PdfPreviewPageFooter';
-import Colors from '../../config/colors';
 import Picture1 from '../../assets/Images/Picture1.png';
 import Picture2 from '../../assets/Images/Picture2.png';
-
+import PdfUtils from '../../utils/PdfUtils';
+import AuthenticationUtils from '../../utils/AuthenticationUtils';
+import CommonUtils from '../../utils/CommonUtils';
+import Colors from '../../config/colors';
+import url from '../../config/url';
+import PdfPreviewPageHeader from './PdfPreviewPageHeader';
+import PdfPreviewPageFooter from './PdfPreviewPageFooter';
+import ProjectService from '../../api/ProjectService';
 Chart2.register(RadialLinearScale);
 Chart2.register(...registerables);
 
@@ -44,6 +48,34 @@ const PdfPreview = () => {
   const [chartData2, setChartData2] = useState();
   const [chartOptions2, setChartOptions2] = useState();
   const [chartData3, setChartData3] = useState();
+
+  // const [element, setElement] = useState();
+
+  const [pieChart1DataURL, setPieChart1DataURL] = useState('url');
+  const [pieChart2DataURL, setPieChart2DataURL] = useState('url');
+  const [radarChartDataURL, setRadarChartDataURL] = useState('url');
+  const [barChartDataURL, setBarChartDataURL] = useState('url');
+
+  const [buttonDisabled, setButtonDisabled] = useState(true);
+
+  const [loading, setLoading] = useState(true);
+  const [success, setSuccess] = useState(false);
+
+  const [notificationVisible, setNotificationVisible] = useState();
+  const [notificationMessage, setNotificationMessage] = useState('');
+  const [status, setStatus] = useState('normal');
+
+  const onNotificationClose = () => {
+    setNotificationVisible(false);
+  };
+
+  useEffect(() => {
+    setTimeout(() => {
+      setLoading(false);
+      setSuccess(true);
+      setTimeout(() => setSuccess(false), 1000);
+    }, 7000);
+  }, []);
 
   useEffect(() => {
     // setData1([
@@ -329,42 +361,160 @@ const PdfPreview = () => {
     // //generate image
 
     //{============================================= uncomment start ====================================================}
-    const element1 = document.getElementById('piechart1'),
-      canvas1 = await html2canvas(element1),
-      data4 = canvas1.toDataURL('image/png');
+    const element1 = document.getElementById('piechart1');
+    const canvas1 = await html2canvas(element1);
+    const data4 = canvas1.toDataURL('image/png');
     //{============================================= uncomment end ======================================================}
 
-    const element2 = document.getElementById('piechart2'),
-      canvas2 = await html2canvas(element2),
-      data5 = canvas2.toDataURL('image/png');
+    const element2 = document.getElementById('piechart2');
+    const canvas2 = await html2canvas(element2);
+    const data5 = canvas2.toDataURL('image/png');
 
-    const element3 = document.getElementById('radarchart'),
-      canvas3 = await html2canvas(element3),
-      data6 = canvas3.toDataURL('image/png');
+    const element3 = document.getElementById('radarchart');
+    const canvas3 = await html2canvas(element3);
+    const data6 = canvas3.toDataURL('image/png');
 
-    const element4 = document.getElementById('barchart'),
-      canvas4 = await html2canvas(element4),
-      data7 = canvas4.toDataURL('image/png');
+    const element4 = document.getElementById('barchart');
+    const canvas4 = await html2canvas(element4);
+    const data7 = canvas4.toDataURL('image/png');
 
-    // navigate("/pdfview", {
-    //   state: {
-    //     projectDetails: projectDetails,
-    //     pieChart2DataURL: data2,
-    //   },
-    // });
+    setPieChart1DataURL(data4);
+    setPieChart2DataURL(data5);
+    setRadarChartDataURL(data6);
+    setBarChartDataURL(data7);
     //{============================================= uncomment start ====================================================}
 
     // console.log(data6);
-    navigate('/pdfview', {
-      state: {
-        pieChart1DataURL: data4,
-        pieChart2DataURL: data5,
-        radarChartDataURL: data6,
-        barChartDataURL: data7,
-        projectDetails,
-      },
-    });
+    // navigate('/pdfview', {
+    //   state: {
+    //     pieChart1DataURL: data4,
+    //     pieChart2DataURL: data5,
+    //     radarChartDataURL: data6,
+    //     barChartDataURL: data7,
+    //     projectDetails,
+    //   },
+    // });
     //{============================================= uncomment end ======================================================}
+  };
+
+  useEffect(() => {
+    const intervalId = setInterval(openPDF, 3000);
+    setTimeout(() => clearInterval(intervalId), 10000);
+    return () => clearInterval(intervalId);
+  }, []);
+
+  // const download = async () => {
+  //   zip
+  //     .generateAsync({ type: 'blob' })
+  //     .then((content) => {
+  //       // Create a download link and trigger the download
+  //       const link = document.createElement('a');
+  //       link.href = URL.createObjectURL(content);
+  //       link.download = 'myZipFile.zip';
+  //       link.click();
+  //     })
+  //     .catch((error) => {
+  //       console.error('Error creating zip file: ', error);
+  //     });
+  // };
+
+  const downloadZip = async () => {
+    setNotificationMessage('Downloading Reports!!');
+    setNotificationVisible(true);
+    setStatus('info');
+    openPDF();
+    const element = (
+      <PdfDocument
+        pieChart1DataURL={pieChart1DataURL}
+        pieChart2DataURL={pieChart2DataURL}
+        radarChartDataURL={radarChartDataURL}
+        barChartDataURL={barChartDataURL}
+        projectDetails={projectDetails}
+      />
+    );
+    const myPdf = pdf(element);
+    const blob1 = await myPdf.toBlob();
+
+    const zip = new JSZip();
+    zip.file(`${projectDetails.project_details[0].project_name}.pdf`, blob1);
+
+    const token = AuthenticationUtils.getToken();
+    if (token) {
+      try {
+        const url_backend = url;
+        const response = await fetch(
+          `${url_backend}/report/${
+            projectDetails.project_details[0].project_name
+          }/${
+            projectDetails.project_details[0].application_name
+          }/${AuthenticationUtils.getEmail()}`,
+          {
+            method: 'GET',
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        const blob = await response.blob();
+        const blob1 = new Blob([blob]);
+
+        zip.file(
+          `${projectDetails.project_details[0].project_name}.zip`,
+          blob1
+        );
+        zip
+          .generateAsync({ type: 'blob' })
+          .then((content) => {
+            // Create a download link and trigger the download
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(content);
+            link.download = `${projectDetails.project_details[0].application_name}.zip`;
+            link.click();
+          })
+          .catch((error) => {
+            console.error('Error creating zip file: ', error);
+          });
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    // ProjectService.getReport(
+    //   projectDetails.project_details[0].project_name,
+    //   projectDetails.project_details[0].application_name,
+    //   AuthenticationUtils.getEmail()
+    // )
+    //   .then((response) => {
+    //     const blob2 = new Blob([response.data], { type: 'application/zip' });
+    //     // var file2 = new File(
+    //     //   `${projectDetails.project_details[0].project_name}.zip`
+    //     // );
+    //     zip.file(
+    //       `${projectDetails.project_details[0].project_name}.zip`,
+    //       blob2
+    //     );
+    //     zip
+    //       .generateAsync({ type: 'blob' })
+    //       .then((content) => {
+    //         // Create a download link and trigger the download
+    //         const link = document.createElement('a');
+    //         link.href = URL.createObjectURL(content);
+    //         link.download = 'myZipFile.zip';
+    //         link.click();
+    //       })
+    //       .catch((error) => {
+    //         console.error('Error creating zip file: ', error);
+    //       });
+    //     // CommonUtils.downloadFileAxios(response, projectDetails.project_details[0].project_name);
+    //     // console.log(fileName + ' downloaded');
+    //     // setLoading(false);
+    //     // setSuccess(true);
+    //     // setTimeout(() => setSuccess(false), 2000);
+    //   })
+    //   .catch((error) => {
+    //     // setNotificationVisible(true);
+    //     // setNotificationMessage('error while downloading report');
+    //   });
   };
 
   return (
@@ -376,19 +526,48 @@ const PdfPreview = () => {
       */}
 
       {/* <button onClick={print}>Print</button> */}
+      <Box align='center' gap='small'>
+        {notificationVisible && (
+          <Notification
+            toast
+            time={4000}
+            status={status}
+            message={notificationMessage}
+            onClose={onNotificationClose}
+          />
+        )}
+      </Box>
       <div
         style={{ justifyContent: 'right', marginLeft: '80%', marginTop: '3%' }}
       >
-        {/* <PDFDownloadLink document={<PdfDocument pieChartDataURL={pieChartDataURL}/>}>
+        {/* <PDFDownloadLink
+          document={
+            <PdfDocument
+              pieChart1DataURL={pieChart1DataURL}
+              pieChart2DataURL={pieChart2DataURL}
+              radarChartDataURL={radarChartDataURL}
+              barChartDataURL={barChartDataURL}
+              projectDetails={projectDetails}
+            />
+          }
+        >
           {({ loading }) =>
             loading ? (
-                <Button primary label='Loading Document...'/>
+              <Button disabled primary label='Loading Document...' />
             ) : (
-              <Button primary label='Download in pdf'/>
+              <Button primary label='Download reports' />
             )
           }
         </PDFDownloadLink> */}
-        <Button primary label='Open as pdf' onClick={openPDF} />
+
+        <Button
+          // disabled={loading}
+          label={'Download reports'}
+          busy={loading}
+          primary
+          success={success}
+          onClick={downloadZip}
+        />
       </div>
       <div style={styles.headerDiv}>
         <p style={styles.headerText}>Analysis Report Preview</p>

@@ -1,11 +1,10 @@
 import axios from 'axios';
-import url from '../config/url';
 
 const signIn = (data) => {
   const config = {
     method: 'post',
     maxBodyLength: Infinity,
-    url: `${url}/login`,
+    url: `/login`,
     headers: {
       'Content-Type': 'application/json',
     },
@@ -18,7 +17,7 @@ const signUp = (data) => {
   const config = {
     method: 'post',
     maxBodyLength: Infinity,
-    url: `${url}/signup`,
+    url: `/signup`,
     headers: {
       'Content-Type': 'application/json',
     },

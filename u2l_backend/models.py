@@ -26,6 +26,7 @@ class project_details(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     project_name = db.Column(db.String(50), nullable=False)
     application_name = db.Column(db.String(50), nullable=False)
+    task_id = db.Column(db.String(200))
     email = db.Column(db.String(50))
     user_id = db.Column(db.Integer, db.ForeignKey('user_details.id'))
     project_client = db.Column(db.String(50))
@@ -40,9 +41,10 @@ class project_details(db.Model):
     UniqueConstraint('project_name', 'application_name'),
     )
 
-    def __init__(self, project_name,application_name, email, user_id, project_client, project_manager, file_name, file_size, analysis_status, created_at):
+    def __init__(self, project_name,application_name, task_id, email, user_id, project_client, project_manager, file_name, file_size, analysis_status, created_at):
         self.project_name = project_name
         self.application_name = application_name
+        self.task_id = task_id
         self.email = email
         self.user_id = user_id
         self.project_client = project_client
@@ -319,4 +321,30 @@ class analysis_summary_java(db.Model):
         self.imapacted_artefacts = imapacted_artefacts
         self.nr_of_loc = nr_of_loc
         self.impacted_nr_of_loc = impacted_nr_of_loc
+
+class celery_job_details(db.Model):
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    project_name = db.Column(db.String(50))
+    application_name = db.Column(db.String(50))
+    task_id = db.Column(db.String(100))
+    task_status = db.Column(db.String(20))
+    task_logs = db.Column(db.String(500))
+
+    def __init__(self, project_name, application_name, task_id, task_status, task_logs):
+        self.project_name = project_name
+        self.application_name = application_name
+        self.task_id = task_id
+        self.task_status = task_status
+        self.task_logs = task_logs
+
+class celery_logs(db.Model):
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    task_id = db.Column(db.String(100))
+    task_status = db.Column(db.String(20))
+    task_log = db.Column(db.String(500))
+
+    def __init__(self, task_id, task_status, task_log):
+        self.task_id = task_id
+        self.task_status = task_status
+        self.task_log = task_log        
     

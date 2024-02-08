@@ -62,12 +62,12 @@ if [ $Input2 == "java" ] ;
 then
 	echo -e "\n getting the 2nd Comamnd line arg from user is :$2 "
 	echo -e  "getting the 2nd parameter after comparing :$Input2"
-	jdksrc_ver=$3
-	jdktarget_ver=$4
-	jspsrc_ver=$5
-	jsptarget_ver=$6
-	servsrc_ver=$7
-	servtarget_ver=$8
+	read -p "Enter source jdk version: " jdksrc_ver
+    read -p "Enter Target jdk version: " jdktarget_ver
+    read -p "Enter source JSP version: " jspsrc_ver
+    read -p "Enter target JSP version: " jsptarget_ver
+    read -p "Enter source Servlet version: " servsrc_ver
+    read -p "Enter target Servlet version: " servtarget_ver
 fi
 # Log_Source_Analysis_`date '+%Y%m%d-%H%M'`.log
 echo "Output generated to $PJHOME/log/$APNAME/Log_Source_Analysis_`date '+%Y%m%d'`.log"

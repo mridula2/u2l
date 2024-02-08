@@ -1,12 +1,12 @@
 import { Box, Card, Header } from 'grommet';
 import SideBar from '../components/common/SideBar';
 import { Download } from 'grommet-icons';
-import url from '../config/url';
 import { ReactComponent as Question } from '../assets/Images/Question.svg';
 import { ReactComponent as Readdocs } from '../assets/Images/Readthedocs.svg';
 import CommonUtils from '../utils/CommonUtils';
 import { useState } from 'react';
 import Colors from '../config/colors';
+import CommonService from '../api/CommonService';
 
 const Documentation = () => {
   const file1 = 'Code Delivery Guidelines-V0.4';
@@ -15,16 +15,15 @@ const Documentation = () => {
   const [mouseEnter2, setMouseEnter2] = useState();
 
   const downloadfile = async (fileName) => {
-    try {
-      const url_backend = url;
-      const response = await fetch(`${url_backend}/documentation/${fileName}`, {
-        method: 'GET',
-      });
-      CommonUtils.downloadFile(response, fileName);
-      console.log(fileName + ' downloaded');
-    } catch (error) {
-      console.error(error);
-    }
+    CommonService.getDocumentation(fileName).then(
+      (response) => {
+        CommonUtils.downloadFileAxios(response, fileName);
+        // console.log(fileName + ' downloaded');
+      },
+      (error) => {
+        console.log(error);
+      }
+    );
   };
 
   return (

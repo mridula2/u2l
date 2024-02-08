@@ -1,9 +1,9 @@
 const findSummary = (datum) => {
-  if (datum.analysis_status === 'analysis started') {
+  if (datum.analysis_status === 'PENDING') {
     return 'Assessment In Progress';
-  } else if (datum.analysis_status === 'analysis successful') {
+  } else if (datum.analysis_status === 'SUCCESS') {
     return 'Successful Assessment';
-  } else if (datum.analysis_status === 'analysis failed') {
+  } else if (datum.analysis_status === 'FAILURE') {
     return 'Failed Assessment';
   } else {
     return 'Analysis status unknown';
@@ -11,11 +11,11 @@ const findSummary = (datum) => {
 };
 
 const iconMapping = (analysis_status) => {
-  if (analysis_status === 'analysis successful') {
+  if (analysis_status === 'SUCCESS') {
     return 'OK';
-  } else if (analysis_status === 'analysis failed') {
+  } else if (analysis_status === 'FAILURE') {
     return 'Critical';
-  } else if (analysis_status === 'analysis started') {
+  } else if (analysis_status === 'PENDING') {
     return 'Started';
   }
 };

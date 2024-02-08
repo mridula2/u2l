@@ -1,5 +1,5 @@
 import { Close, FormNext } from 'grommet-icons';
-import React, { useContext, useState } from 'react';
+import { useContext, useState } from 'react';
 import {
   Box,
   Button,
@@ -19,12 +19,13 @@ import { emailValidation } from '../../utils/FormValidation';
 import AuthenticationService from '../../api/AuthenticationService';
 import CommonUtils from '../../utils/CommonUtils';
 import AuthenticationUtils from '../../utils/AuthenticationUtils';
+import { FormView, Hide } from 'grommet-icons';
 
 const ResetPassword = ({ closeLayer, email }) => {
-  const [formValues, setFormValues] = React.useState({ resetEmail: email });
-  const [notificationVisible, setNotificationVisible] = React.useState();
-  const [notificationMessage, setNotificationMessage] = React.useState('');
-  const [status, setStatus] = React.useState('normal');
+  const [formValues, setFormValues] = useState({ resetEmail: email });
+  const [notificationVisible, setNotificationVisible] = useState();
+  const [notificationMessage, setNotificationMessage] = useState('');
+  const [status, setStatus] = useState('normal');
   const onSubmit = ({ value }) => {
     //reset logic here
     console.log(value.resetEmail);
@@ -112,16 +113,17 @@ const ResetPassword = ({ closeLayer, email }) => {
 };
 
 const LoginForm = () => {
-  const [formValues, setFormValues] = React.useState({
+  const [formValues, setFormValues] = useState({
     email: '',
     password: '',
   });
   const size = useContext(ResponsiveContext);
-  const [showForgotPassword, setShowForgotPassword] = React.useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [checked, setChecked] = useState(false);
-  const [notificationVisible, setNotificationVisible] = React.useState();
-  const [notificationMessage, setNotificationMessage] = React.useState('');
-  const [status, setStatus] = React.useState('normal');
+  const [notificationVisible, setNotificationVisible] = useState();
+  const [notificationMessage, setNotificationMessage] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [status, setStatus] = useState('normal');
   const navigate = useNavigate();
 
   const onClose = () => {
@@ -181,6 +183,11 @@ const LoginForm = () => {
         }
       });
   };
+
+  const changeShowPassword = () => {
+    setShowPassword((prev) => !prev);
+  };
+
   return (
     <Box margin={{ top: '3%', left: '5%' }}>
       <Box align='center' gap='small'>
@@ -242,12 +249,25 @@ const LoginForm = () => {
             label='Password'
             required={{ indicator: false }}
           >
-            <TextInput
-              id='password-sign-in'
-              name='password'
-              placeholder='Enter your password'
-              type='password'
-            />
+            <Box
+              direction='row'
+              focusIndicator={false}
+              style={{ borderRadius: '4px' }}
+            >
+              <TextInput
+                id='password-sign-in'
+                name='password'
+                placeholder='Enter your password'
+                type={showPassword ? 'text' : 'password'}
+                style={{ border: 'none' }}
+                focusIndicator={false}
+              />
+              <Button
+                icon={showPassword ? <Hide /> : <FormView />}
+                onClick={changeShowPassword}
+                style={{ border: 'none', borderRadius: '0px' }}
+              />
+            </Box>
           </FormField>
           <FormField htmlFor='remember-me'>
             <CheckBox

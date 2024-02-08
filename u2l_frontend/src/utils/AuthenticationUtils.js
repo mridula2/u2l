@@ -34,10 +34,12 @@ const removeUserDetails = () => {
 };
 
 const isUserLoggedIn = () => {
-  return !(
-    sessionStorage.getItem(jwt) === null &&
-    localStorage.getItem(jwt) === null
-  );
+    // console.log(jwtUtils.getItemFromToken('exp') * 1000 < Date.now())
+    // console.log(Date.now())
+    if(getToken()){
+      return !jwtUtils.getItemFromToken('exp') * 1000 < Date.now();
+    }
+  return false;
 };
 const getEmail = () => {
   return jwtUtils.getItemFromToken(userEmail);

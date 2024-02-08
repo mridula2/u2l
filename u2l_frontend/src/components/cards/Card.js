@@ -4,12 +4,9 @@ import { CardTemplate } from './CardTemplate';
 
 const SelectionSummary = (props) => {
   return (
-    <Box direction='row' gap='xxsmall'>
-      <Text size='large' weight='bold'>
-        {props.length}
-      </Text>
-      <Text></Text>
-    </Box>
+    <Text size='large' weight='bold' margin='none'>
+      {props.length}
+    </Text>
   );
 };
 
@@ -54,7 +51,9 @@ const Card = (props) => {
         {/* <Box flex skeleton={false} /> */}
         <Box
           style={{ justifySelf: 'end' }}
-          margin={{ top: 'xsmall', right: 'small' }}
+          margin={{ top: 'xsmall', right: 'medium' }}
+          width='24px'
+          height='24px'
         >
           <SelectionSummary length={props.length} />
         </Box>

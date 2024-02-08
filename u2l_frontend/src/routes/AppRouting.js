@@ -1,5 +1,6 @@
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+
 import LoginPage from '../pages/Login/LoginPage';
 import LogDetails from '../pages/LogDetails';
 import PdfPreview from '../pages/pdf/PdfPreview';
@@ -7,23 +8,61 @@ import PdfView from '../pages/pdf/PdfViewer';
 import Review from '../pages/Review';
 import ProjectDetails from '../pages/ProjectDetails';
 import Dashboard from '../pages/Dashboard';
-import WizardValidationExample from '../components/Wizard/Wizard';
 import SignUp from '../pages/SignUp';
 import Documentation from '../pages/Documentation';
 import Contact from '../pages/Contact';
 import AboutUs from '../pages/AboutUs';
-import AuthenticatedRoute from './AuthenticatedRoute';
+import Rules from '../pages/Rules';
+import jwtUtils from '../utils/jwtUtils';
 import AuthenticationUtils from '../utils/AuthenticationUtils';
+import WizardValidationExample from '../components/Wizard/Wizard';
+import AuthenticatedRoute from './AuthenticatedRoute';
 import AdminPursuitCustomerAuthorizedRoute from './AdminPursuitCustomerAuthorizedRoute';
+import url from '../config/url';
 
 const AppRouting = () => {
-  axios.interceptors.request.use(function (config) {
-    const token = AuthenticationUtils.getToken();
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+  const navigate = useNavigate();
+  // axios.interceptors.request.use(function (config) {
+  //   const token = AuthenticationUtils.getToken();
+  //   if (token) {
+  //     if (jwtUtils.decodeJWTToken(token).exp < Date.now() / 1000) {
+  //       console.log(`Token expired`);
+  //       AuthenticationUtils.removeUserDetails();
+  //       navigate('/');
+  //       throw config;
+  //     }
+  //     config.headers.Authorization = `Bearer ${token}`;
+  //   }
+  //   return config;
+  // });
+  axios.defaults.baseURL = url;
+  axios.interceptors.request.use(
+    (request) => {
+      // console.log(request);
+      const token = AuthenticationUtils.getToken();
+      if (token) {
+        request.headers.Authorization = `Bearer ${token}`;
+      }
+      return request;
+    },
+    (error) => {
+      return Promise.reject(error);
     }
-    return config;
-  });
+  );
+
+  axios.interceptors.response.use(
+    (response) => {
+      return response;
+    },
+    (error) => {
+      if (error.response && error.response.status === 401) {
+        AuthenticationUtils.removeUserDetails();
+        navigate('/');
+      }
+      return error;
+    }
+  );
+
   // let location = useLocation();
   return (
     <Routes>
@@ -44,6 +83,7 @@ const AppRouting = () => {
         {/* Only users with role admin, pursuit or customer can access */}
         <Route element={<AdminPursuitCustomerAuthorizedRoute />}>
           <Route path='/documentation' element={<Documentation />} />
+          <Route path='/rules' element={<Rules />} />
         </Route>
       </Route>
     </Routes>

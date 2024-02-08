@@ -1,0 +1,108 @@
+xlc,gcc
+C89,gcc ansi
+xlc128,NA
+xlc128,NA
+cc128,NA
+q32,-m32
+q64i,-m64
+qlanglvl,-fstd
+qaggrcopy,NA
+qalias,-fstrict
+qansialias,-qansialias
+qalign,-mstrict
+qalloca,Default GNU
+qarch,-mcpu=cpu_type
+qnoassert,Default GNU
+qattr,NA
+bdynamic,fpic
+bshared,-shared 
+bstatic,-static 
+qbitfields,-fsigned
+brtl,-shared 
+qcache,Default GNU
+qchars,-fsigned
+qcheck,Default GNU	
+qcinc,Default GNU
+qcompact,-Os
+qcpluscmt,Default GNU
+qdataimported,Default GNU
+qdataimportedi,Default GNU
+qdatalocali,Default GNU
+qdbxextrai,Default GNU
+qdigraphi,Default GNU
+qdollari,fdollars
+qdpcli,Default GNU
+qeLabeli,-e Label 
+qehi,-fexceptions
+qenumi,__attribute__
+qexpfilei,Default GNU
+qextchki,Default GNU
+qfpdr,Default GNU
+qflag,Default GNU
+qfloat,Default GNU
+qflttrap,-mfp-trap-mode= TRap mode
+qfold,Default GNU
+-qfullpath,Default GNU
+-qfuncsect,Default GNU
+-qgenproto,Default GNU
+-qhalt,Default GNU
+-qhaltonmsg,Default GNU
+-qhot,Default GNU
+-qhsflt,Default GNU
+-qhssngl,Default GNU
+-qidirfirst,Default GNU
+-qignerrno,Default GNU
+-qignprag,Default GNU
+-qinfo,Default GNU
+-qinitauto,Default GNU
+-qinlglue,Default GNU
+-qinline,Default GNU
+-qipa,Default GNU
+-qisolated_call,Default GNU
+-qkeepinlines,Default GNU
+-qkeyword,Default GNU
+-qlanglvl,-ansi flang-isoc9x
+-qldbl128,Default GNU
+-qlongdouble,Default GNU
+-qlibansi,Default GNU
+-qlinedebug,Default GNU
+-qlist,Default GNU
+-qlistopt,Default GNU
+-qlonglit,Default GNU
+-qlonglong,-mlong64
+-qmacpstr,Default GNU
+-qmaf,Default GNU
+-qmakedep,-M
+-qmaxerr,Default GNU
+-qmaxmem,Default GNU
+-qmbcs,LANG
+-qmkshrobj,libtool or -shared
+-qnamemangling,Default GNU
+-qobjmodel,Default GNU
+-qoldpassbyvalue,Default GNU
+-qpascal,Default GNU
+-qpath,Default GNU
+-qpdf1,Default GNU
+-qpdf2,Default GNU
+-pg,-fprofile-generate
+-qphsinfo,gcov
+-qprint,Default GNU
+-qpriority,Default GNU
+-qproclocali,Default GNU
+-qprocimported,Default GNU
+-qprocunknowni,Default GNU
+-qprotoi,Default GNU
+-qstdinci,-nostdinc
+-qsyntaxonly,-fsyntax-only
+-qtempinc,-frepo
+-qtemplaterecompilei,-frepo
+-qtemplateregistryi,-frepo
+-qthreaded,-lpthread -D_REENTRANT
+-qtune,-b
+-qunroll,-funroll-loops
+-qvftable,-fvtable-thunks
+-bexpall,-E --export-dynamic
+usersec.h,Check GNU Header
+userpw.h,Check GNU Header
+sys/mode.h,Check GNU Header
+standards.h,Check GNU Header

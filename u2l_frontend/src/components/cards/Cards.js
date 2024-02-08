@@ -35,13 +35,13 @@ const Cards = ({
 
   const inProgress = () => {
     return projects.filter((e) =>
-      e.analysis_status.toLowerCase().includes('started')
+      e.analysis_status.toLowerCase().includes('pending')
     ).length;
   };
 
   const okLength = () => {
     return projects.filter((e) =>
-      e.analysis_status.toLowerCase().includes('successful')
+      e.analysis_status.toLowerCase().includes('success')
     ).length;
   };
 

@@ -1,8 +1,9 @@
 import { PDFViewer } from '@react-pdf/renderer';
 import { useLocation } from 'react-router-dom';
-import PdfDocument from './PdfDocument';
 import { Box } from 'grommet';
 import { useEffect } from 'react';
+
+import PdfDocument from './PdfDocument';
 
 const PdfView = () => {
   const location = useLocation();

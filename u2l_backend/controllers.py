@@ -1,5 +1,5 @@
-from flask import Blueprint, jsonify, request, Response, Flask
-from utils import validate_email, generate_workbook, sheet_transfer, fetch_store_java_data, send_email, summary_sheet_generation, testing_task, run_cppcheck
+from flask import Blueprint, jsonify, request, Response, Flask, stream_with_context
+from utils import validate_email, generate_workbook, sheet_transfer, fetch_store_java_data, send_email, summary_sheet_generation, testing_task, run_cppcheck, get_task_queue_name, convert_to_dataframe_move_to_excel, createDf, java_doc_sheet
 from models import *
 import datetime
 import os
@@ -11,10 +11,22 @@ import re
 import numpy as np
 import zipfile
 import openpyxl
-# from app import celery
+import logging
+from celery_setup import celery
+import requests
+from bs4 import BeautifulSoup
 
 from flask_jwt_extended import create_access_token #, get_jwt_claims
 from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
+
+import json
+import time
+from celery.result import AsyncResult
+
+from flask_sse import sse
+import redis
+
+redis_client = redis.StrictRedis(host='localhost', port=6379, db=0)
 
 
 authentication_controller = Blueprint('authentication', __name__)
@@ -39,10 +51,6 @@ def signup():
     form_last_name = json_data['last_name']
     form_role = json_data['user_role']
     roles = ["delivery", "pursuit", "customer", "admin"]
-    result = testing_task.delay(5, 5)  # Use .delay() to call the Celery task asynchronously
-    result1 = testing_task.delay(5, 6)  # Use .delay() to call the Celery task asynchronously
-    result2 = testing_task.delay(5, 7)  # Use .delay() to call the Celery task asynchronously
-    return jsonify({'message': 'SignUp Successful', 'task_id': result.id, 'task_id1': result1.id, 'task_id2': result2.id}), 200
 
     if form_role.lower() not in roles:
       error_message = {'error' :"Invalid role type"}
@@ -143,1419 +151,437 @@ def jwt_access_token2():
 @authentication_controller.route('/analysis', methods=['POST'])
 @jwt_required()
 def upload():
-    try:
-        file = request.files['file_name']
+    
+    print('Analysis Started !!')
+    file = request.files['file_name']
 
-        form_project_name = request.form['project_name']
-        form_application_name = request.form['application_name']
-        form_project_client = request.form['project_client']
-        form_project_manager = request.form['project_manager']
-        global tool_analysis_type
-        tool_analysis_type = request.form['analysis_type']
+    form_project_name = request.form['project_name']
+    form_application_name = request.form['application_name']
+    form_project_client = request.form['project_client']
+    form_project_manager = request.form['project_manager']
+    global tool_analysis_type
+    tool_analysis_type = request.form['analysis_type']
 
-        form_source_os = request.form['source_os']
-        form_source_os_version = request.form['source_os_version']
-        form_target_os = request.form['target_os']
-        form_target_os_version = request.form['target_os_version']
-        c_analysis_types = ['C', 'C++', 'Pro*C', 'C/Pro*C', 'C++/Pro*C']
+    form_source_os = request.form['source_os']
+    form_source_os_version = request.form['source_os_version']
+    form_target_os = request.form['target_os']
+    form_target_os_version = request.form['target_os_version']
+    c_analysis_types = ['C', 'C++', 'Pro*C', 'C/Pro*C', 'C++/Pro*C']
+    # framework_type = request.form['framework']
+    framework_type = ''
+
+    form_source_jdk = ''
+    form_target_jdk = ''
+    form_source_jsp = ''
+    form_target_jsp = ''
+    form_source_servlet = ''
+    form_target_servlet = ''
+
+    form_source_pre_compiler = ''
+    form_target_pre_compiler = ''
+    form_source_pre_compiler_version = ''
+    form_target_pre_compiler_version = ''
+    form_source_compiler = ''
+    form_target_compiler = ''
+    form_source_compiler_version = ''
+    form_target_compiler_version = ''
+
+    form_source_compiler = ''
+    form_target_compiler = ''
+    form_source_compiler_version = ''
+    form_target_compiler_version = ''
+    form_source_pre_compiler = ''
+    form_target_pre_compiler = ''
+    form_source_pre_compiler_version = ''
+    form_target_pre_compiler_version = ''
+
+    form_source_pre_compiler = ''
+    form_target_pre_compiler = ''
+    form_source_pre_compiler_version = ''
+    form_target_pre_compiler_version = ''
+    form_source_compiler = ''
+    form_target_compiler = ''
+    form_source_compiler_version = ''
+    form_target_compiler_version = ''
+
+    form_source_shell = ''
+    form_target_shell = ''
+    form_source_shell_version = ''
+    form_target_shell_version = ''
+
+    if(tool_analysis_type == 'Java'):
+        tool_analysis_type = 'javaanalysis'
+        form_source_jdk = request.form['source_jdk']
+        form_target_jdk = request.form['target_jdk']
+        form_source_jsp = request.form['source_jsp']
+        form_target_jsp = request.form['target_jsp']
+        form_source_servlet = request.form['source_servlet']
+        form_target_servlet = request.form['target_servlet']
         framework_type = request.form['framework']
+    elif(tool_analysis_type in c_analysis_types):
+        if(tool_analysis_type == 'Pro*C'):
+            tool_analysis_type = 'canalysis'
+            form_source_pre_compiler = request.form['source_pre_compiler']
+            form_target_pre_compiler = request.form['target_pre_compiler']
+            form_source_pre_compiler_version = request.form['source_pre_compiler_version']
+            form_target_pre_compiler_version = request.form['target_pre_compiler_version']
+            form_source_compiler = ''
+            form_target_compiler = ''
+            form_source_compiler_version = ''
+            form_target_compiler_version = ''
+        elif(tool_analysis_type == 'C' or tool_analysis_type == 'C++'):
+            print('Accepting C Parameters!')
+            tool_analysis_type = 'canalysis'
+            form_source_compiler = request.form['source_compiler']
+            form_target_compiler = request.form['target_compiler']
+            form_source_compiler_version = request.form['source_compiler_version']
+            form_target_compiler_version = request.form['target_compiler_version']
+            form_source_pre_compiler = ''
+            form_target_pre_compiler = ''
+            form_source_pre_compiler_version = ''
+            form_target_pre_compiler_version = ''
+            form_middleware_type = request.form['middleware_type']
+            print(form_middleware_type)
+        elif(tool_analysis_type == 'C/Pro*C' or tool_analysis_type == 'C++/Pro*C'):
+            tool_analysis_type = 'canalysis'
+            form_source_pre_compiler = request.form['source_pre_compiler']
+            form_target_pre_compiler = request.form['target_pre_compiler']
+            form_source_pre_compiler_version = request.form['source_pre_compiler_version']
+            form_target_pre_compiler_version = request.form['target_pre_compiler_version']  
+            form_source_compiler = request.form['source_compiler']
+            form_target_compiler = request.form['target_compiler']
+            form_source_compiler_version = request.form['source_compiler_version']
+            form_target_compiler_version = request.form['target_compiler_version']
+    elif(tool_analysis_type == 'Shell'):  
+        tool_analysis_type = 'shellanalysis'
+        form_source_shell = request.form['source_shell']
+        form_target_shell = request.form['target_shell']
+        form_source_shell_version = request.form['source_shell_version']
+        form_target_shell_version = request.form['target_shell_version']
 
-        if(tool_analysis_type == 'Java'):
-            tool_analysis_type = 'javaanalysis'
-            form_source_jdk = request.form['source_jdk']
-            form_target_jdk = request.form['target_jdk']
-            form_source_jsp = request.form['source_jsp']
-            form_target_jsp = request.form['target_jsp']
-            form_source_servlet = request.form['source_servlet']
-            form_target_servlet = request.form['target_servlet']
-        elif(tool_analysis_type in c_analysis_types):
-            if(tool_analysis_type == 'Pro*C'):
-                tool_analysis_type = 'canalysis'
-                form_source_pre_compiler = request.form['source_pre_compiler']
-                form_target_pre_compiler = request.form['target_pre_compiler']
-                form_source_pre_compiler_version = request.form['source_pre_compiler_version']
-                form_target_pre_compiler_version = request.form['target_pre_compiler_version']
-                form_source_compiler = ''
-                form_target_compiler = ''
-                form_source_compiler_version = ''
-                form_target_compiler_version = ''
-            elif(tool_analysis_type == 'C' or tool_analysis_type == 'C++'):
-                tool_analysis_type = 'canalysis'
-                form_source_compiler = request.form['source_compiler']
-                form_target_compiler = request.form['target_compiler']
-                form_source_compiler_version = request.form['source_compiler_version']
-                form_target_compiler_version = request.form['target_compiler_version']
-                form_source_pre_compiler = ''
-                form_target_pre_compiler = ''
-                form_source_pre_compiler_version = ''
-                form_target_pre_compiler_version = ''
-            elif(tool_analysis_type == 'C/Pro*C' or tool_analysis_type == 'C++/Pro*C'):
-                tool_analysis_type = 'canalysis'
-                form_source_pre_compiler = request.form['source_pre_compiler']
-                form_target_pre_compiler = request.form['target_pre_compiler']
-                form_source_pre_compiler_version = request.form['source_pre_compiler_version']
-                form_target_pre_compiler_version = request.form['target_pre_compiler_version']  
-                form_source_compiler = request.form['source_compiler']
-                form_target_compiler = request.form['target_compiler']
-                form_source_compiler_version = request.form['source_compiler_version']
-                form_target_compiler_version = request.form['target_compiler_version']
-        elif(tool_analysis_type == 'Shell'):  
-            tool_analysis_type = 'shellanalysis'
-            form_source_shell = request.form['source_shell']
-            form_target_shell = request.form['target_shell']
-            form_source_shell_version = request.form['source_shell_version']
-            form_target_shell_version = request.form['target_shell_version']
-
-
-        analysis_types = ['javaanalysis', 'canalysis', 'shellanalysis']
-        if tool_analysis_type not in analysis_types:
-            error_message = {'error' :"Invalid analysis type"}
-            return jsonify(error_message), 404
-
-        cur_date = datetime.datetime.now()
+    analysis_types = ['javaanalysis', 'canalysis', 'shellanalysis']
+    if tool_analysis_type not in analysis_types:
+        error_message = {'error' :"Invalid analysis type"}
+        return jsonify(error_message), 404
     
-        global file_name
-        file_name = file.filename
-        temp_tuple = os.path.splitext(file_name)
-        if temp_tuple[1] != '.zip':
-            error_message = {'error' :"Upload .zip files only"}
-            return jsonify(error_message), 404
-        file_name = temp_tuple[0]
+    cur_date = datetime.datetime.now()
 
-        year_month_day = str(cur_date).split(" ")
-        global yMD
-        yMD = year_month_day[0].replace("-", "")
+    global file_name
+    file_name = file.filename
+    temp_tuple = os.path.splitext(file_name)
+    if temp_tuple[1] != '.zip':
+        error_message = {'error' :"Upload .zip files only"}
+        return jsonify(error_message), 404
 
-        hour_min_sec = os.path.splitext(year_month_day[1])
-        global hMS
-        hMS = hour_min_sec[0].replace(":", "")
+    file_name = temp_tuple[0]
 
-        file_name = file_name + "_" + yMD + "_" + hMS 
-        directory = './projects/' + file_name
-        os.makedirs(directory)
-        file.save(os.path.join(directory, file_name +'.zip'))
+    year_month_day = str(cur_date).split(" ")
+    global yMD
+    yMD = year_month_day[0].replace("-", "")
 
-        file_size_bytes = os.stat(directory +'/'+ file_name + '.zip').st_size
-        file_size_mb = round(file_size_bytes/(1024), 3)
+    hour_min_sec = os.path.splitext(year_month_day[1])
+    global hMS
+    hMS = hour_min_sec[0].replace(":", "")
 
-        #to copy Java, U2L and report_templates folder
-        try:
-            source_dir = '/usr/u2l/u2l_backend/'
-            source_dir_report = '/usr/u2l/u2l_backend/report_templates/'
-            dest_dir = directory
-            source_path = os.path.join(source_dir, 'U2L')
-            dest_path = os.path.join(dest_dir, 'U2L')
-            shutil.copytree(source_path, dest_path)  
-            
-            if(tool_analysis_type == 'javaanalysis'):
-                source_path = os.path.join(source_dir, 'Java')
-                dest_path = os.path.join(dest_dir, 'Java')
-                shutil.copytree(source_path, dest_path)
+    file_name = file_name + "_" + yMD + "_" + hMS 
+    directory = '/usr/u2l/u2l_backend/projects/' + file_name
+    os.makedirs(directory)
+    file.save(os.path.join(directory, file_name +'.zip'))
 
-                source_path = os.path.join(source_dir, 'pmd-bin-6.55.0')
-                dest_path = os.path.join(dest_dir, 'pmd-bin-6.55.0')
-                shutil.copytree(source_path, dest_path)
+    file_size_bytes = os.stat(directory +'/'+ file_name + '.zip').st_size
+    file_size_mb = round(file_size_bytes/(1024), 3)
 
-                make_directory = dest_dir + '/pmd-bin-6.55.0/Reports_1'
-                os.makedirs(make_directory)
-
-                source_path = os.path.join(source_dir_report, 'java_report.xlsx')
-                dest_path = os.path.join(dest_dir, 'java_report.xlsx')
-                shutil.copy(source_path, dest_path)
-
-                source_path = os.path.join(source_dir_report, 'java_inventory_report.xlsx')
-                dest_path = os.path.join(dest_dir, 'java_inventory_report.xlsx')
-                shutil.copy(source_path, dest_path)
-
-                source_path = os.path.join(source_dir_report, 'java_remediation_report.xlsx')
-                dest_path = os.path.join(dest_dir, 'java_remediation_report.xlsx')
-                shutil.copy(source_path, dest_path)
-
-                source_path = os.path.join(source_dir_report, 'java_high_level_report.xlsx')
-                dest_path = os.path.join(dest_dir, 'java_high_level_report.xlsx')
-                shutil.copy(source_path, dest_path)
-
-            elif(tool_analysis_type == 'shellanalysis'):
-
-                source_path = os.path.join(source_dir, 'pmd-bin-6.55.0')
-                dest_path = os.path.join(dest_dir, 'pmd-bin-6.55.0')
-                shutil.copytree(source_path, dest_path)
-
-                make_directory = dest_dir + '/pmd-bin-6.55.0/Reports_1'
-                os.makedirs(make_directory)
-
-                source_path = os.path.join(source_dir_report, 'shell_report.xlsx')
-                dest_path = os.path.join(dest_dir, 'shell_report.xlsx')
-                shutil.copy(source_path, dest_path)
-
-                source_path = os.path.join(source_dir_report, 'shell_inventory_report.xlsx')
-                dest_path = os.path.join(dest_dir, 'shell_inventory_report.xlsx')
-                shutil.copy(source_path, dest_path)
-
-                source_path = os.path.join(source_dir_report, 'shell_remediation_report.xlsx')
-                dest_path = os.path.join(dest_dir, 'shell_remediation_report.xlsx')
-                shutil.copy(source_path, dest_path)
-
-                source_path = os.path.join(source_dir_report, 'shell_high_level_report.xlsx')
-                dest_path = os.path.join(dest_dir, 'shell_high_level_report.xlsx')
-                shutil.copy(source_path, dest_path)
-
-            elif(tool_analysis_type == 'canalysis'):
-                source_path = os.path.join(source_dir_report, 'c_report.xlsx')
-                dest_path = os.path.join(dest_dir, 'c_report.xlsx')
-                shutil.copy(source_path, dest_path)
-
-                source_path = os.path.join(source_dir_report, 'c_inventory_report.xlsx')
-                dest_path = os.path.join(dest_dir, 'c_inventory_report.xlsx')
-                shutil.copy(source_path, dest_path)
+    # # to copy Java, U2L and report_templates folder
+    try:
+        source_dir = '/usr/u2l/u2l_backend/'
+        source_dir_report = '/usr/u2l/u2l_backend/report_templates/'
+        dest_dir = directory
+        source_path = os.path.join(source_dir, 'U2L')
+        dest_path = os.path.join(dest_dir, 'U2L')
+        shutil.copytree(source_path, dest_path)  
         
-        except Exception as e:
-            response = jsonify({'error': str(e)})
-            response.status_code = 500
-            return response 
-
-        #storing values in db project_details table
-        db_project_details = project_details(form_project_name, form_application_name, 'admin@hpe.com', 1, form_project_client, form_project_manager, file_name, file_size_mb, 'analysis started', cur_date)
-        db.session.add(db_project_details)
-        try:
-            db.session.commit()
-        except Exception as e:
-            db.session.rollback()
-            print(e)
-            return jsonify({'message': 'project_details : Project name already exists'}), 409
-
-        #storing values in db analysis_type table
-        db_analysis_type = analysis_type(form_project_name, form_application_name, tool_analysis_type)
-        db.session.add(db_analysis_type)
-        try:
-            db.session.commit()
-        except Exception as e:
-            db.session.rollback()
-            return jsonify({'message': 'analysis_type : Project name already exists'}), 409
-
-        #storing values in db os_details table
-        db_os_details = os_details(form_project_name, form_application_name, form_source_os, form_source_os_version, form_target_os, form_target_os_version)
-        db.session.add(db_os_details)
-        try:
-            db.session.commit()
-        except Exception as e:
-            db.session.rollback()
-            return jsonify({'message': 'os_details : Project name already exists'}), 409
-        
-        #storing values in db analysis_status table
-        analysis_start_time = datetime.datetime.now()
-        analysis_end_time = datetime.datetime.now()
-        db_analysis_status = analysis_status(form_project_name, form_application_name, db_analysis_type.id, 'admin@hpe.com', 'analysis started', file_name, file_size_mb, analysis_start_time, analysis_end_time)
-        db.session.add(db_analysis_status)
-        try:
-            db.session.commit()
-        except Exception as e:
-            db.session.rollback()
-            return jsonify({'message': 'analysis_status : Project name already exists'}), 409
-
-        # Execute U2LTool_Install.sh Script
-        script_path = './projects/' + file_name + '/U2L/U2LTool_Install.sh'
-    
-        if(db_analysis_type.analysis_type == 'javaanalysis'):
-            db_analysis_java = analysis_java(form_project_name, form_application_name, db_analysis_type.id, form_source_jdk, form_target_jdk, form_source_jsp, form_target_jsp, form_source_servlet, form_target_servlet)
-            db.session.add(db_analysis_java)
-            db.session.commit()
-            file_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/java-vfunction_' + yMD + '_' + hMS
-        elif(db_analysis_type.analysis_type == 'canalysis'):
-            db_analysis_c = analysis_c(form_project_name, form_application_name, db_analysis_type.id, form_source_compiler, form_target_compiler, form_source_compiler_version, form_target_compiler_version, form_source_pre_compiler, form_target_pre_compiler, form_source_pre_compiler_version, form_target_pre_compiler_version)
-            db.session.add(db_analysis_c)
-            db.session.commit()
-            file_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/c-vfunction_' + yMD + '_' + hMS
-        elif(db_analysis_type.analysis_type == 'shellanalysis'):
-            db_analysis_shell = analysis_shell(form_project_name, form_application_name, db_analysis_type.id, form_source_shell, form_target_shell, form_source_shell_version, form_target_shell_version)
-            db.session.add(db_analysis_shell)
-            db.session.commit()
-            file_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/shell-vfunction_' + yMD + '_' + hMS
-
-        try:
-            command = ['sh', script_path, file_path, tool_analysis_type]
-            process = subprocess.Popen(command, stdout=subprocess.PIPE)
-            output = process.communicate()[0].decode().strip()
-            lines = output.split('\n')
-            print(lines)
-            print('\nTool Installation Completed !!') 
-        except Exception as e:
-            return jsonify({'error': str(e)})
-
-        global PJHOME
-        PJHOME = lines[5].split(':')[1]
-        global APNAME
-        APNAME = lines[6].split(':')[1]
-        
-        # Export 'PJHOME' & 'APNAME' variables
-        os.environ['PJHOME'] = PJHOME
-        os.environ['APNAME'] = APNAME
-
-        # Copy source code to java/c/shell analysis directory
-        source_path = '/usr/u2l/u2l_backend/projects/' + file_name +'/'+ file_name + '.zip'
-        try:
-            if(tool_analysis_type == 'javaanalysis'):
-                destination_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/java-vfunction_'+ yMD + '_' + hMS +'/work/javaanalysis/'
-            elif(tool_analysis_type == 'canalysis'):
-                destination_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/c-vfunction_'+ yMD + '_' + hMS +'/work/canalysis/'
-            elif(tool_analysis_type == 'shellanalysis'):
-                destination_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/shell-vfunction_'+ yMD + '_' + hMS +'/work/shellanalysis/'
-            shutil.unpack_archive(source_path, destination_path, 'zip')
-            
-        except Exception as e:
-            response = jsonify({'error': str(e)})
-            response.status_code = 500
-            return response
-
-        # Execute U2LTool_Analysis.sh Script for c/shell analysis
-        try:
-            if(tool_analysis_type == 'canalysis' or tool_analysis_type == 'shellanalysis'):
-                script_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/U2LTool_Analysis.sh'
-
-                command = ['sh', script_path, PJHOME, APNAME]
-                process = subprocess.Popen(command, stdout=subprocess.PIPE)
-                process.wait()
-                output = process.communicate()[0].decode().strip()
-                print('\nCompleted running U2LTool_Analysis.sh')
-        
-        except Exception as e:
-            return jsonify({'error': str(e)})
-        
-        # Execute U2LTool_Analysis.sh Script for java analysis
         if(tool_analysis_type == 'javaanalysis'):
-            try:
+            source_path = os.path.join(source_dir, 'Java')
+            dest_path = os.path.join(dest_dir, 'Java')
+            shutil.copytree(source_path, dest_path)
 
-                script_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/U2LTool_Analysis.sh'
+            source_path = os.path.join(source_dir, 'pmd-bin-6.55.0')
+            dest_path = os.path.join(dest_dir, 'pmd-bin-6.55.0')
+            shutil.copytree(source_path, dest_path)
 
-                command = ['sh', script_path, PJHOME, APNAME]
-                process = subprocess.Popen(command, stdout=subprocess.PIPE)
-                process.wait()
-                output = process.communicate()[0].decode().strip()
-                # form_source_jdk = request.form.get('source_jdk', '\n')
-                # form_target_jdk = request.form.get('target_jdk', '\n')
-                # form_source_jsp = request.form.get('source_jsp', '\n')
-                # form_target_jsp = request.form.get('target_jsp', '\n')
-                # form_source_servlet = request.form.get('source_servlet', '\n')
-                # form_target_servlet = request.form.get('target_servlet', '\n')
+            make_directory = dest_dir + '/pmd-bin-6.55.0/Reports_1'
+            os.makedirs(make_directory)
 
-                # command = ['sh', script_path, PJHOME, APNAME, form_source_jdk, form_target_jdk, form_source_jsp, form_target_jsp, form_source_servlet, form_target_servlet]
-                # process = subprocess.Popen(command, stdout=subprocess.PIPE)
-                # output = process.communicate()[0].decode().strip()
-                # lines = output.split('\n')
-                # print(lines)
-                # print(output)
+            source_path = os.path.join(source_dir_report, 'java_report.xlsx')
+            dest_path = os.path.join(dest_dir, 'java_report.xlsx')
+            shutil.copy(source_path, dest_path)
 
-                print('\nCompleted running U2LTool_Analysis.sh')
-            
-            except Exception as e:
-                return jsonify({'error': str(e)})
+            source_path = os.path.join(source_dir_report, 'java_inventory_report.xlsx')
+            dest_path = os.path.join(dest_dir, 'java_inventory_report.xlsx')
+            shutil.copy(source_path, dest_path)
 
-            # To run the javaanalysis scripts
-            # Export 'PJHOME' variable
-            PJHOME = '/usr/u2l/u2l_backend/projects/' + file_name + '/Java'
-            os.environ['PJHOME'] = PJHOME
+            source_path = os.path.join(source_dir_report, 'java_remediation_report.xlsx')
+            dest_path = os.path.join(dest_dir, 'java_remediation_report.xlsx')
+            shutil.copy(source_path, dest_path)
 
-            # Run javaSourceDiscovery.sh script
-            try:
-                script_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/Java/javaSourceDiscovery.sh'
-                code_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/java-vfunction_'+ yMD + '_' + hMS +'/work/javaanalysis/'
-                command = ['sh', script_path, code_path]
-                process = subprocess.Popen(command, stdout=subprocess.PIPE)
-                output = process.communicate()[0].decode().strip()
-                lines = output.split('\n')
-                print(lines)
-                print('\nCompleted running javaSourceDiscovery.sh')
-            except Exception as e:
-                return jsonify({'error': str(e)})    
+            source_path = os.path.join(source_dir_report, 'java_high_level_report.xlsx')
+            dest_path = os.path.join(dest_dir, 'java_high_level_report.xlsx')
+            shutil.copy(source_path, dest_path)
 
-            # Run javaRulesScan.sh script
-            try:
-                script_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/Java/javaRulesScan.sh'
-                code_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/java-vfunction_'+ yMD + '_' + hMS +'/work/javaanalysis/'
-                command = ['sh', script_path, code_path]
-                process = subprocess.Popen(command, stdout=subprocess.PIPE)
-                output = process.communicate()[0].decode().strip()
-                lines = output.split('\n')
-                print(lines)
-                print('\nCompleted running javaRulesScan.sh')
-            except Exception as e:
-                return jsonify({'error': str(e)})   
+        elif(tool_analysis_type == 'shellanalysis'):
 
-            # Run javaRulesRemedy.sh script
-            try:
-                script_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/Java/javaRulesRemedy.sh'
-                code_path = '/usr/u2l/u2l_backend/projects/' + file_name + 'U2L/java-vfunction_'+ yMD + '_' + hMS +'/work/javaanalysis/'
-                command = subprocess.Popen(['bash', script_path, code_path], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                output = command.communicate()[0].decode().strip()
-                lines = output.split('\n')
-                print(lines)
-                print('Completed running javaRulesRemedy.sh')
-            except Exception as e:
-                return jsonify({'error': str(e)})
-            
-            # Run javaFrameworkScan.sh script
-            if (framework_type != ''):
-                try:
-                    script_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/Java/javaFrameworkScan.sh'
-                    code_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/java-vfunction_'+ yMD + '_' + hMS +'/work/javaanalysis/'
-                    if(framework_type == 'JSF'):
-                        framework_type = 'Jsf'
-                    command = subprocess.Popen(['bash', script_path, code_path, framework_type], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                    output = command.communicate()[0].decode().strip()
-                    lines = output.split('\n')
-                    print(lines)
-                    print('\nCompleted running javaFrameworkScan.sh\n')
-                except Exception as e:
-                    return jsonify({'error': str(e)})
+            source_path = os.path.join(source_dir, 'pmd-bin-6.55.0')
+            dest_path = os.path.join(dest_dir, 'pmd-bin-6.55.0')
+            shutil.copytree(source_path, dest_path)
 
-            try:
+            make_directory = dest_dir + '/pmd-bin-6.55.0/Reports_1'
+            os.makedirs(make_directory)
 
-                print("Moving text files !!!")
-                source_dir = '/usr/u2l/u2l_backend/'
-                destination_dir = '/usr/u2l/u2l_backend/projects/' + file_name + '/'
+            source_path = os.path.join(source_dir_report, 'shell_report.xlsx')
+            dest_path = os.path.join(dest_dir, 'shell_report.xlsx')
+            shutil.copy(source_path, dest_path)
 
-                if not os.path.exists(source_dir):
-                    return 'Source directory does not exist', 400
-                if not os.path.exists(destination_dir):
-                    return 'Destination directory does not exist', 400
+            source_path = os.path.join(source_dir_report, 'shell_inventory_report.xlsx')
+            dest_path = os.path.join(dest_dir, 'shell_inventory_report.xlsx')
+            shutil.copy(source_path, dest_path)
 
-                files_to_transfer = os.listdir(source_dir)
+            source_path = os.path.join(source_dir_report, 'shell_remediation_report.xlsx')
+            dest_path = os.path.join(dest_dir, 'shell_remediation_report.xlsx')
+            shutil.copy(source_path, dest_path)
 
-                for filename in files_to_transfer:
-                    if os.path.isfile(os.path.join(source_dir, filename)):
-                        file_extension = os.path.splitext(filename)[1]
-                        if file_extension == '.txt' or not file_extension:
-                            try:
-                                os.rename(os.path.join(source_dir, filename), os.path.join(destination_dir, filename))
-                            except FileNotFoundError:
-                                continue
-            except Exception as e:
-                return jsonify({'error': str(e)})
+            source_path = os.path.join(source_dir_report, 'shell_high_level_report.xlsx')
+            dest_path = os.path.join(dest_dir, 'shell_high_level_report.xlsx')
+            shutil.copy(source_path, dest_path)
 
-            extracted_file_name = file_name.split('_')[0]
-            
-            #Performance
-            run_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/pmd-bin-6.55.0/bin/run.sh'
-            pmd = 'pmd'
-            d = '-d'
-            src_filepath = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/java-vfunction_'+ yMD + '_' + hMS +'/work/javaanalysis/' + extracted_file_name
-            f = '-f'
-            report_format = 'csv'
-            r = '-R'
-            rule_set = 'rulesets/java/u2l_performance.xml'
-            use_version = '--use-version'
-            version = 'java-1.8'
-            report_file = '--report-file'
-            report_file_name = '/usr/u2l/u2l_backend/projects/' + file_name + '/pmd-bin-6.55.0/Reports_1/Performance_Report.csv'
-
-            command = ['sh', run_path, pmd, d, src_filepath, f, report_format, r, rule_set, use_version, version, report_file, report_file_name]
-
-            try:
-                process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                output, error = process.communicate()
-            except:
-                return 'PMD failed'
-
-            #Best Practices
-            run_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/pmd-bin-6.55.0/bin/run.sh'
-            pmd = 'pmd'
-            d = '-d'
-            src_filepath = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/java-vfunction_'+ yMD + '_' + hMS +'/work/javaanalysis/' + extracted_file_name
-            f = '-f'
-            report_format = 'csv'
-            r = '-R'
-            rule_set = 'rulesets/java/u2l_bestpractices.xml'
-            use_version = '--use-version'
-            version = 'java-1.8'
-            report_file = '--report-file'
-            report_file_name = '/usr/u2l/u2l_backend/projects/' + file_name + '/pmd-bin-6.55.0/Reports_1/BestPractices_Report.csv'
-
-            command = ['sh', run_path, pmd, d, src_filepath, f, report_format, r, rule_set, use_version, version, report_file, report_file_name]
-
-            try:
-                process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                output, error = process.communicate()
-            except:
-                return 'PMD failed'
-
-            #Multithreading
-            run_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/pmd-bin-6.55.0/bin/run.sh'
-            pmd = 'pmd'
-            d = '-d'
-            src_filepath = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/java-vfunction_'+ yMD + '_' + hMS +'/work/javaanalysis/' + extracted_file_name
-            f = '-f'
-            report_format = 'csv'
-            r = '-R'
-            rule_set = 'rulesets/java/u2l_multithread.xml'
-            use_version = '--use-version'
-            version = 'java-1.8'
-            report_file = '--report-file'
-            report_file_name = '/usr/u2l/u2l_backend/projects/' + file_name + '/pmd-bin-6.55.0/Reports_1/MultiThreading_Report.csv'
-
-            command = ['sh', run_path, pmd, d, src_filepath, f, report_format, r, rule_set, use_version, version, report_file, report_file_name]
-
-            try:
-                process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                output, error = process.communicate()
-            except:
-                return 'PMD failed'
-
-            #Security
-            run_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/pmd-bin-6.55.0/bin/run.sh'
-            pmd = 'pmd'
-            d = '-d'
-            src_filepath = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/java-vfunction_'+ yMD + '_' + hMS +'/work/javaanalysis/' + extracted_file_name
-            f = '-f'
-            report_format = 'csv'
-            r = '-R'
-            rule_set = 'rulesets/java/u2l_security.xml'
-            use_version = '--use-version'
-            version = 'java-1.8'
-            report_file = '--report-file'
-            report_file_name = '/usr/u2l/u2l_backend/projects/' + file_name + '/pmd-bin-6.55.0/Reports_1/Security_Report.csv'
-
-            command = ['sh', run_path, pmd, d, src_filepath, f, report_format, r, rule_set, use_version, version, report_file, report_file_name]
-
-            try:
-                process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                output, error = process.communicate()
-            except:
-                return 'PMD failed'
-            
         elif(tool_analysis_type == 'canalysis'):
-
-            file_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/'
-            os_source_details = 'HP-UX'
-            os_target_details = 'RHEL'
-
-            command = ['sh', file_path, os_source_details, os_target_details]
-
-        # Converting logs into dataframes and generating reports
-        try:
-
-            if(tool_analysis_type == 'javaanalysis'):
-
-                yyyy_mmdd = yMD[:4] + '-' + yMD[4:]
-                java_remediation_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/java_remediation_report.xlsx'
-                java_high_level_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/java_high_level_report.xlsx'
-                java_inventory_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/java_inventory_report.xlsx'
-                java_report_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/java_report.xlsx'
-                O29=0
-                P29=0
-                O32=0
-                P32=0
-                O35=0
-                P35=0
-                O36=0
-                P36=0
-                
-                # Convert javaSourceScanRemedy
-                print("Start 1 : javaSourceScanRemedy")
-                javaSourceScanRemedy = '/usr/u2l/u2l_backend/projects/' + file_name + '/javaSourceScanRemedy'
-                if os.path.isfile(javaSourceScanRemedy) and os.path.getsize(javaSourceScanRemedy) > 0:
-                    df = pd.read_csv(javaSourceScanRemedy, sep='\t', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
-                    df.columns = ['RULE ID', 'FILE NAME', 'LINE NUMBER', 'REMEDY']
-                    df['FILE NAME'] = df['FILE NAME'].str.replace(r'/usr/u2l/u2l_backend/projects/'+ file_name +'/U2L/java-vfunction_' + yMD + '_' + hMS + '/work/javaanalysis(/new)?/', './', regex=True)
-                    generate_workbook(df, java_report_path,'javaSourceScanRemedy')
-
-                    df1 = pd.read_excel(java_report_path, engine='openpyxl', sheet_name='javaSourceScanRemedy', skiprows=1, header=None)
-                    df1 = df1.iloc[:, [4]]
-                print("End 1 : javaSourceScanRemedy")
-
-                # Convert javaSourceCode2Remedy
-                print("Start 2 : javaSourceCode2Remedy")
-                javaSourceCode2Remedy = '/usr/u2l/u2l_backend/projects/' + file_name + '/javaSourceCode2Remedy'
-                if os.path.isfile(javaSourceCode2Remedy) and os.path.getsize(javaSourceCode2Remedy) > 0:
-                    with open(javaSourceCode2Remedy, 'r') as file:
-                        lines = file.readlines()
-
-                    with open(javaSourceCode2Remedy, 'w') as file:
-                        for line in lines:
-                            colon_count = line.count(':')
-                            if colon_count == 4:
-                                last_colon_index = line.rfind(':')
-                                line_without_last_colon = line[:last_colon_index] + line[last_colon_index + 1:]
-                            else:
-                                line_without_last_colon = line
-
-                            if line.startswith('\t'):
-                                line_without_first_tab = line[1:]
-                            else:
-                                line_without_first_tab = line
-
-                            file.write(line_without_last_colon)
-
-                    with open(javaSourceCode2Remedy, 'r') as file:
-                        lines = file.readlines()
-
-                    with open(javaSourceCode2Remedy, 'w') as file:
-                        for line in lines:
-                            first_tab_index = line.find('\t')
-                            if first_tab_index != -1:
-                                line_with_colon = line[:first_tab_index] + ':' + line[first_tab_index + 1:]
-                                line_without_tabs = line_with_colon.replace('\t', '')
-                            else:
-                                line_without_tabs = line
-
-                            file.write(line_without_tabs)
-
-                    df = pd.read_csv(javaSourceCode2Remedy, sep=':', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
-                    df.columns = ['RULE ID', 'FILE NAME', 'LINE NUMBER', 'AFFECTED CODE']
-                    df['FILE NAME'] = df['FILE NAME'].str.replace(r'/usr/u2l/u2l_backend/projects/'+ file_name +'/U2L/java-vfunction_' + yMD + '_' + hMS + '/work/javaanalysis(/new)?/', './', regex=True)
-                    O33 = df['FILE NAME'].nunique()
-                    P33 = df['FILE NAME'].count()
-                    
-                    generate_workbook(df, java_report_path,'javaSourceCode2Remedy')
-
-                    book = load_workbook(java_report_path)
-                    writer = pd.ExcelWriter(java_report_path, engine='openpyxl')
-                    writer.book = book
-                    sheet_name = 'javaSourceCode2Remedy'
-                    writer.sheets = dict((ws.title, ws) for ws in book.worksheets)
-                    df1.to_excel(writer, sheet_name=sheet_name, startcol=5, startrow=1, index=False, header=False)
-                    writer.save()
-
-                    df2 = pd.read_excel(java_report_path, engine='openpyxl', sheet_name='javaSourceCode2Remedy', skiprows=0)
-                    df2 = df2.iloc[:, [1,2,3,4,5]]
-
-                    book = load_workbook(java_report_path)
-                    writer = pd.ExcelWriter(java_report_path, engine='openpyxl')
-                    writer.book = book
-                    sheet_name = 'javaSourceCode2Remedy_1'
-                    writer.sheets = dict((ws.title, ws) for ws in book.worksheets)
-                    df2.to_excel(writer, sheet_name=sheet_name, startcol=0, startrow=1, index=False, header=False)
-                    writer.save()
-
-                    sheet_transfer('javaSourceCode2Remedy_1', '6. Java Source Scan Remedy', 6, 1, java_report_path, java_remediation_path)
-                    summary_sheet_generation(java_remediation_path, '6. Java Source Scan Remedy', '6. Java Source Scan Summary', 5, 4, java_remediation_path, 7, 2)
-                print("Sheet : 6. Java Source Scan Remedy : CREATED")
-                print("Sheet : 6. Java Source Scan Summary : CREATED")
-                print("End 2 : javaSourceCode2Remedy\n")
-
-                # Convert sourceScanRemedy
-                print("Start 3 : sourceScanRemedy")
-                sourceScanRemedy_dir_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/sourceScanRemedy'
-                if os.path.isfile(sourceScanRemedy_dir_path) and os.path.getsize(sourceScanRemedy_dir_path) > 0:
-                    ic_lines = []
-                    def remove_trailing_tabs(line):
-                        return re.sub(r'\t*$', '', line)
-                    with open(sourceScanRemedy_dir_path, 'r') as file:
-                        for line in file:
-                            cleaned_line = remove_trailing_tabs(line)
-                            if cleaned_line.strip().startswith('IC_'):
-                                ic_lines.append(cleaned_line)
-
-                    with open(sourceScanRemedy_dir_path, 'w') as file:
-                        file.write(''.join(ic_lines))
-
-                    df = pd.read_csv(sourceScanRemedy_dir_path, sep='\t', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
-                    df.index = df.index + 1
-                    df.columns = ['RULE ID', 'FILE NAME', 'LINE NUMBER', 'REMEDY']
-                    df['FILE NAME'] = df['FILE NAME'].str.replace(r'/usr/u2l/u2l_backend/projects/'+ file_name +'/U2L/java-vfunction_' + yMD + '_' + hMS + '/work/javaanalysis(/new)?/', './', regex=True)
-                    generate_workbook(df, java_report_path,'sourceScanRemedy')
-
-                    df1 = pd.read_excel(java_report_path, engine='openpyxl', sheet_name='sourceScanRemedy', skiprows=1, header=None)
-                    df1 = df1.iloc[:, [4]]
-                print("End 3 : sourceScanRemedy")
-
-                # Convert sourceCode2Remedy
-                print("Start 4 : sourceCode2Remedy")
-                sourceCode2Remedy_dir_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/sourceCode2Remedy'
-                if os.path.isfile(sourceCode2Remedy_dir_path) and os.path.getsize(sourceCode2Remedy_dir_path) > 0:
-                    with open(sourceCode2Remedy_dir_path, 'r') as file:
-                        lines = file.readlines()
-
-                    with open(sourceCode2Remedy_dir_path, 'w') as file:
-                        for line in lines:
-                            colon_count = line.count(':')
-                            if colon_count == 4:
-                                last_colon_index = line.rfind(':')
-                                line_without_last_colon = line[:last_colon_index] + line[last_colon_index + 1:]
-                            else:
-                                line_without_last_colon = line
-
-                            if line.startswith('\t'):
-                                line_without_first_tab = line[1:]
-                            else:
-                                line_without_first_tab = line
-
-                            file.write(line_without_last_colon)
-
-                    with open(sourceCode2Remedy_dir_path, 'r') as file:
-                        lines = file.readlines()
-
-                    with open(sourceCode2Remedy_dir_path, 'w') as file:
-                        for line in lines:
-                            first_tab_index = line.find('\t')
-                            if first_tab_index != -1:
-                                line_with_colon = line[:first_tab_index] + ':' + line[first_tab_index + 1:]
-                                line_without_tabs = line_with_colon.replace('\t', '')
-                            else:
-                                line_without_tabs = line
-
-                            file.write(line_without_tabs)
-                    df = pd.read_csv(sourceCode2Remedy_dir_path, sep=':', engine='python', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
-                    df.index = df.index + 1
-                    df.columns = ['RULE ID', 'FILE NAME', 'LINE NUMBER', 'AFFECTED CODE']
-                    df['FILE NAME'] = df['FILE NAME'].str.replace(r'/usr/u2l/u2l_backend/projects/'+ file_name +'/U2L/java-vfunction_' + yMD + '_' + hMS + '/work/javaanalysis(/new)?/', './', regex=True)
-                    O35 = df['FILE NAME'].nunique()
-                    P35 = df['FILE NAME'].count()
-                    generate_workbook(df, java_report_path,'sourceCode2Remedy')
-
-                    book = load_workbook(java_report_path)
-                    writer = pd.ExcelWriter(java_report_path, engine='openpyxl')
-                    writer.book = book
-                    sheet_name = 'sourceCode2Remedy'
-                    writer.sheets = dict((ws.title, ws) for ws in book.worksheets)
-                    df1.to_excel(writer, sheet_name=sheet_name, startcol=5, startrow=1, index=False, header=False)
-                    writer.save()
-
-                    df2 = pd.read_excel(java_report_path, engine='openpyxl', sheet_name='sourceCode2Remedy', skiprows=0)
-                    df2 = df2.iloc[:, [1,2,3,4,5]]
-
-                    book = load_workbook(java_report_path)
-                    writer = pd.ExcelWriter(java_report_path, engine='openpyxl')
-                    writer.book = book
-                    sheet_name = 'sourceCode2Remedy_1'
-                    writer.sheets = dict((ws.title, ws) for ws in book.worksheets)
-                    df2.to_excel(writer, sheet_name=sheet_name, startcol=0, startrow=1, index=False, header=False)
-                    writer.save()
-
-                    sheet_transfer('sourceCode2Remedy_1', '8. Affected Framework Remedy', 6, 1, java_report_path, java_remediation_path)
-                    summary_sheet_generation(java_remediation_path, '8. Affected Framework Remedy', '8. Affected Framework Summary', 5, 4, java_remediation_path, 7, 2)
-                print("Sheet : 8. Affected Framework Remedy : CREATED")
-                print("Sheet : 8. Affected Framework Summary : CREATED")
-                print("End 4 : sourceCode2Remedy\n")
-
-                # Convert javaUniqRulesGrepped.txt
-                print("Start 5 : javaUniqRulesGrepped.txt")
-                javaUniqRulesGrepped_dir_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/javaUniqRulesGrepped.txt'
-                if os.path.isfile(javaUniqRulesGrepped_dir_path) and os.path.getsize(javaUniqRulesGrepped_dir_path) > 0:
-                    ic_lines = []
-                    with open(javaUniqRulesGrepped_dir_path, 'r') as file:
-                        for line in file:
-                            cleaned_line = re.sub(r'\t*$', '', line)
-                            if cleaned_line.strip().startswith('IC_'):
-                                ic_lines.append(cleaned_line)
-
-                    with open(javaUniqRulesGrepped_dir_path, 'w') as file:
-                        file.write('\n'.join(ic_lines))
-
-                    with open(javaUniqRulesGrepped_dir_path, 'r') as file:
-                        lines = [re.sub(r'\t*$', '', line) for line in file]
-
-                    with open(javaUniqRulesGrepped_dir_path, 'w') as file:
-                        file.write('\n'.join(lines))
-                    print('inside 5')
-                    df = pd.read_csv(javaUniqRulesGrepped_dir_path, sep='\t', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
-                    df.index = df.index + 1
-                    df.columns = ['RULE ID', 'ENTITY', 'PACKAGE', 'OBJECT', 'REMEDY']
-
-                    generate_workbook(df, java_report_path,'Possible Import Remediations')
-                    sheet_transfer('Possible Import Remediations', '7. Possible Import Remediation', 6, 1, java_report_path, java_remediation_path)
-                    summary_sheet_generation(java_remediation_path, '7. Possible Import Remediation', '7. Import Remediation Summary', 5, 6, java_remediation_path, 8, 2)
-                print("Sheet : 7. Possible Import Remediation : CREATED")
-                print("Sheet : 7. Import Remediation Summary : CREATED")
-                print("End 5 : javaUniqRulesGrepped.txt\n")
-
-                # Convert javacWarnings.list
-                print("Start 6 : javacWarnings.list")
-                javacWarnings_dir_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/java-vfunction_'+ yMD + '_' + hMS + '/log/' + tool_analysis_type + '/java/javacLog/' + yyyy_mmdd + '/javacWarnings.list'
-                if os.path.isfile(javacWarnings_dir_path) and os.path.getsize(javacWarnings_dir_path) > 0:
-                    df = pd.read_csv(javacWarnings_dir_path, sep='\t', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
-                    df.index = df.index + 1
-                    df.columns = ['WARNING MESSAGE WITH TYPE', 'FILE PATH', 'FILE NAME', 'LINE', 'Column5']
-                    df = df.drop(columns=['Column5'])
-                    O29 = df['FILE NAME'].nunique()
-                    P29 = df['FILE NAME'].count()
-
-                    generate_workbook(df, java_report_path,'Compilation Warning Report')
-                    sheet_transfer('Compilation Warning Report', '2. Compilation Warning Detail', 6, 1, java_report_path, java_remediation_path)
-                    summary_sheet_generation(java_remediation_path, '2. Compilation Warning Detail', '2. Compilation Warning Summary', 5, 2, java_remediation_path, 9, 2)
-                print("Sheet : 2. Compilation Warning Detail : CREATED")
-                print("Sheet : 2. Compilation Warning Summary : CREATED")
-                print("End 6 : javacWarnings.list\n")
-
-                # Convert import_lines.out
-                print("Start 7 : import_lines.out")
-                importLines_dir_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/java-vfunction_'+ yMD + '_' + hMS + '/log/' + tool_analysis_type + '/java/import/' + yyyy_mmdd + '/import_lines.out'
-                if os.path.isfile(importLines_dir_path) and os.path.getsize(importLines_dir_path) > 0:
-                    df = pd.read_csv(importLines_dir_path, sep='\t', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
-                    df.columns = ['IMPORTS', 'FILE NAME', 'LINE NUMBER']
-                    df.index = df.index + 1
-
-                    generate_workbook(df, java_report_path,'Import Class Report')
-                    sheet_transfer('Import Class Report', 'Import Class Detail', 6, 1, java_report_path, java_remediation_path)
-                print("Sheet : Import Class Detail : CREATED")
-                print("End 7 : import_lines.out\n")
-
-                # Convert import_lines_jsp.out
-                print("Start 8 : import_lines_jsp.out")
-                importLinesJsp_dir_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/java-vfunction_'+ yMD + '_' + hMS + '/log/' + tool_analysis_type + '/java/import/' + yyyy_mmdd + '/import_lines_jsp.out'
-                if os.path.isfile(importLinesJsp_dir_path) and os.path.getsize(importLinesJsp_dir_path) > 0:
-                    df = pd.read_csv(importLinesJsp_dir_path, sep=':', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
-                    df.columns = ['FILE NAME', 'LINE NUMBER', 'IMPORTED JSP']
-                    df['FILE NAME'] = './' + df['FILE NAME']
-                    df.index = df.index + 1
-
-                    generate_workbook(df, java_report_path,'Import JSP Report')
-                    sheet_transfer('Import JSP Report', 'Import JSP Detail', 6, 1, java_report_path, java_remediation_path)
-                print("Sheet : Import JSP Detail : CREATED")
-                print("End 8 : import_lines_jsp.out\n")
-                
-                # Best Practices
-                print("Start 9 : Best Practices")
-                best_pratices_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/pmd-bin-6.55.0/Reports_1/BestPractices_Report.csv'
-                if os.path.isfile(best_pratices_path) and os.path.getsize(best_pratices_path) > 0:
-                    df = pd.read_csv(best_pratices_path, sep=',', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
-                    df.columns = ['Problem','Package','File','Priority','Line','Description','Rule Set','Rule']
-                    df['File'] = df['File'].str.replace(r'/usr/u2l/u2l_backend/projects/'+ file_name +'/U2L/java-vfunction_' + yMD + '_' + hMS + '/work/javaanalysis(/new)?/', './', regex=True)
-                    df = df.drop(df.index[0])
-
-                    generate_workbook(df, java_report_path,'Best_Practices')
-                    sheet_transfer('Best_Practices', '9. Best Practices', 6, 1, java_report_path, java_remediation_path)
-                print("Sheet : 9. Best Practices : CREATED")
-                print("End 9 : Best Practices\n")
-
-                # MultiThreading
-                print("Start 10 : MultiThreading")
-                multithreading_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/pmd-bin-6.55.0/Reports_1/MultiThreading_Report.csv'
-                if os.path.isfile(multithreading_path) and os.path.getsize(multithreading_path) > 0:
-                    df = pd.read_csv(multithreading_path, sep=',', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
-                    df.columns = ['Problem','Package','File','Priority','Line','Description','Rule Set','Rule']
-                    df['File'] = df['File'].str.replace(r'/usr/u2l/u2l_backend/projects/'+ file_name +'/U2L/java-vfunction_' + yMD + '_' + hMS + '/work/javaanalysis(/new)?/', './', regex=True)
-                    df = df.drop(df.index[0])
-
-                    generate_workbook(df, java_report_path,'Multithreading')
-                    sheet_transfer('Multithreading', '10. MultiThreading', 6, 1, java_report_path, java_remediation_path)
-                print("Sheet : 10. MultiThreading : CREATED")
-                print("End 10 : MultiThreading\n")
-
-                # Performance
-                print("Start 11 : Performance")
-                performance_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/pmd-bin-6.55.0/Reports_1/Performance_Report.csv'
-                if os.path.isfile(performance_path) and os.path.getsize(performance_path) > 0:
-                    df = pd.read_csv(performance_path, sep=',', engine='python', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
-                    df.columns = ["Problem","Package","File","Priority","Line","Description","Rule set","Rule"]
-                    df['File'] = df['File'].str.replace(r'/usr/u2l/u2l_backend/projects/'+ file_name +'/U2L/java-vfunction_' + yMD + '_' + hMS + '/work/javaanalysis(/new)?/', './', regex=True)
-                    df = df.drop(df.index[0])
-
-                    generate_workbook(df, java_report_path,'Performance')
-                    sheet_transfer('Performance', '11. Performance', 6, 1, java_report_path, java_remediation_path)
-                print("Sheet : 11. Performance : CREATED")
-                print("End 11 : Performance")
-
-                # Security
-                print("Start 12 : Security")
-                security_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/pmd-bin-6.55.0/Reports_1/Security_Report.csv'
-                if os.path.isfile(security_path) and os.path.getsize(security_path) > 0:
-                    df = pd.read_csv(security_path, sep=',', engine='python', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
-                    df.columns = ["Problem","Package","File","Priority","Line","Description","Rule set","Rule"]
-                    df['File'] = df['File'].str.replace(r'/usr/u2l/u2l_backend/projects/'+ file_name +'/U2L/java-vfunction_' + yMD + '_' + hMS + '/work/javaanalysis(/new)?/', './', regex=True)
-                    df = df.drop(df.index[0])
-
-                    generate_workbook(df, java_report_path,'Security')
-                    sheet_transfer('Security', '12. Security', 6, 1, java_report_path, java_remediation_path)
-                print("Sheet : 12. Security : CREATED")
-                print("End 12 : Security")
-                
-                #Source Code Inventory
-                print("Start 13 : Source Code Inventory")
-                regex = r'^.*$'
-                source_code_java_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/java-vfunction_'+ yMD + '_' + hMS + '/log/' + tool_analysis_type + '/Log_Source_Analysis_' + yMD + '.log'
-                print(source_code_java_path)
-                if os.path.isfile(source_code_java_path) and os.path.getsize(source_code_java_path) > 0:
-                    
-                    with open(source_code_java_path, 'r') as f:
-                        data = f.read()
-                    lines = data.split('\n')
-                    log_entries = []
-                    for line in lines:
-                        match = re.match(regex, line)
-                        if match:
-                            log_entries.append(match.group())
-                    df = pd.DataFrame(log_entries, columns=['log_message'])
-
-                    start_str = '###########  Execution 0001_stepcounter Starts  ###########'
-                    end_str = '###########  Execution 0001_stepcounter Ends ###########'
-                    start_df = df[df['log_message'].str.contains(start_str)]
-                    end_df = df[df['log_message'].str.contains(end_str)]
-
-                    start_index = start_df.index[0]
-                    end_index = end_df.index[0]
-                    extracted_df = df.iloc[start_index+1:end_index]
-
-                    result_df = extracted_df[extracted_df['log_message'].str.startswith('./')]
-                    result_df[['Directory', 'Type', 'col2', 'Actual Nr of Lines', 'Nr Blank Lines', 'Nr Commented Lines', 'Total Nr LoC']] = result_df['log_message'].str.split(',', expand=True)
-                    result_df = result_df.replace(r'^\s*$', np.nan, regex=True)
-                    result_df = result_df.dropna(subset=['Actual Nr of Lines', 'Nr Blank Lines', 'Nr Commented Lines', 'Total Nr LoC'])
-                    result_df = result_df.drop(['log_message', 'col2'], axis=1)
-                    result_df = result_df.reset_index(drop=True)
-                    result_df.index += 1
-
-                    artefact_type_dict = result_df['Type'].unique()                                     # ['Java', 'KShell']
-                    type_counts = result_df['Type'].value_counts()
-                    type_counts_dict = type_counts.to_dict()                                            # {'KShell': 23, 'Java': 2}
-                    F6 = sum(type_counts_dict.values())
-                    result_df['Actual Nr of Lines'] = result_df['Actual Nr of Lines'].astype(int)
-                    autual_by_type = result_df.groupby('Type')['Actual Nr of Lines'].sum().reset_index()
-                    autual_by_type_dict = autual_by_type.set_index('Type')['Actual Nr of Lines'].to_dict()    # {'Java': 231, 'KShell': 3716}
-                    O6 = sum(autual_by_type_dict.values())
-                    result_df['Total Nr LoC'] = result_df['Total Nr LoC'].astype(int)
-                    total_by_type = result_df.groupby('Type')['Total Nr LoC'].sum().reset_index()
-                    total_by_type_dict = total_by_type.set_index('Type')['Total Nr LoC'].to_dict()      # {'Java': 424, 'KShell': 5841}
-
-                    generate_workbook(result_df, java_report_path,'Source Code Inventory')
-
-                    sheet_transfer('Source Code Inventory', 'Source Code Inventory', 1, 0, java_report_path, java_inventory_path)
-                    sheet_transfer('Source Code Inventory', 'Source Code Inventory', 6, 1, java_report_path, java_remediation_path)
-                    sheet_transfer('Source Code Inventory', 'Source Code Inventory', 6, 1, java_report_path, java_high_level_path)
-                    print('Transfer Completed !!')
-
-                    wb = load_workbook(java_remediation_path)
-                    print('1')
-                    ws = wb['Environment Information']
-                    print('2')
-                    start_row = 22
-                    start_col = 2
-                    col_actual = 2
-                    col_total = 3
-
-                    for row_idx, artefact_type in enumerate(artefact_type_dict, start=start_row):
-                        col_idx = start_col
-                        ws.cell(row=row_idx, column=col_idx, value=artefact_type)
-
-                        value = type_counts_dict.get(artefact_type, 0)
-                        col_idx = start_col + 1
-                        ws.cell(row=row_idx, column=col_idx, value=value)
-
-                        actual_value = autual_by_type_dict.get(artefact_type, 0)
-                        col_idx = start_col + col_actual
-                        ws.cell(row=row_idx, column=col_idx, value=actual_value)
-
-                        actual_value = total_by_type_dict.get(artefact_type, 0)
-                        col_idx = start_col + col_total
-                        ws.cell(row=row_idx, column=col_idx, value=actual_value)
-
-                    wb.save(java_remediation_path)
-
-                    wb = load_workbook(java_high_level_path)
-                    ws = wb['Environment Information']
-                    start_row = 22
-                    start_col = 2
-                    col_actual = 2
-                    col_total = 3
-
-                    for row_idx, artefact_type in enumerate(artefact_type_dict, start=start_row):
-                        col_idx = start_col
-                        ws.cell(row=row_idx, column=col_idx, value=artefact_type)
-
-                        value = type_counts_dict.get(artefact_type, 0)
-                        col_idx = start_col + 1
-                        ws.cell(row=row_idx, column=col_idx, value=value)
-
-                        actual_value = autual_by_type_dict.get(artefact_type, 0)
-                        col_idx = start_col + col_actual
-                        ws.cell(row=row_idx, column=col_idx, value=actual_value)
-
-                        actual_value = total_by_type_dict.get(artefact_type, 0)
-                        col_idx = start_col + col_total
-                        ws.cell(row=row_idx, column=col_idx, value=actual_value)
-
-                    wb.save(java_high_level_path)
-                print("Sheet : Source Code Inventory : CREATED")
-                print("End 13 : Source Code Inventory")
-
-                # Convert OS_diff.out
-                print("Start 14 : OS_diff.out")
-                OSDiff_dir_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/java-vfunction_'+ yMD + '_' + hMS + '/log/' + tool_analysis_type + '/java/versiondiff/' + yyyy_mmdd + '/OS_diff.out'
-                if os.path.isfile(OSDiff_dir_path) and os.path.getsize(OSDiff_dir_path) > 0:
-                    print("inside 12")
-
-                    with open(OSDiff_dir_path, 'r') as file:
-                        lines = file.readlines()
-
-                    modified_lines = []
-                    for line in lines:
-                        if not line.startswith('OS-IC'):
-                            line = line.replace('\t', '')
-                            modified_lines[-1] = modified_lines[-1].rstrip() + line.strip()
-                        else:
-                            modified_lines.append(line)
-
-                    with open(OSDiff_dir_path, 'w') as file:
-                        file.writelines(modified_lines)
-
-                    with open(OSDiff_dir_path, 'r') as file:
-                        lines = file.readlines()
-
-                    modified_lines = []
-                    for line in lines:
-                        parts = line.split()
-                        parts = [part.strip() for part in parts]
-                        modified_line = '@'.join(parts)
-                        modified_lines.append(modified_line + '\n')
-
-                    with open(OSDiff_dir_path, 'w') as file:
-                        file.writelines(modified_lines)
-
-                    with open(OSDiff_dir_path, 'r') as file:
-                        lines = file.readlines()
-
-                    modified_lines = []
-                    for line in lines:
-                        modified_line = re.sub(r'@', lambda match: ' ' if match.start() > line.find('@', line.find('@', line.find('@') + 1) + 1) else match.group(), line.strip())
-                        modified_lines.append(modified_line + '\n')
-
-                    with open(OSDiff_dir_path, 'w') as file:
-                        file.writelines(modified_lines)
-
-                    df = pd.read_csv(OSDiff_dir_path, sep='@', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
-
-                    df.columns = ['RULE ID', 'FILE NAME', 'LINE NUMBER', 'SOURCE CODE']
-                    O32 = df['FILE NAME'].nunique()
-                    P32 = df['FILE NAME'].count()
-
-                    generate_workbook(df, java_report_path,'OS Analysis Details')
-                    sheet_transfer('OS Analysis Details', '5. OS Analysis Detail', 6, 1, java_report_path, java_remediation_path)
-                    summary_sheet_generation(java_remediation_path, '5. OS Analysis Detail', '5. OS Analysis Summary', 5, 5, java_remediation_path, 8, 2)
-                print("Sheet : 5. OS Analysis Detail : CREATED")
-                print("Sheet : 5. OS Analysis Summary : CREATED")
-                print("End 14 : OS_diff.out\n")
-
-                # Convert jdk_diff.out
-                print("Start 15 : jdk_diff.out")
-                jdkDiff_dir_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/java-vfunction_'+ yMD + '_' + hMS + '/log/' + tool_analysis_type + '/java/versiondiff/' + yyyy_mmdd + '/jdk_diff.out'
-                if os.path.isfile(jdkDiff_dir_path) and os.path.getsize(jdkDiff_dir_path) > 0:
-                    df = pd.read_csv(jdkDiff_dir_path, sep='\s+', engine='python', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
-                    df = df.drop(columns=['Column1'])
-                    df.index = df.index + 1
-
-                    generate_workbook(df, java_report_path,'JDK Anaylsis Details')
-                    sheet_transfer('JDK Anaylsis Details', '3. JDK Analysis Detail', 6, 1, java_report_path, java_remediation_path)
-                    summary_sheet_generation(java_remediation_path, '3. JDK Analysis Detail', '3. JDK Analysis Summary', 5, 6, java_remediation_path, 8, 2)
-                print("Sheet : 3. JDK Analysis Detail : CREATED")
-                print("Sheet : 3. JDK Analysis Summary : CREATED")
-                print("End 15 : jdk_diff.out\n")
-
-                #java_high_level_report.xlsx - Source Code Impacted
-                print("Start 16 : Source Code Impacted")
-                sheet_configs = {
-                    '1. Compilation Error Report': {'usecols': lambda x: x != 1, 'skiprows': 5, 'column_index': 2},
-                    '2. Compilation Warning Detail': {'usecols': lambda x: x != 1, 'skiprows': 5, 'column_index': 2},
-                    '3. JDK Analysis Detail': {'usecols': lambda x: x != 1, 'skiprows': 5, 'column_index': 2},
-                    '4. J2EE Analysis Detail': {'usecols': lambda x: x != 1, 'skiprows': 5, 'column_index': 2},
-                    '5. OS Analysis Detail': {'usecols': lambda x: x != 1, 'skiprows': 5, 'column_index': 2},
-                    '6. Java Source Scan Remedy': {'usecols': lambda x: x != 1, 'skiprows': 5, 'column_index': 1},
-                    # '7. Possible Import Remediation': {'usecols': lambda x: x != 1, 'skiprows': 5, 'column_index': 2},
-                    '8. Affected Framework Remedy': {'usecols': lambda x: x != 1, 'skiprows': 5, 'column_index': 1}
-                }
-
-                dfs = []
-
-                for sheet_name, config in sheet_configs.items():
-                    df = pd.read_excel(java_remediation_path, engine='openpyxl', sheet_name=sheet_name, usecols=config['usecols'], skiprows=config['skiprows'])
-                    df = df.drop(df.columns[0], axis=1)
-                    df = df.iloc[:, config['column_index']]
-
-                    if not df.empty and not df.isnull().all().all():
-                        dfs.append(df)
-
-                df_combined = pd.concat(dfs, ignore_index=True)
-                df_combined = df_combined.drop_duplicates()
-                df_combined = df_combined.reset_index(drop=True)
-                df_combined = df_combined.dropna()
-                df_count = len(df_combined)
-                F7 = df_count
-                print(df_combined)
-
-                writer = pd.ExcelWriter(java_high_level_path, engine='openpyxl', mode='a')
-                book = load_workbook(java_high_level_path)
-                writer.book = book
-                writer.sheets = dict((ws.title, ws) for ws in book.worksheets)
-                df_combined.to_excel(writer, sheet_name='Source Code Impacted', index=False, startrow=6, startcol=1, header=False)
-                writer.save()
-
-                wb = load_workbook(java_remediation_path)
-                ws = wb['Migration Summary']
-                start_row = 7
-                start_col = 6
-                ws.cell(row=start_row, column=start_col, value=df_count)
-
-                wb.save(java_remediation_path)
-
-                wb = load_workbook(java_high_level_path)
-                ws = wb['Analysis Summary']
-                start_row = 7
-                start_col = 6
-                ws.cell(row=start_row, column=start_col, value=df_count)
-
-                wb.save(java_high_level_path)
-
-                fetch_store_java_data(form_project_name, form_application_name, java_report_path)
-
-                # Migration Summary : java_remediation_report
-                print('Migration Summary')
-                wb = load_workbook(java_remediation_path)
-                ws = wb['Migration Summary']
-                start_col_1 = 15
-                start_row_1 = 29
-                start_row_2 = 32
-                start_row_3 = 33
-                start_row_4 = 35
-                start_col_2 = 16
-                start_row_5 = 29
-                start_row_6 = 32
-                start_row_7 = 33
-                start_row_8 = 35
-                if O29 != 0:
-                    ws.cell(row=start_row_1, column=start_col_1, value=O29)
-                if O32 != 0:
-                    ws.cell(row=start_row_2, column=start_col_1, value=O32)
-                if O33 != 0:
-                    ws.cell(row=start_row_3, column=start_col_1, value=O33)
-                if O35 != 0:
-                    ws.cell(row=start_row_4, column=start_col_1, value=O35)
-                if P29 != 0:
-                    ws.cell(row=start_row_5, column=start_col_2, value=P29)
-                if P32 != 0:
-                    ws.cell(row=start_row_6, column=start_col_2, value=P32)
-                if P33 != 0:
-                    ws.cell(row=start_row_7, column=start_col_2, value=P33)
-                if P35 != 0:
-                    ws.cell(row=start_row_8, column=start_col_2, value=P35)
-
-                O7 = P29 + P32 + P33 + P35
-                wb.save(java_remediation_path)
-
-                print('Storing values to database')
-                db_analysis_summary_java = analysis_summary_java(form_project_name, form_application_name, O29, P29, O32, P32, O33, P33, O35, P35, F6, F7, O6, O7)
-                db.session.add(db_analysis_summary_java)
+            source_path = os.path.join(source_dir_report, 'c_report.xlsx')
+            dest_path = os.path.join(dest_dir, 'c_report.xlsx')
+            shutil.copy(source_path, dest_path)
+
+            source_path = os.path.join(source_dir_report, 'c_report_old.xlsx')
+            dest_path = os.path.join(dest_dir, 'c_report_old.xlsx')
+            shutil.copy(source_path, dest_path)
+
+            source_path = os.path.join(source_dir_report, 'c_inventory_report.xlsx')
+            dest_path = os.path.join(dest_dir, 'c_inventory_report.xlsx')
+            shutil.copy(source_path, dest_path)
+
+            source_path = os.path.join(source_dir_report, 'c_remediation_report.xlsx')
+            dest_path = os.path.join(dest_dir, 'c_remediation_report.xlsx')
+            shutil.copy(source_path, dest_path)
+    
+    except Exception as e:
+        response = jsonify({'error': str(e)})
+        response.status_code = 500
+        return response
+
+    #storing values in db analysis_type table
+    db_analysis_type = analysis_type(form_project_name, form_application_name, tool_analysis_type)
+    db.session.add(db_analysis_type)
+    try:
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'message': 'analysis_type : Project name already exists'}), 409
+
+    #storing values in db os_details table
+    db_os_details = os_details(form_project_name, form_application_name, form_source_os, form_source_os_version, form_target_os, form_target_os_version)
+    db.session.add(db_os_details)
+    try:
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'message': 'os_details : Project name already exists'}), 409
+    
+    #storing values in db analysis_status table
+    analysis_start_time = datetime.datetime.now()
+    analysis_end_time = datetime.datetime.now()
+    db_analysis_status = analysis_status(form_project_name, form_application_name, db_analysis_type.id, 'admin@hpe.com', 'analysis started', file_name, file_size_mb, analysis_start_time, analysis_end_time)
+    db.session.add(db_analysis_status)
+    try:
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'message': 'analysis_status : Project name already exists'}), 409
+
+    script_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/U2LTool_Install.sh'
+
+    if(tool_analysis_type == 'javaanalysis'):
+        db_analysis_java = analysis_java(form_project_name, form_application_name, db_analysis_type.id, form_source_jdk, form_target_jdk, form_source_jsp, form_target_jsp, form_source_servlet, form_target_servlet)
+        db.session.add(db_analysis_java)
+        db.session.commit()
+        file_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/java-vfunction_' + yMD + '_' + hMS
+    elif(tool_analysis_type == 'canalysis'):
+        db_analysis_c = analysis_c(form_project_name, form_application_name, db_analysis_type.id, form_source_compiler, form_target_compiler, form_source_compiler_version, form_target_compiler_version, form_source_pre_compiler, form_target_pre_compiler, form_source_pre_compiler_version, form_target_pre_compiler_version)
+        db.session.add(db_analysis_c)
+        db.session.commit()
+        file_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/c-vfunction_' + yMD + '_' + hMS
+    elif(tool_analysis_type == 'shellanalysis'):
+        db_analysis_shell = analysis_shell(form_project_name, form_application_name, db_analysis_type.id, form_source_shell, form_target_shell, form_source_shell_version, form_target_shell_version)
+        db.session.add(db_analysis_shell)
+        db.session.commit()
+        file_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/shell-vfunction_' + yMD + '_' + hMS
+
+    task = testing_task.apply_async(args=[yMD, hMS, tool_analysis_type, framework_type, file_name, script_path, file_path, form_project_name, form_application_name, form_project_client, form_project_manager, form_source_os, form_source_os_version, form_target_os, form_target_os_version, form_source_jdk, form_target_jdk, form_source_jsp, form_target_jsp, form_source_servlet, form_target_servlet, form_source_compiler, form_target_compiler, form_source_compiler_version, form_target_compiler_version, form_source_pre_compiler, form_target_pre_compiler, form_source_pre_compiler_version, form_target_pre_compiler_version, form_source_shell, form_target_shell, form_source_shell_version, form_target_shell_version])
+
+    task_id = task.id
+    task_status = task.status
+    #storing values in db project_details table
+    db_project_details = project_details(form_project_name, form_application_name, task_id, 'admin@hpe.com', 1, form_project_client, form_project_manager, file_name, file_size_mb, task_status, cur_date)
+    db.session.add(db_project_details)
+    try:
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        print(e)
+        return jsonify({'message': 'project_details : Project name already exists'}), 409
+
+    print('Async call in progress !!')
+
+    return jsonify({'message': 'Request processing started', 'task_id': task.id}), 202
+
+@authentication_controller.route('/stream_logs/<task_id>', methods=['GET'])
+def stream_logs(task_id):
+    query = project_details.query.filter_by(task_id=task_id)
+    stream_task_status = query.first().analysis_status  # {'PENDING', 'SUCCESS'}
+
+    total_logs = celery_logs.query.filter_by(task_id=task_id).count()
+    redis_queue_name = get_task_queue_name(task_id)  # {'logs : {task_id}'}
+
+    def event_stream():
+        if stream_task_status == 'SUCCESS':
+            print('Status: SUCCESS')
+            logs = celery_logs.query.filter_by(task_id=task_id).all()
+            log_message = []
+            for log in logs:
+                log = log.task_log
+                log_message.append(log)
+            x = {
+                "logs" : log_message,
+                "progress" : 100
+            }
+            y = json.dumps(x)
+            yield f"data: {y}\n\n"
+
+        while stream_task_status == 'PENDING':
+            print('Status: PENDING')
+            log_message = redis_client.lpop(redis_queue_name)
+            if log_message:
+                progress_info, message = log_message.decode('utf-8').split('::', 1)
+                progress = int(progress_info.split('/')[0])
+                total_progress = int(progress_info.split('/')[1])
+                print(progress)
+                print(total_progress)
+                print(message)
+
+                db_celery_logs = celery_logs(task_id, stream_task_status, message)
+                db.session.add(db_celery_logs)
                 try:
                     db.session.commit()
                 except Exception as e:
                     db.session.rollback()
+                    return jsonify({'message': 'Celery logs db error'}), 409
+                
+                # prog = (progress / total_progress) * 100
+                # print('prog={}'.format(prog))
 
-                print('Analysis Summary')
+                # x = {
+                #     "logs" : message,
+                #     "progress" : prog
+                # }
+                # y = json.dumps(x)
+                # yield f"data: {y}\n\n"
 
-                # Analysis Summary : java_high_level_report
-                wb = load_workbook(java_high_level_path)
-                ws = wb['Analysis Summary']
-                start_col_1 = 15
-                start_row_1 = 29
-                start_row_2 = 32
-                start_row_3 = 33
-                start_row_4 = 35
-                start_col_2 = 16
-                start_row_5 = 29
-                start_row_6 = 32
-                start_row_7 = 33
-                start_row_8 = 35
-                if O29 != 0:
-                    ws.cell(row=start_row_1, column=start_col_1, value=O29)
-                if O32 != 0:
-                    ws.cell(row=start_row_2, column=start_col_1, value=O32)
-                if O33 != 0:
-                    ws.cell(row=start_row_3, column=start_col_1, value=O33)
-                if O35 != 0:
-                    ws.cell(row=start_row_4, column=start_col_1, value=O35)
-                if P29 != 0:
-                    ws.cell(row=start_row_5, column=start_col_2, value=P29)
-                if P32 != 0:
-                    ws.cell(row=start_row_6, column=start_col_2, value=P32)
-                if P33 != 0:
-                    ws.cell(row=start_row_7, column=start_col_2, value=P33)
-                if P35 != 0:
-                    ws.cell(row=start_row_8, column=start_col_2, value=P35)
+                logs = celery_logs.query.filter_by(task_id=task_id).all()
+                log_message = []
+                for log in logs:
+                    log = log.task_log
+                    log_message.append(log)
+                prog = (progress / total_progress) * 100    
+                x = {
+                    "logs" : log_message,
+                    "progress" : prog
+                }
+                y = json.dumps(x)
+                yield f"data: {y}\n\n"
+            time.sleep(20)
 
-                wb.save(java_high_level_path)
+        print('event end !')
+        yield "event: end\n\n"
 
-                print("Sheet : Source Code Impacted : CREATED")
-                print("End 16 : Source Code Impacted\n")
+        # response = Response(stream_with_context(event_stream()), content_type='text/event-stream')
+        # response.headers['X-Accel-Buffering'] = 'no'
+        # return response
+    return Response(stream_with_context(event_stream()), content_type='text/event-stream')
 
-                print("Start 17 : Other inventory")
-                # Convert check_files.out
-                check_files_dir_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/java-vfunction_'+ yMD + '_' + hMS + '/log/' + tool_analysis_type + '/srccheck/' + yyyy_mmdd + '/check_files.out'
-                other_inventory_df1 = None
-                if os.path.isfile(check_files_dir_path) and os.path.getsize(check_files_dir_path) > 0:
-                    other_inventory_df1 = pd.read_csv(check_files_dir_path, sep='\n', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
-                    other_inventory_df1.index = other_inventory_df1.index + 1
-                    print(other_inventory_df1)
+@authentication_controller.route('/stream_logs1/<task_id>', methods=['GET'])
+def stream_logs1(task_id):
+    query = project_details.query.filter_by(task_id=task_id)
+    stream_task_status = query.first().analysis_status      # {'PENDING', 'SUCCESS'}
 
-                # Convert exclude_files.out
-                exclude_files_dir_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/java-vfunction_'+ yMD + '_' + hMS + '/log/' + tool_analysis_type + '/srccheck/' + yyyy_mmdd + '/exclude_files.out'
-                other_inventory_df2 = None
-                if os.path.isfile(exclude_files_dir_path) and os.path.getsize(exclude_files_dir_path) > 0:
-                    other_inventory_df2 = pd.read_csv(exclude_files_dir_path, sep='\n', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
-                    other_inventory_df2.index = other_inventory_df2.index + 1
-                    print(other_inventory_df2)
+    redis_queue_name = get_task_queue_name(task_id)         # {'logs : {task_id}'}
+    
+    def event_stream():
+        if stream_task_status == 'SUCCESS':
+            print('Status: SUCCESS')
+            logs = celery_logs.query.filter_by(task_id=task_id).all()
+            log_message = []
+            for log in logs:
+                log = log.task_log
+                log_message.append(log)
 
-                if other_inventory_df1 is not None and other_inventory_df2 is not None:
-                    other_inventory_combined_df = pd.concat([other_inventory_df1, other_inventory_df2], ignore_index=True)
-                    other_inventory_combined_df = other_inventory_combined_df.drop_duplicates()
-                    print(other_inventory_combined_df)
+            yield f"data: {log_message}\n\n"
 
-                    writer = pd.ExcelWriter(java_high_level_path, engine='openpyxl', mode='a')
-                    book = load_workbook(java_high_level_path)
-                    writer.book = book
-                    writer.sheets = dict((ws.title, ws) for ws in book.worksheets)
-                    other_inventory_combined_df.to_excel(writer, sheet_name='Other Inventory', index=False, startrow=6, startcol=1, header=False)
-                    writer.save()
-                    print('java_high_level other inventory added')
+        while stream_task_status == 'PENDING':
+            print('Status: PENDING')
+            log_message = redis_client.lpop(redis_queue_name)
+            if log_message:
+                db_celery_logs = celery_logs(task_id, stream_task_status, log_message)
+                db.session.add(db_celery_logs)
+                try:
+                    db.session.commit()
+                except Exception as e:
+                    db.session.rollback()
+                    return jsonify({'message':'Celery logs db error'}), 409
 
-                    writer = pd.ExcelWriter(java_inventory_path, engine='openpyxl', mode='a')
-                    book = load_workbook(java_inventory_path)
-                    writer.book = book
-                    writer.sheets = dict((ws.title, ws) for ws in book.worksheets)
-                    other_inventory_combined_df.to_excel(writer, sheet_name='Other Inventory', index=False, startrow=6, startcol=1, header=False)
-                    writer.save()
-                    print('java_inventory other inventory added')
+            logs = celery_logs.query.filter_by(task_id=task_id).all()
+            log_message = []
+            for log in logs:
+                log = log.task_log
+                log_message.append(log)
 
-                    writer = pd.ExcelWriter(java_remediation_path, engine='openpyxl', mode='a')
-                    book = load_workbook(java_remediation_path)
-                    writer.book = book
-                    writer.sheets = dict((ws.title, ws) for ws in book.worksheets)
-                    other_inventory_combined_df.to_excel(writer, sheet_name='Other Inventory', index=False, startrow=6, startcol=1, header=False)
-                    writer.save()
-                    print('java_remediation other inventory added')
-
-                print("Sheet : Other Inventory : CREATED")
-                print("End 17 : Other inventory\n")
-
-            elif(tool_analysis_type == 'canalysis'):
-
-                yyyy_mmdd = yMD[:4] + '-' + yMD[4:]
-
-                # Convert stk-YYYY-MMDD-detail.log
-                stk_dir_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/c-vfunction_' + yMD + '_' + hMS + '/log/' + tool_analysis_type + '/stk/' + yyyy_mmdd + '/stk-' + yyyy_mmdd + '-detail.log'
-                if os.path.isfile(stk_dir_path) and os.path.getsize(stk_dir_path) > 0:
-                    df = pd.read_csv(stk_dir_path, sep=':', engine='python', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
-                    df.index = df.index + 1
-                    save_location = '/usr/u2l/u2l_backend/projects/' + file_name + '/c_report.xlsx'
-
-                    generate_workbook(df, save_location,'STK Analysis Detail')
-
-                # Convert 64bit_C_reportlog
-                bitC_dir_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/c-vfunction_' + yMD + '_' + hMS + '/log/' + tool_analysis_type + '/checkanalysis/64bit_C_reportlog'
-                if os.path.isfile(bitC_dir_path) and os.path.getsize(bitC_dir_path) > 0:
-                    df = pd.read_csv(bitC_dir_path, sep=':', engine='python', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
-                    df.columns = ['FILE PATH', 'LINE NUMBER', 'SOURCE CODE', 'Column4', 'Column5']
-                    df = df.drop(columns=['Column4', 'Column5'])
-                    df.index = df.index + 1
-                    save_location = '/usr/u2l/u2l_backend/projects/' + file_name + '/c_report.xlsx'
-
-                    generate_workbook(df, save_location,'64-bit Analysis Detail')
-
-                # Convert endian_C_reportlog
-                endian_dir_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/c-vfunction_' + yMD + '_' + hMS + '/log/' + tool_analysis_type + '/checkanalysis/endian_C_reportlog'
-                if os.path.isfile(endian_dir_path) and os.path.getsize(endian_dir_path) > 0:
-                    df = pd.read_csv(endian_dir_path, sep=':', engine='python', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
-                    df.columns = ['FILE PATH', 'LINE NUMBER', 'SOURCE CODE']
-                    df.index = df.index + 1
-                    save_location = '/usr/u2l/u2l_backend/projects/' + file_name + '/c_report.xlsx'
-
-                    generate_workbook(df, save_location,'Endianness Analysis Detail')
-
-                # Convert char-array.out
-                charArray_dir_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/c-vfunction_' + yMD + '_' + hMS + '/log/' + tool_analysis_type + '/charinv/' + yyyy_mmdd + '/char-array.out'
-                if os.path.isfile(charArray_dir_path) and os.path.getsize(charArray_dir_path) > 0:
-                    df = pd.read_csv(charArray_dir_path, sep='\t', engine='python', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
-                    df.columns = ['FILE PATH', 'LINE NUMBER', 'SOURCE CODE']
-                    df.index = df.index + 1
-                    save_location = '/usr/u2l/u2l_backend/projects/' + file_name + '/c_report.xlsx'
-
-                    generate_workbook(df, save_location,'String-Mem Analysis Detail')
-
-                # Convert Log_Envcheck_CFiles_YYYY-MMDD.log
-                envCheck_dir_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/c-vfunction_' + yMD + '_' + hMS + '/log/' + tool_analysis_type + '/Log_Envcheck_CFiles_' + yyyy_mmdd + '.log'
-                if os.path.isfile(envCheck_dir_path) and os.path.getsize(envCheck_dir_path) > 0:
-                    df = pd.read_csv(envCheck_dir_path, sep=':', engine='python', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
-                    df.columns = ['FILE PATH', 'LINE NUMBER', 'SOURCE CODE']
-                    df.index = df.index + 1
-                    save_location = '/usr/u2l/u2l_backend/projects/' + file_name + '/c_report.xlsx'
-
-                    generate_workbook(df, save_location,'ExecutionEnv Analysis Detail')
-
-
-                #Source Code Inventory
-                regex = r'^.*$'
-                source_code_c_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/c-vfunction_' + yMD + '_' + hMS + '/log/' + tool_analysis_type + '/Log_Source_Analysis_' + yMD + '.log'
-                if os.path.isfile(source_code_c_path) and os.path.getsize(source_code_c_path) > 0:
-                    with open(source_code_c_path, 'r') as f:
-                        data = f.read()
-                    lines = data.split('\n')
-                    log_entries = []
-                    for line in lines:
-                        match = re.match(regex, line)
-                        if match:
-                            log_entries.append(match.group())
-                    df = pd.DataFrame(log_entries, columns=['log_message'])
-
-                    start_str = '###########  Execution 0001_stepcounter Starts  ###########'
-                    end_str = '###########  Execution 0001_stepcounter Ends ###########'
-                    start_df = df[df['log_message'].str.contains(start_str)]
-                    end_df = df[df['log_message'].str.contains(end_str)]
-
-                    start_index = start_df.index[0]
-                    end_index = end_df.index[0]
-                    extracted_df = df.iloc[start_index+1:end_index]
-
-                    result_df = extracted_df[extracted_df['log_message'].str.startswith('./')]
-                    result_df[['Directory', 'Type', 'col2', 'Actual Nr of Lines', 'Nr Blank Lines', 'Nr Commented Lines', 'Total Nr LoC']] = result_df['log_message'].str.split(',', expand=True)
-                    result_df = result_df.replace(r'^\s*$', np.nan, regex=True)
-                    result_df = result_df.dropna(subset=['Actual Nr of Lines', 'Nr Blank Lines', 'Nr Commented Lines', 'Total Nr LoC'])
-                    result_df = result_df.drop(['log_message', 'col2'], axis=1)
-                    result_df = result_df.reset_index(drop=True)
-                    result_df.index += 1
-
-                    save_location = '/usr/u2l/u2l_backend/projects/' + file_name + '/c_report.xlsx'
-
-                    generate_workbook(result_df, save_location,'Source Code Inventory')
-
-
-                    save_location = '/usr/u2l/u2l_backend/projects/' + file_name + '/c_inventory_report.xlsx'
-
-                    generate_workbook(result_df, save_location,'Source Code Inventory')
-
-            elif(tool_analysis_type == 'shellanalysis'):
+            yield f"data: {log_message}\n\n"
             
-                yyyy_mmdd = yMD[:4] + '-' + yMD[4:]
+            time.sleep(20)
 
-                # Convert ksh_env_common.txt
-                ksh_env_common_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/shell-vfunction_' + yMD + '_' + hMS + '/log/' + tool_analysis_type + '/shell/env/' + yyyy_mmdd + '/ksh_env_common.txt'
-                if os.path.isfile(ksh_env_common_path) and os.path.getsize(ksh_env_common_path) > 0:
-                    df = pd.read_csv(ksh_env_common_path, sep='\t', engine='python', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
-                    df.columns = ['Column1', 'FILE NAME', 'LINE NUMBER', 'SOURCE CODE']
-                    df = df.drop(columns=['Column1'])
-                    df.index = df.index + 1
-                    save_location = '/usr/u2l/u2l_backend/projects/' + file_name + '/shell_report.xlsx'
+        print('event end !')    
+        yield f"event: end"
 
-                    generate_workbook(df, save_location,'OS Specific ENV Var Details')
-
-                # Convert ksh_filepath_common.txt
-                ksh_filepath_common_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/shell-vfunction_' + yMD + '_' + hMS + '/log/' + tool_analysis_type + '/shell/env/' + yyyy_mmdd + '/ksh_filepath_common.txt'
-                if os.path.isfile(ksh_filepath_common_path) and os.path.getsize(ksh_filepath_common_path) > 0:
-                    df = pd.read_csv(ksh_filepath_common_path, sep='\t', engine='python', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
-                    df.columns = ['Column1', 'FILE NAME', 'LINE NUMBER', 'SOURCE CODE']
-                    df = df.drop(columns=['Column1'])
-                    df.index = df.index + 1
-                    save_location = '/usr/u2l/u2l_backend/projects/' + file_name + '/shell_report.xlsx'
-
-                    generate_workbook(df, save_location,'OS Specific File Path Details')
-
-                # Convert ksh_parsed_uniq.out
-                ksh_parsed_uniq_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/shell-vfunction_' + yMD + '_' + hMS + '/log/' + tool_analysis_type + '/shell/parse/' + yyyy_mmdd + '/ksh_parsed_uniq.out'
-                if os.path.isfile(ksh_parsed_uniq_path) and os.path.getsize(ksh_parsed_uniq_path) > 0:
-                    df = pd.read_csv(ksh_parsed_uniq_path, sep='\t', engine='python', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
-                    df.columns = ['Column1', 'Column2', 'COMMAND', 'Column4', 'FILE NAME', 'LINE NUMBER', 'SOURCE CODE']
-                    df = df.drop(columns=['Column1', 'Column2', 'Column4'])
-                    df.index = df.index + 1
-                    save_location = '/usr/u2l/u2l_backend/projects/' + file_name + '/shell_report.xlsx'
-
-                    generate_workbook(df, save_location,'Command and option Details')
-
-                # Convert ksh_shebang.txt
-                ksh_shebang_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/shell-vfunction_' + yMD + '_' + hMS + '/log/' + tool_analysis_type + '/shell/shebang/' + yyyy_mmdd + '/ksh_shebang.txt'
-                if os.path.isfile(ksh_shebang_path) and os.path.getsize(ksh_shebang_path) > 0:
-                    with open(ksh_shebang_path, 'r') as f:
-                        lines = f.readlines()
-                    data = []
-                    prev_column1 = None
-                    for line in lines:
-                        split_line = line.strip().split('#!')
-                        if split_line[0].strip():
-                            prev_column1 = split_line[0].strip()
-                        data.append([prev_column1, '#!' + split_line[1].strip() if len(split_line) > 1 else ''])
-                    df = pd.DataFrame(data, columns=['column1', 'column2']).dropna()
-                    df['column2'] = df.groupby(df.index // 2)['column2'].transform(lambda x: x.iloc[1])
-                    df.columns = ['FILE NAME', 'SOURCE CODE']
-                    df.index = df.index + 1
-                    df = df.drop(df[df.index % 2 == 0].index).reset_index(drop=True)
-
-                    save_location = '/usr/u2l/u2l_backend/projects/' + file_name + '/shell_report.xlsx'
-
-                    generate_workbook(df, save_location,'Shebang Line Analysis')
-
-                # Convert ksh_heredocument.txt
-                ksh_heredocument_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/shell-vfunction_' + yMD + '_' + hMS + '/log/' + tool_analysis_type + '/shell/syntax/' + yyyy_mmdd + '/ksh_heredocument.txt'
-                if os.path.isfile(ksh_heredocument_path) and os.path.getsize(ksh_heredocument_path) > 0:
-                    df = pd.read_csv(ksh_heredocument_path, sep='\t', engine='python', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
-                    df.columns = ['Column1', 'FILE NAME', 'LINE NUMBER', 'SOURCE CODE']
-                    df = df.drop(columns=['Column1'])
-                    df.index = df.index + 1
-                    save_location = '/usr/u2l/u2l_backend/projects/' + file_name + '/shell_report.xlsx'
-
-                    generate_workbook(df, save_location,'Heredoc Analysis')
-
-                # Source Code Inventory
-                regex = r'^.*$'
-                source_code_shell_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/shell-vfunction_' + yMD + '_' + hMS + '/log/' + tool_analysis_type + '/Log_Source_Analysis_' + yMD + '.log'
-                if os.path.isfile(source_code_shell_path) and os.path.getsize(source_code_shell_path) > 0:
-                    with open(source_code_shell_path, 'r') as f:
-                        data = f.read()
-                    lines = data.split('\n')
-                    log_entries = []
-                    for line in lines:
-                        match = re.match(regex, line)
-                        if match:
-                            log_entries.append(match.group())
-                    df = pd.DataFrame(log_entries, columns=['log_message'])
-
-                    start_str = '###########  Execution 0001_stepcounter Starts  ###########'
-                    end_str = '###########  Execution 0001_stepcounter Ends ###########'
-                    start_df = df[df['log_message'].str.contains(start_str)]
-                    end_df = df[df['log_message'].str.contains(end_str)]
-
-                    start_index = start_df.index[0]
-                    end_index = end_df.index[0]
-                    extracted_df = df.iloc[start_index+1:end_index]
-
-                    result_df = extracted_df[extracted_df['log_message'].str.startswith('./')]
-                    result_df[['Directory', 'Type', 'col2', 'Actual Nr of Lines', 'Nr Blank Lines', 'Nr Commented Lines', 'Total Nr LoC']] = result_df['log_message'].str.split(',', expand=True)
-                    result_df = result_df.replace(r'^\s*$', np.nan, regex=True)
-                    result_df = result_df.dropna(subset=['Actual Nr of Lines', 'Nr Blank Lines', 'Nr Commented Lines', 'Total Nr LoC'])
-                    result_df = result_df.drop(['log_message', 'col2'], axis=1)
-                    result_df = result_df.reset_index(drop=True)
-                    result_df.index += 1
-
-                    save_location = '/usr/u2l/u2l_backend/projects/' + file_name + '/shell_report.xlsx'
-
-                    generate_workbook(result_df, save_location,'Source Code Inventory')
-
-                    save_location = '/usr/u2l/u2l_backend/projects/' + file_name + '/shell_inventory_report.xlsx'
-                    
-                    generate_workbook(result_df, save_location,'Source Code Inventory')
-
-        except Exception as e:
-            return jsonify({'error': str(e)})
-    
-    except Exception as e:
-            analysis_end_time = datetime.datetime.now()
-            # if db_project_details is not None:
-            #     db_project_details.analysis_status = 'analysis failed'
-            #     db.session.commit()
-            # if db_analysis_status is not None:
-            #     db_analysis_status.analysis_status = 'analysis failed'
-            #     db_analysis_status.analysis_start_time = analysis_start_time
-            #     db_analysis_status.analysis_end_time = analysis_end_time
-            #     db.session.commit()
-            return jsonify({'message': 'analysis failed', 'error': str(e)}), 401
-    
-    analysis_end_time = datetime.datetime.now()
-    if db_project_details is not None:
-        db_project_details.analysis_status = 'analysis successful'
-        db.session.commit()
-    if db_analysis_status is not None:
-        db_analysis_status.analysis_status = 'analysis successful'
-        db_analysis_status.analysis_start_time = analysis_start_time
-        db_analysis_status.analysis_end_time = analysis_end_time
-        db.session.commit()
-    return jsonify({'message': 'analysis successful'}), 200
+    return Response(stream_with_context(event_stream()), content_type='text/event-stream')
 
 @authentication_controller.route('/projects/<query_email>', methods=['GET']) #{email}
 @jwt_required()
 def projects(query_email):
     
+    query = project_details.query.with_entities(project_details.task_id).filter_by(email=query_email)
+
+    task_status_details = [task_id[0] for task_id in query.all()]
+
+    task_statuses = []
+
+    for task_id in task_status_details:
+        result = AsyncResult(task_id, app=celery)
+        task_statuses.append({
+            'task_id': task_id,
+            'status': result.state
+        })
+
+    for task_analysis_status in task_statuses:
+        if(task_analysis_status['status'] == 'SUCCESS'):
+            query = project_details.query.filter_by(task_id=task_analysis_status['task_id'])
+            query.update({"analysis_status": "SUCCESS"})
+            db.session.commit()
+
     query = project_details.query.filter_by(email=query_email)
     json_project_details = []
     for row in query.all():
@@ -1585,6 +611,7 @@ def report(query_project_name, query_application_name, query_email):
     elif analysisType == 'canalysis':
         file1_path = '/usr/u2l/u2l_backend/projects/'+ fileName +'/c_inventory_report.xlsx'
         file2_path = '/usr/u2l/u2l_backend/projects/'+ fileName +'/c_report.xlsx'
+        file3_path = '/usr/u2l/u2l_backend/projects/'+ fileName +'/c_report_old.xlsx'
     elif analysisType == 'shellanalysis':
         file1_path = '/usr/u2l/u2l_backend/projects/'+ fileName +'/shell_inventory_report.xlsx'
         file2_path = '/usr/u2l/u2l_backend/projects/'+ fileName +'/shell_report.xlsx'
@@ -1606,7 +633,7 @@ def report(query_project_name, query_application_name, query_email):
 
     return Response(
         open('files.zip', 'rb').read(),
-        # mimetype='application/zip',
+        mimetype='application/zip',
         headers={
             'Content-Disposition': 'attachment;filename=files.zip',
             'Access-Control-Allow-Origin': '*',
@@ -3219,9 +2246,60 @@ def generate_logs_latest():
 
     return 'success'
 
-@authentication_controller.route('/cppcheck', methods=['POST'])
-@jwt_required()
-def cppcheck():
+@authentication_controller.route('/clogs', methods=['POST'])
+# @jwt_required()
+def clogs():
+
+    c_report_path = '/usr/u2l/u2l_backend/projects/c_report.xlsx'
+    c_remediation_path = '/usr/u2l/u2l_backend/projects/c_remediation_report.xlsx'
+    c_inventory_path = '/usr/u2l/u2l_backend/projects/c_inventory_report.xlsx'
+
+    form_source_ver = 'AIX'
+
+    source_versions = ["AIX", "Solaris", "HP-UX"]
+    if form_source_ver not in source_versions:
+      error_message = {'error' :"Invalid Source Vesion"}
+      return jsonify(error_message), 404
+
+    script_path = '/usr/u2l/u2l_backend/scan_source.sh'
+    file_path = '/usr/u2l/u2l_backend/UNIX_HPE'
+    source_ver = form_source_ver
+    target_ver = 'RHEL'
+    command = ['sh', script_path, file_path, source_ver, target_ver]
+    process = subprocess.Popen(command, stdout=subprocess.PIPE)
+    output = process.communicate()[0].decode().strip()
+    lines = output.split('\n')
+    print(lines)
+
+    ic_lines = []
+    with open('/usr/u2l/u2l_backend/final_report.csv', 'r') as file:
+        for line in file:
+            if line.strip().startswith('/usr/'):
+                ic_lines.append(line)
+
+    with open('/usr/u2l/u2l_backend/final_report.csv', 'w') as file:
+        file.write(''.join(ic_lines))
+
+    ic_lines = []
+    with open('/usr/u2l/u2l_backend/final_report.csv', 'r') as file:
+        for line in file:
+            modified_line = line.replace(':', ',', 1)
+            ic_lines.append(modified_line)
+
+    with open('/usr/u2l/u2l_backend/final_report.csv', 'w') as file:
+        file.write(''.join(ic_lines))
+
+    final_report_path = '/usr/u2l/u2l_backend/final_report.csv'
+    if os.path.isfile(final_report_path) and os.path.getsize(final_report_path) > 0:
+        df = pd.read_csv(final_report_path, sep=',', engine='python', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
+        df.columns = ["FILE PATH","LINE NUMBER","SOURCE CODE","ERROR MESSAGE","REMEDIATION"]
+        df = df.drop(df.index[0])
+        O28 = df['FILE PATH'].nunique()
+        P28 = df['FILE PATH'].count()
+        print(df)
+
+    generate_workbook(df, c_report_path,'Source Scan Remedy Detail')
+
     source_path = "/usr/u2l/u2l_backend/UNIX_HPE"
     stdout, stderr = run_cppcheck(source_path)
 
@@ -3264,98 +2342,415 @@ def cppcheck():
     }
 
     df = pd.DataFrame(data)
-    print(df)
+    df.columns = ['FILE PATH', 'LINE NUMBER', 'ERROR MESSAGE', 'ERROR LINES']
+    O29 = df['FILE PATH'].nunique()
+    P29 = df['FILE PATH'].count()
 
-    # df['Index'] = range(1, len(df) + 1)
     df.reset_index(drop=True, inplace=True)
     df.index = df.index + 1
 
-    c_report_path = 'c_report.xlsx'
     book = load_workbook(c_report_path)
     writer = pd.ExcelWriter(c_report_path, engine='openpyxl')
     writer.book = book
     sheet_name = 'Compilation Warning Detail'
     writer.sheets = dict((ws.title, ws) for ws in book.worksheets)
-    df.to_excel(writer, sheet_name=sheet_name, startcol=0, startrow=1,header=False)
+    df.to_excel(writer, sheet_name=sheet_name, startcol=0, startrow=1, header=False)
     writer.save()
+
+    sheet_transfer('Source Scan Remedy Detail', '1. Source Scan Remedy Detail', 6, 1, c_report_path, c_remediation_path)
+    sheet_transfer('Compilation Warning Detail', '2. Compilation Warning Detail', 6, 1, c_report_path, c_remediation_path)
+    sheet_transfer('Source Code Inventory', 'Source Code Inventory', 1, 0, c_report_path, c_inventory_path)
+    sheet_transfer('Source Code Inventory', 'Source Code Inventory', 6, 1, c_report_path, c_remediation_path)
+
+    print("Start 13 : Source Code Inventory")
+    regex = r'^.*$'
+    source_code_java_path = '/usr/u2l/u2l_backend/projects//Log_Source_Analysis_20230907.log'
+    print(source_code_java_path)
+    if os.path.isfile(source_code_java_path) and os.path.getsize(source_code_java_path) > 0:
+        
+        with open(source_code_java_path, 'r') as f:
+            data = f.read()
+        lines = data.split('\n')
+        log_entries = []
+        for line in lines:
+            match = re.match(regex, line)
+            if match:
+                log_entries.append(match.group())
+        df = pd.DataFrame(log_entries, columns=['log_message'])
+
+        start_str = '###########  Execution 0001_stepcounter Starts  ###########'
+        end_str = '###########  Execution 0001_stepcounter Ends ###########'
+        start_df = df[df['log_message'].str.contains(start_str)]
+        end_df = df[df['log_message'].str.contains(end_str)]
+
+        start_index = start_df.index[0]
+        end_index = end_df.index[0]
+        extracted_df = df.iloc[start_index+1:end_index]
+
+        result_df = extracted_df[extracted_df['log_message'].str.startswith('./')]
+        result_df[['Directory', 'Type', 'col2', 'Actual Nr of Lines', 'Nr Blank Lines', 'Nr Commented Lines', 'Total Nr LoC']] = result_df['log_message'].str.split(',', expand=True)
+        result_df = result_df.replace(r'^\s*$', np.nan, regex=True)
+        result_df = result_df.dropna(subset=['Actual Nr of Lines', 'Nr Blank Lines', 'Nr Commented Lines', 'Total Nr LoC'])
+        result_df = result_df.drop(['log_message', 'col2'], axis=1)
+        result_df = result_df.reset_index(drop=True)
+        result_df.index += 1
+
+        artefact_type_dict = result_df['Type'].unique()                                     # ['C/C++' 'CShell' 'KShell']
+        type_counts = result_df['Type'].value_counts()
+        type_counts_dict = type_counts.to_dict()                                            # {'C/C++': 690, 'KShell': 107, 'CShell': 1}
+        F6 = sum(type_counts_dict.values())
+        result_df['Actual Nr of Lines'] = result_df['Actual Nr of Lines'].astype(int)
+        autual_by_type = result_df.groupby('Type')['Actual Nr of Lines'].sum().reset_index()
+        autual_by_type_dict = autual_by_type.set_index('Type')['Actual Nr of Lines'].to_dict()    # {'Java': 231, 'KShell': 3716}
+        O6 = sum(autual_by_type_dict.values())
+        result_df['Total Nr LoC'] = result_df['Total Nr LoC'].astype(int)
+        total_by_type = result_df.groupby('Type')['Total Nr LoC'].sum().reset_index()
+        total_by_type_dict = total_by_type.set_index('Type')['Total Nr LoC'].to_dict()      # {'C/C++': 958392, 'CShell': 9, 'KShell': 9689}
+
+        # generate_workbook(result_df, c_report_path,'Source Code Inventory')
+        print('Transfer Completed !!')
+    
+    wb = load_workbook(c_remediation_path)
+    print('1')
+    ws = wb['Environment Information']
+    print('2')
+    start_row = 22
+    start_col = 2
+    col_actual = 2
+    col_total = 3
+
+    for row_idx, artefact_type in enumerate(artefact_type_dict, start=start_row):
+        col_idx = start_col
+        ws.cell(row=row_idx, column=col_idx, value=artefact_type)
+
+        value = type_counts_dict.get(artefact_type, 0)
+        col_idx = start_col + 1
+        ws.cell(row=row_idx, column=col_idx, value=value)
+
+        actual_value = autual_by_type_dict.get(artefact_type, 0)
+        col_idx = start_col + col_actual
+        ws.cell(row=row_idx, column=col_idx, value=actual_value)
+
+        actual_value = total_by_type_dict.get(artefact_type, 0)
+        col_idx = start_col + col_total
+        ws.cell(row=row_idx, column=col_idx, value=actual_value)
+
+    wb.save(c_remediation_path)
+
+    wb = load_workbook(c_inventory_path)
+    print('1')
+    ws = wb['Scope of Artefacts']
+    print('2')
+    start_row = 2
+    start_col = 1
+    col_total = 2
+
+    for row_idx, artefact_type in enumerate(artefact_type_dict, start=start_row):
+        col_idx = start_col
+        ws.cell(row=row_idx, column=col_idx, value=artefact_type)
+
+        value = type_counts_dict.get(artefact_type, 0)
+        col_idx = start_col + 1
+        ws.cell(row=row_idx, column=col_idx, value=value)
+
+        actual_value = total_by_type_dict.get(artefact_type, 0)
+        col_idx = start_col + col_total
+        ws.cell(row=row_idx, column=col_idx, value=actual_value)
+
+    wb.save(c_inventory_path)
+
+    summary_sheet_generation(c_remediation_path, '2. Compilation Warning Detail', '2. Compilation Warning Summary', 5, 3, c_remediation_path, 7, 2)
+    summary_sheet_generation(c_remediation_path, '1. Source Scan Remedy Detail', '1. Source Scan Remedy Summary', 5, 5, c_remediation_path, 7, 2)
+
+    print("Sheet : Source Code Inventory : CREATED")
+    print("End 13 : Source Code Inventory")
+
+    print("Start 17 : Other inventory")
+    # Convert check_files.out
+    # check_files_dir_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/c-vfunction_'+ yMD + '_' + hMS + '/log/' + tool_analysis_type + '/srccheck/' + yyyy_mmdd + '/check_files.out'
+    check_files_dir_path = '/usr/u2l/u2l_backend/projects/check_files.out'
+    other_inventory_df1 = None
+    if os.path.isfile(check_files_dir_path) and os.path.getsize(check_files_dir_path) > 0:
+        other_inventory_df1 = pd.read_csv(check_files_dir_path, sep='\n', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
+        other_inventory_df1.index = other_inventory_df1.index + 1
+        print(other_inventory_df1)
+
+    # Convert exclude_files.out
+    # exclude_files_dir_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/c-vfunction_'+ yMD + '_' + hMS + '/log/' + tool_analysis_type + '/srccheck/' + yyyy_mmdd + '/exclude_files.out'
+    exclude_files_dir_path = '/usr/u2l/u2l_backend/projects/exclude_files.out'
+    other_inventory_df2 = None
+    if os.path.isfile(exclude_files_dir_path) and os.path.getsize(exclude_files_dir_path) > 0:
+        other_inventory_df2 = pd.read_csv(exclude_files_dir_path, sep='\n', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
+        other_inventory_df2.index = other_inventory_df2.index + 1
+        print(other_inventory_df2)
+
+    # Convert c_files.out
+    # c_files_dir_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/c-vfunction_'+ yMD + '_' + hMS + '/log/' + tool_analysis_type + '/srccheck/' + yyyy_mmdd + '/c_files.out'
+    c_files_dir_path = '/usr/u2l/u2l_backend/projects/c_files.out'
+    other_inventory_df3 = None
+    if os.path.isfile(c_files_dir_path) and os.path.getsize(c_files_dir_path) > 0:
+        other_inventory_df3 = pd.read_csv(c_files_dir_path, sep='\n', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
+        other_inventory_df3.index = other_inventory_df3.index + 1
+        print(other_inventory_df3)
+
+    # Convert csh_list.out
+    # csh_list_dir_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/c-vfunction_'+ yMD + '_' + hMS + '/log/' + tool_analysis_type + '/srccheck/' + yyyy_mmdd + '/csh_list.out'
+    csh_list_dir_path = '/usr/u2l/u2l_backend/projects/csh_list.out'
+    other_inventory_df4 = None
+    if os.path.isfile(csh_list_dir_path) and os.path.getsize(csh_list_dir_path) > 0:
+        other_inventory_df4 = pd.read_csv(csh_list_dir_path, sep='\n', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
+        other_inventory_df4.index = other_inventory_df4.index + 1
+        print(other_inventory_df4)    
+
+    # Convert ksh_list.out
+    # ksh_list_dir_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/c-vfunction_'+ yMD + '_' + hMS + '/log/' + tool_analysis_type + '/srccheck/' + yyyy_mmdd + '/ksh_list.out'
+    ksh_list_dir_path = '/usr/u2l/u2l_backend/projects/ksh_list.out'
+    other_inventory_df5 = None
+    if os.path.isfile(ksh_list_dir_path) and os.path.getsize(ksh_list_dir_path) > 0:
+        other_inventory_df5 = pd.read_csv(ksh_list_dir_path, sep='\n', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
+        other_inventory_df5.index = other_inventory_df5.index + 1
+        print(other_inventory_df5)
+
+    # Convert ot2_list.out
+    # ot2_list_dir_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/c-vfunction_'+ yMD + '_' + hMS + '/log/' + tool_analysis_type + '/srccheck/' + yyyy_mmdd + '/ot2_list.out'
+    ot2_list_dir_path = '/usr/u2l/u2l_backend/projects/ot2_list.out'
+    other_inventory_df6 = None
+    if os.path.isfile(ot2_list_dir_path) and os.path.getsize(ot2_list_dir_path) > 0:
+        other_inventory_df6 = pd.read_csv(ot2_list_dir_path, sep='\n', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
+        other_inventory_df6.index = other_inventory_df6.index + 1
+        print(other_inventory_df6)   
+
+    
+    other_inventory_combined_df = pd.concat([other_inventory_df1, other_inventory_df2, other_inventory_df3, other_inventory_df4, other_inventory_df5, other_inventory_df6], ignore_index=True)
+    other_inventory_combined_df = other_inventory_combined_df.drop_duplicates()
+    print(other_inventory_combined_df)
+
+    writer = pd.ExcelWriter(c_inventory_path, engine='openpyxl', mode='a')
+    book = load_workbook(c_inventory_path)
+    writer.book = book
+    writer.sheets = dict((ws.title, ws) for ws in book.worksheets)
+    other_inventory_combined_df.to_excel(writer, sheet_name='Other Inventory', index=False, startrow=6, startcol=1, header=False)
+    writer.save()
+    print('c_inventory other inventory added')
+
+    writer = pd.ExcelWriter(c_remediation_path, engine='openpyxl', mode='a')
+    book = load_workbook(c_remediation_path)
+    writer.book = book
+    writer.sheets = dict((ws.title, ws) for ws in book.worksheets)
+    other_inventory_combined_df.to_excel(writer, sheet_name='Other Inventory', index=False, startrow=6, startcol=1, header=False)
+    writer.save()
+    print('c_remediation other inventory added')
+
+    print("Sheet : Other Inventory : CREATED")
+    print("End 17 : Other inventory\n")
+
+    middleware_type = 'Tuxedo'
+    if(middleware_type != 'Tuxedo'):
+        filename = c_remediation_path
+        sheet_name = '6. Middleware-Tuxedo'
+        workbook = load_workbook(filename)
+
+        if sheet_name in workbook.sheetnames:
+            sheet_to_delete = workbook[sheet_name]
+            workbook.remove(sheet_to_delete)
+            workbook.save(filename)
+        print('Tuxedo sheet removed !!!')
+
+    print('Migration Summary')
+    wb = load_workbook(c_remediation_path)
+    ws = wb['Migration Summary']
+    start_col_1 = 15
+    start_col_2 = 16
+    start_row_1 = 28
+    start_row_2 = 29
+    if O28 != 0:
+        ws.cell(row=start_row_1, column=start_col_1, value=O28)
+    if O29 != 0:
+        ws.cell(row=start_row_2, column=start_col_1, value=O29)
+    if P28 != 0:
+        ws.cell(row=start_row_1, column=start_col_2, value=P28)
+    if P29 != 0:
+        ws.cell(row=start_row_2, column=start_col_2, value=P29)
+
+    O7 = P28 + P29
+    F7 = O28 + O29
+
+    if O7 != 0:
+        ws.cell(row=7, column=15, value=O7)
+    if O6 != 0:
+        ws.cell(row=6, column=15, value=O6)
+    if F7 != 0:
+        ws.cell(row=7, column=6, value=F7)
+    if F6 != 0:
+        ws.cell(row=6, column=6, value=F6)
+
+    wb.save(c_remediation_path)
+
+    return 'clog generated'
+
+@authentication_controller.route('/apitest', methods=['POST'])
+def apitest():
+
+    # Convert javaUniqRulesGrepped.txt
+    
+    javaUniqRulesGrepped_dir_path = '/usr/u2l/u2l_backend/javaUniqRulesGrepped.txt'
+    if os.path.isfile(javaUniqRulesGrepped_dir_path) and os.path.getsize(javaUniqRulesGrepped_dir_path) > 0:
+        ic_lines = []
+        with open(javaUniqRulesGrepped_dir_path, 'r') as file:
+            for line in file:
+                cleaned_line = re.sub(r'\t*$', '', line)
+                if cleaned_line.strip().startswith('IC_'):
+                    ic_lines.append(cleaned_line)
+
+        with open(javaUniqRulesGrepped_dir_path, 'w') as file:
+            file.write(''.join(ic_lines))
+
+        with open(javaUniqRulesGrepped_dir_path, 'r') as file:
+            lines = [re.sub(r'\t*$', '', line) for line in file]
+
+        with open(javaUniqRulesGrepped_dir_path, 'w') as file:
+            file.write(''.join(lines))
+        df = pd.read_csv(javaUniqRulesGrepped_dir_path, sep='\t', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
+        df.index = df.index + 1
+        df.columns = ['RULE ID', 'ENTITY', 'PACKAGE', 'OBJECT', 'REMEDY']
+        print(df)
+    #     generate_workbook(df, java_report_path,'Possible Import Remediations')
+    #     sheet_transfer('Possible Import Remediations', '7. Possible Import Remediation', 6, 1, java_report_path, java_remediation_path)
+    #     summary_sheet_generation(java_remediation_path, '7. Possible Import Remediation', '7. Import Remediation Summary', 5, 6, java_remediation_path, 8, 2)
+    # logger.info("SHEET : 7. Possible Import Remediation : CREATED")
+    # logger.info("SHEET : 7. Import Remediation Summary : CREATED")
+    # logger.info("END 5 : javaUniqRulesGrepped.txt\n")
 
     return 'success'
 
-@authentication_controller.route('/clogs', methods=['POST'])
-@jwt_required()
-def clogs():
+@authentication_controller.route('/collectdatademo', methods=['GET'])
+def collectdatademo():
 
-    script_path = '/usr/u2l/u2l_backend/scan_source.sh'
-    file_path = '/usr/u2l/u2l_backend/UNIX_HPE'
-    source_ver = 'HP-UX'
-    target_ver = 'RHEL'
-    command = ['bash', script_path, file_path, source_ver, target_ver]
-    process = subprocess.Popen(command, stdout=subprocess.PIPE)
-    output = process.communicate()[0].decode().strip()
-    lines = output.split('\n')
-    print(lines)
+    import requests
+    from bs4 import BeautifulSoup
 
-    # file_path = '/usr/u2l/u2l_backend/final_report.csv'
-    # modified_lines = []
+    url = 'https://docs.oracle.com/en/java/javase/17/docs/api/deprecated-list.html'
 
-    # with open(file_path, 'r') as file:
-    #     lines = file.readlines()
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
 
-    # i = 0
+        soup = BeautifulSoup(response.content, 'html.parser')
 
-    # while i < len(lines):
-    #     line = lines[i]
+        deprecated_item_names = soup.find_all('div', class_=['col-summary-item-name', 'col-first'])
+        deprecation_comments = soup.find_all('div', class_='col-last')
+        convert_to_dataframe_move_to_excel(deprecated_item_names, deprecation_comments)
 
-    #     if line[0] == ':':
-    #         if i > 0:
-    #             modified_lines[i-1] = modified_lines[i-1] + line
-    #         else:
-    #             modified_lines.append(line)
-    #     else:
-    #         modified_lines.append(line)
+        return 'Package found successfully'
 
-    #     i += 1
+    except requests.exceptions.RequestException as e:
+        return jsonify({'error': str(e)})
 
-    # modified_content = '\n'.join(modified_lines)
+# Java SE 10-19 doc for all deprecated items
+@authentication_controller.route('/collectdata', methods=['POST'])
+def collectdata():
 
-    # with open(file_path, "w") as file:
-    #     file.writelines(modified_content)
+    java_docs_version = request.form['java_doc_version']
+    java_docs_version_int = int(java_docs_version)
 
-    # df = pd.read_csv('/usr/u2l/u2l_backend/final_report.csv', sep=':')
-    # df.columns = ['FILE NAME', 'LINE NUMBER', 'SOURCE CODE', 'WARNING MESSAGE', 'Column5']
-    # df.index = df.index + 1
-    # print(df)
+    if ((java_docs_version_int > 10) and (java_docs_version_int < 20)):
+        # 11, 12, 13, 14, 15, 16, 17, 18, 19
+        url = 'https://docs.oracle.com/en/java/javase/' + java_docs_version + '/docs/api/deprecated-list.html'
+    elif((java_docs_version_int > 5) and (java_docs_version_int < 11)):
+        # 6, 7, 8, 9, 10
+        url = 'https://docs.oracle.com/javase/' + java_docs_version + '/docs/api/deprecated-list.html'
+    else:
+        return 'Please Enter Valid Java Version !!'
 
-    # from utils import process_content 
+    try:
 
-    # with open('/usr/u2l/u2l_backend/final_report.txt', 'r') as file:
-    #     lines = file.readlines()
+        deprecated_excel_file_path = '/usr/u2l/u2l_backend/deprecated_data.xlsx'
+        sheet_name = 'JDK'
+        response = requests.get(url)
+        response.raise_for_status()
 
-    # data = []
-    # for line in lines:
-    #     line = line.strip()
-    #     if line:
-    #         data.append(line.split(','))
-    #         # re.sub(r'\t*$', '', line)
+        soup = BeautifulSoup(response.content, 'html.parser')
+  
+        # JDK SE 6, 7, 8, 9
+        if ((java_docs_version_int > 5) and (java_docs_version_int < 10)):
+            if (java_docs_version_int == 6):
+                deprecated_item_names = [item.text.strip() for item in soup.find_all('tr', class_='TableRowColor')]
+            elif ((java_docs_version_int == 7) or (java_docs_version_int == 8)):
+                deprecated_item_names = [item.text.strip() for item in soup.find_all('td', class_='colOne')]
+            elif (java_docs_version_int == 9):
 
-    # columns = ['Column1', 'Column2', 'Column3', 'Column4', 'Column5']  # Adjust column names as needed
-    # df = pd.DataFrame(data, columns=columns)
+                deprecated_item_names_alt = [item.text.strip() for item in soup.find_all('tr', class_='altColor')]
+                df1 = createDf(deprecated_item_names_alt, java_docs_version)
 
-    # df_txt = df.to_string(index=False)
-    
-    # with open('dataframe.txt', 'w') as txt_file:
-    #     txt_file.write(df_txt)
+                deprecated_item_names_row = [item.text.strip() for item in soup.find_all('tr', class_='rowColor')]
+                df2 = createDf(deprecated_item_names_row, java_docs_version)
 
-    # # with open('dataframe.txt', 'r') as f:
-    # #     lines = f.readlines()
-    
-    # # modified_lines = process_content(lines)
-    
-    # # with open('dataframe.txt', 'w') as f:
-    # #     f.writelines(modified_lines)
-    # df1 = pd.read_csv('dataframe.txt')
-    # # df1.columns = ['Column1', 'Column2', 'Column3', 'Column4', 'Column5'] 
-    # df1 = df1[df1[1].notna() & (df1[1] != '`')]
+                df = df1.append(df2, ignore_index=True)
+                java_doc_sheet(deprecated_excel_file_path, sheet_name, df)
 
-    # print(df1)
-    return 'clog generated'
+                return f'Data collected and saved to successfully'
+
+            df = createDf(deprecated_item_names, java_docs_version)
+            print(df)
+            java_doc_sheet(deprecated_excel_file_path, sheet_name, df)
+
+            return f'Data collected and saved to successfully'
+
+        # JDK SE 10, 11, 12, 13, 14, 15
+        elif ((java_docs_version_int > 8) and (java_docs_version_int < 16)):
+
+            deprecated_item_names = soup.find_all('th', class_='colDeprecatedItemName')
+            deprecation_comments = soup.find_all('td', class_='colLast')
+            df = convert_to_dataframe_move_to_excel(deprecated_item_names, deprecation_comments, java_docs_version)
+
+            ## OpenAI Implementation
+
+            java_doc_sheet(deprecated_excel_file_path, sheet_name, df)
+
+            return f'Data collected and saved to successfully'
+
+        # JDK SE 16, 17, 18, 19
+        elif ((java_docs_version_int > 15) and (java_docs_version_int < 20)):
+
+            if(java_docs_version_int == 16):
+                deprecated_item_names = soup.find_all('div', class_=['col-deprecated-item-name', 'col-first'])
+            else:
+                deprecated_item_names = soup.find_all('div', class_=['col-summary-item-name', 'col-first'])
+
+            deprecation_comments = soup.find_all('div', class_='col-last')
+            df = convert_to_dataframe_move_to_excel(deprecated_item_names, deprecation_comments, java_docs_version)
+            java_doc_sheet(deprecated_excel_file_path, sheet_name, df)
+
+            return f'Data collected and saved to successfully'
+
+        return 'Requested URL not found !!'
+
+    except requests.exceptions.RequestException as e:
+        return jsonify({'error': str(e)})
+
+@authentication_controller.route('/openai', methods=['POST'])
+def openai():
+    import os
+    import openai
+
+    openai.api_type = "azure"
+    openai.api_base = "https://azure-openai-demo1.openai.azure.com/"
+    openai.api_version = "2023-07-01-preview"
+    openai.api_key = "c2c49c25ad2946b98d9e7ca876f7f7cb"
+    message_text = [
+    {"role": "system", "content": "You are an expert middleware architect."},
+    {"role": "user", "content": "2+2"}
+    ]
+    completion = openai.ChatCompletion.create(
+        engine="gpt-4-32k",
+        messages = message_text,
+        temperature=0.0,
+        max_tokens=800,
+        top_p=0.95,
+        frequency_penalty=0,
+        presence_penalty=0,
+        stop=None
+        )
+    result = completion.choices[0].message['content']
+    print(result)
+    return result

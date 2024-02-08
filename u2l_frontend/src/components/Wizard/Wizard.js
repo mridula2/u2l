@@ -28,6 +28,7 @@ import { FormNext, FormPreviousLink, FormPrevious } from 'grommet-icons';
 import { getWidth } from './Utils';
 import ProjectService from '../../api/ProjectService';
 import WizardUtils from '../../utils/WizardUtils';
+import CommonUtils from '../../utils/CommonUtils';
 // import FileReader from 'filereader';
 
 const WizardValidationExample = ({ containerRef }) => {
@@ -68,6 +69,7 @@ const WizardValidationExample = ({ containerRef }) => {
         framework: '',
         source_framework_version: '',
         target_framework_version: '',
+        middleware_type:''
       };
     } else {
       return {
@@ -110,6 +112,7 @@ const WizardValidationExample = ({ containerRef }) => {
         target_framework_version:
           location.state.formValues.target_framework_version,
         file_name: location.state.formValues.file_name,
+        middleware_type: location.state.formValues.middleware_type
       };
     }
   };
@@ -321,7 +324,7 @@ const styles = {
     alignItems: 'center',
     borderRadius: '0',
     borderBottom: '0.1px solid white',
-    fontWeight: 'normal',
+    // fontWeight: 'normal',
   },
   sideBarbtnonselect: {
     display: 'flex',
@@ -338,7 +341,7 @@ const styles = {
     alignItems: 'center',
     borderRadius: '0',
     borderBottom: '0.1px solid white',
-    fontWeight: 'normal',
+    // fontWeight: 'normal',
     background: ' #F7F7F7 0% 0% no-repeat padding-box',
     width: '100%',
     textAlign: 'left',
@@ -428,19 +431,21 @@ export const StepOne = (nextId) => {
 
 export const StepTwo = (nextId) => {
   const { valid, setValid } = useContext(WizardContext);
+  const sourceOS = ['HP-UX', 'Solaris', 'AIX'];
   return (
     <Box align='center'>
       <Box width={{ max: 'medium' }}>
         <h3>OS details</h3>
 
         <Box htmlFor='source_os' direction='row' margin={{ bottom: 'medium' }}>
-          <Box width='80%'>
+          <Box width={'60%'}>
             <label htmlFor='source_os'>Source OS*</label>
           </Box>
-          <TextInput
-            placeholder='Enter Value'
+          <Select
+            placeholder='Source OS'
             id='source_os'
             name='source_os'
+            options={sourceOS}
             required={true}
           />
         </Box>
@@ -451,13 +456,13 @@ export const StepTwo = (nextId) => {
           margin={{ bottom: 'medium' }}
         >
           <Box width='80%'>
-            <label htmlFor='source_os_version'>Source OS version*</label>
+            <label htmlFor='source_os_version'>Source OS version</label>
           </Box>
           <TextInput
             placeholder='Enter Value'
             id='source_os_version'
             name='source_os_version'
-            required={true}
+            // required={true}
           />
         </Box>
 
@@ -479,13 +484,13 @@ export const StepTwo = (nextId) => {
           margin={{ bottom: 'medium' }}
         >
           <Box width='80%'>
-            <label htmlFor='target_os_version'>Target OS version*</label>
+            <label htmlFor='target_os_version'>Target OS version</label>
           </Box>
           <TextInput
             placeholder='Enter Value'
             id='target_os_version'
             name='target_os_version'
-            required={true}
+            // required={true}
           />
         </Box>
       </Box>
@@ -548,6 +553,7 @@ export const StepThree = (nextId) => {
         target_pre_compiler: '',
         target_pre_compiler_version: '',
         file_name: '',
+        middleware_type:''
       };
     } else {
       return {
@@ -590,6 +596,7 @@ export const StepThree = (nextId) => {
         target_framework_version:
           location.state.formValues.target_framework_version,
         file_name: location.state.formValues.file_name,
+        middleware_type:location.state.formValues.middleware_type
       };
     }
   };
@@ -603,7 +610,9 @@ export const StepThree = (nextId) => {
       return formValues.analysis_type;
     }
   };
+  // const inputRef = useRef(null);
   const [showhide, setShowHide] = useState(defaultLanguage);
+  const [inputRef, setInputFocus] = CommonUtils.useFocus();
 
   const languages = [
     'Java',
@@ -614,6 +623,19 @@ export const StepThree = (nextId) => {
     'C/Pro*C',
     'C++/Pro*C',
   ];
+
+  const compilers = ['ACC', 'GCC', 'Other'];
+  const [activeElementType, setActiveElementType] = useState('dropdown');
+
+  const defaultCCompiler = () => {
+    if (location.state) {
+      return location.state.formValues.source_compiler;
+    } else {
+      return formValues.source_compiler;
+    }
+  };
+
+  const [cCompiler, setCCompiler] = useState(defaultCCompiler);
 
   const handleshowhide = (event) => {
     const getLang = event.target.value;
@@ -681,6 +703,17 @@ export const StepThree = (nextId) => {
     }
   };
 
+  const checkSourceCompiler = (e) => {
+    setCCompiler(e.target.value);
+    if (e.target.value === 'Other') {
+      setActiveElementType('input');
+      setCCompiler('');
+      setTimeout(() => {
+        setInputFocus();
+      }, 100);
+    }
+  };
+
   return (
     <Box align='center'>
       <Box width={{ max: 'medium' }}>
@@ -693,7 +726,7 @@ export const StepThree = (nextId) => {
           direction='row'
           margin={{ bottom: 'medium' }}
         >
-          <Box width='68%'>
+          <Box width='66%'>
             <label htmlFor='analysis_type'>Type of analysis*</label>
           </Box>
           <Select
@@ -819,15 +852,28 @@ export const StepThree = (nextId) => {
               direction='row'
               margin={{ bottom: 'medium' }}
             >
-              <Box width='medium'>
-                <label htmlFor='source_compiler'>Source Compiler*</label>
+              <Box width={activeElementType === 'dropdown' ? '66%' : 'medium'}>
+                <label htmlFor='source_compiler'>Source Compiler</label>
               </Box>
-              <TextInput
-                placeholder='Enter Value'
-                id='source_compiler'
-                name='source_compiler'
-                required={true}
-              />
+              {activeElementType === 'dropdown' ? (
+                <Select
+                  placeholder='Select'
+                  id='source_compiler'
+                  name='source_compiler'
+                  // value={cCompiler}
+                  options={compilers}
+                  // onChange={(e) => checkSourceCompiler(e)}
+                />
+              ) : (
+                <TextInput
+                  placeholder='Enter Value'
+                  id='source_compiler'
+                  name='source_compiler'
+                  value={cCompiler}
+                  ref={inputRef}
+                  onChange={(e) => checkSourceCompiler(e)}
+                />
+              )}
             </Box>
 
             <Box
@@ -853,13 +899,13 @@ export const StepThree = (nextId) => {
               margin={{ bottom: 'medium' }}
             >
               <Box width='medium'>
-                <label htmlFor='target_compiler'>Target Compiler*</label>
+                <label htmlFor='target_compiler'>Target Compiler</label>
               </Box>
               <TextInput
                 placeholder='Enter Value'
                 id='target_compiler'
                 name='target_compiler'
-                required={true}
+                // required={true}
               />
             </Box>
 
@@ -877,6 +923,20 @@ export const StepThree = (nextId) => {
                 placeholder='Enter Value'
                 id='target_compiler_version'
                 name='target_compiler_version'
+              />
+            </Box>
+            <Box
+              htmlFor='middleware_type'
+              direction='row'
+              margin={{ bottom: 'medium' }}
+            >
+              <Box width='medium'>
+                <label htmlFor='middleware_type'>Middleware Type</label>
+              </Box>
+              <TextInput
+                placeholder='Enter Value'
+                id='middleware_type'
+                name='middleware_type'
               />
             </Box>
           </Box>
@@ -1510,52 +1570,60 @@ export const StepThree = (nextId) => {
           </Box>
         )}
 
-        <Box htmlFor='framework' direction='row' margin={{ bottom: 'medium' }}>
-          <Box width='68%'>
-            <label htmlFor='framework'>Framework</label>
-          </Box>
-          <Select
-            placeholder='Select'
-            id='framework'
-            name='framework'
-            options={['Spring', 'Struts', 'JSF', 'Hibernate']}
-            onChange={(e) => handleFramework(e)}
-          />
-        </Box>
+        {showhide === 'Java' && (
+          <Box>
+            <Box
+              htmlFor='framework'
+              direction='row'
+              margin={{ bottom: 'medium' }}
+            >
+              <Box width='68%'>
+                <label htmlFor='framework'>Framework</label>
+              </Box>
+              <Select
+                placeholder='Select'
+                id='framework'
+                name='framework'
+                options={['Spring', 'Struts', 'JSF', 'Hibernate']}
+                onChange={(e) => handleFramework(e)}
+              />
+            </Box>
 
-        <Box
-          htmlFor='source_framework_version'
-          direction='row'
-          margin={{ bottom: 'medium' }}
-        >
-          <Box width='medium'>
-            <label htmlFor='source_framework_version'>
-              Source Framework Version
-            </label>
-          </Box>
-          <TextInput
-            placeholder='Enter value'
-            id='source_framework_version'
-            name='source_framework_version'
-          />
-        </Box>
+            <Box
+              htmlFor='source_framework_version'
+              direction='row'
+              margin={{ bottom: 'medium' }}
+            >
+              <Box width='medium'>
+                <label htmlFor='source_framework_version'>
+                  Source Framework Version
+                </label>
+              </Box>
+              <TextInput
+                placeholder='Enter value'
+                id='source_framework_version'
+                name='source_framework_version'
+              />
+            </Box>
 
-        <Box
-          htmlFor='target_framework_version'
-          direction='row'
-          margin={{ bottom: 'medium' }}
-        >
-          <Box width='medium'>
-            <label htmlFor='target_framework_version'>
-              Target Framework Version
-            </label>
+            <Box
+              htmlFor='target_framework_version'
+              direction='row'
+              margin={{ bottom: 'medium' }}
+            >
+              <Box width='medium'>
+                <label htmlFor='target_framework_version'>
+                  Target Framework Version
+                </label>
+              </Box>
+              <TextInput
+                placeholder='Enter value'
+                id='target_framework_version'
+                name='target_framework_version'
+              />
+            </Box>
           </Box>
-          <TextInput
-            placeholder='Enter value'
-            id='target_framework_version'
-            name='target_framework_version'
-          />
-        </Box>
+        )}
 
         {/* <Box data-testid="test-4" width="medium" margin="0" pad="small" >
           <Text>Source Code</Text> */}

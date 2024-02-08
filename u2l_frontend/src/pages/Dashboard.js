@@ -1,3 +1,4 @@
+import React, { useContext, useEffect, useState } from 'react';
 import {
   Button,
   Box,
@@ -5,9 +6,9 @@ import {
   TextInput,
   Notification,
 } from 'grommet';
-import styled from 'styled-components';
-import React, { useContext, useEffect, useState } from 'react';
 import { Search as SearchIcon } from 'grommet-icons';
+import styled from 'styled-components';
+
 import Cards from '../components/cards/Cards';
 import FilteringTable from '../components/table/FilteringTable';
 import AppHeader from '../components/navbars/AppHeader';
@@ -17,11 +18,6 @@ import AuthenticationUtils from '../utils/AuthenticationUtils';
 // import dummyData from "../Views/dummyData";
 
 export const DefaultButtonExample = () => <Button label='Default button' />;
-
-const uploadFile = () => {
-  console.log('Uploading file');
-  // axios.post('https://localhost:5000/uploaded_file', uploadFile)
-};
 
 const mystyle = {
   width: '40px',
@@ -76,20 +72,29 @@ const Dashboard = (containerRef) => {
     setNotificationVisible(false);
   };
   const skeletonAlign = loading ? 'none' : 'start';
+
   useEffect(() => {
-    ProjectService.getProjects(AuthenticationUtils.getEmail())
-      .then((response) => {
-        // response.data
-        console.log(response);
-        setProjects(response.data.project_details);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.log(error);
-        setNotificationMessage('Error while fetching projects');
-        setStatus('critical');
-        setNotificationVisible(true);
-      });
+    const fetchData = () => {
+      ProjectService.getProjects(AuthenticationUtils.getEmail())
+        .then((response) => {
+          // response.data
+          console.log(response);
+          const reverseArrayProjectDetails =
+            response.data.project_details.reverse();
+          setProjects(reverseArrayProjectDetails);
+          setLoading(false);
+        })
+        .catch((error) => {
+          console.log(error);
+          setNotificationMessage('Error while fetching projects');
+          setStatus('critical');
+          setNotificationVisible(true);
+        });
+    };
+
+    fetchData();
+    const intervalId = setInterval(fetchData, 30000);
+    return () => clearInterval(intervalId);
   }, []);
 
   const image = {

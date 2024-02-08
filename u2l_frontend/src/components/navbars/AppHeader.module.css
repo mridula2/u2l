@@ -1,9 +1,6 @@
 .mystyle {
-    width: 40px;
-    height: 40px;
-    background-color: #FFBC44;
-    type: Initials;
-    left: 1107;
-    top: 1400;
-    border: 24;
-  };
+  background-color: #ffbc44;
+  left: 1107;
+  top: 1400;
+  border: 24;
+}

@@ -4,15 +4,15 @@ import { Box, Button, Footer, ResponsiveContext } from 'grommet';
 import { FormNext, Previous } from 'grommet-icons';
 import WizardContext from '../Wizard/WizardContext';
 
-const StepFooter = ({ nextId,formValues, previousId, onNavigate, ...rest }) => {
+const StepFooter = ({ nextId, formValues, previousId, ...rest }) => {
   const size = useContext(ResponsiveContext);
   const [btnDisable, setButtonDisable] = useState(false);
   const { activeIndex, id, steps, width, activeStep, setActiveIndex } =
     useContext(WizardContext);
 
   const handleBtn = () => {
-    setButtonDisable(true)
-  }
+    setButtonDisable(true);
+  };
 
   return (
     <Box
@@ -25,27 +25,27 @@ const StepFooter = ({ nextId,formValues, previousId, onNavigate, ...rest }) => {
       {...rest}
     >
       <Footer
-        justify="end"
-        margin={{left:"10%"}}
+        justify='end'
+        margin={{ left: '10%' }}
         pad={
           !['xsmall', 'small'].includes(size)
             ? { vertical: 'medium' }
             : { vertical: 'small', horizontal: 'medium' }
         }
-        alignSelf="start"
+        alignSelf='start'
         width={width}
-        gap="large"
+        gap='large'
       >
         {activeStep > 1 && (
           <Button
-            align="start"
+            align='start'
             id={previousId}
             label={
               !['xsmall', 'small'].includes(size)
                 ? (steps[activeIndex - 1] && steps[activeIndex - 1].title) ||
-                `Step ${activeStep - 1} title`
+                  `Step ${activeStep - 1} title`
                 : // `Previous`
-                undefined
+                  undefined
             }
             icon={<Previous />}
             onClick={() => setActiveIndex(activeIndex - 1)}
@@ -55,14 +55,14 @@ const StepFooter = ({ nextId,formValues, previousId, onNavigate, ...rest }) => {
         <Button
           id={nextId}
           icon={<FormNext />}
-          disabled={activeStep === 3 && !formValues.file_name }
+          disabled={activeStep === 3 && !formValues.file_name}
           // disabled={activeStep === 3}
           reverse
           label={activeIndex === steps.length - 1 ? 'Review + Create' : 'Next'}
           // label={decideLable}
           form={`${id}-form`}
-          type="submit"
-          onClick={activeIndex === 2 && onNavigate}
+          type='submit'
+          // onClick={activeIndex === 2 && onNavigate}
         />
       </Footer>
     </Box>
@@ -74,4 +74,3 @@ StepFooter.propTypes = {
 };
 
 export default StepFooter;
-

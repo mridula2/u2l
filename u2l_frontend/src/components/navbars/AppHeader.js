@@ -20,7 +20,7 @@ import {
 import { Link, useNavigate } from 'react-router-dom';
 import classes from './AppHeader.module.css';
 import AuthenticationUtils from '../../utils/AuthenticationUtils';
-
+                           
 export const AppHeader = () => {
   const size = useContext(ResponsiveContext);
   const [focused, setFocused] = useState(false);
@@ -35,50 +35,43 @@ export const AppHeader = () => {
         navigate(headerLinks[0].path);
       },
     },
+    {
+      label: 'Rules',
+      path: '/rules',
+      onClick: () => {
+        navigate(headerLinks[1].path);
+      },
+    },
   ];
   AuthenticationUtils.getUserRole() !== 'Delivery' &&
     headerLinks.push({
       label: 'Documentation',
       path: '/documentation',
       onClick: () => {
-        navigate(headerLinks[1].path);
+        navigate(headerLinks[2].path);
       },
     });
 
   const loginPageHeaderLinks = [
     {
-      label: 'HPE GreenLake',
-      path: 'https://www.hpe.com/emea_europe/en/greenlake.html',
+      label: 'Login',
+      path: '/',
       onClick: () => {
-        window.location.replace(loginPageHeaderLinks[0].path);
-      },
-    },
-    {
-      label: 'Products',
-      path: 'https://www.hpe.com/emea_europe/en/products.html',
-      onClick: () => {
-        window.location.replace(loginPageHeaderLinks[1].path);
-      },
-    },
-    {
-      label: 'Support',
-      path: 'https://www.hpe.com/emea_europe/en/services.html',
-      onClick: () => {
-        window.location.replace(loginPageHeaderLinks[2].path);
+        navigate(loginPageHeaderLinks[0].path);
       },
     },
     {
       label: 'Contact',
       path: '/contact',
       onClick: () => {
-        window.location.replace(loginPageHeaderLinks[3].path);
+        navigate(loginPageHeaderLinks[1].path);
       },
     },
     {
       label: 'About us',
       path: '/aboutus',
       onClick: () => {
-        window.location.replace(loginPageHeaderLinks[4].path);
+        navigate(loginPageHeaderLinks[2].path);
       },
     },
   ];
@@ -112,6 +105,10 @@ export const AppHeader = () => {
     // return "A A"
   };
 
+  const navigateToPage = (page) => {
+    navigate(page);
+  };
+
   if (
     window.location.pathname === '/' ||
     window.location.pathname === '/aboutus' ||
@@ -124,7 +121,14 @@ export const AppHeader = () => {
           boxShadow: '0 3px 6px rgba(0,0,0,0.16)',
         }}
       >
-        <Box direction='column' gap='none' margin={{ left: 'medium' }}>
+        <Box
+          direction='column'
+          gap='none'
+          margin={{ left: 'medium' }}
+          style={{ cursor: 'pointer' }}
+          focusIndicator={false}
+          onClick={() => navigateToPage('/')}
+        >
           <Hpe color='plain' size='large' />
           <Box>
             <Text color='text-strong' size='medium' weight='bold'>
@@ -143,8 +147,9 @@ export const AppHeader = () => {
                   style={{ borderRadius: '0' }}
                   label={item.label}
                   key={item.label}
-                  href={item.path}
+                  onClick={() => navigateToPage(item.path)}
                   active={window.location.pathname === item.path}
+                  // disabled={window.location.pathname === item.path}
                 />
               ))}
             </Nav>
@@ -170,7 +175,8 @@ export const AppHeader = () => {
   } else if (
     window.location.pathname === '/dashboard' ||
     window.location.pathname === '/wizard' ||
-    window.location.pathname === '/documentation'
+    window.location.pathname === '/documentation' ||
+    window.location.pathname === '/rules'
   ) {
     return (
       <Header
@@ -181,7 +187,14 @@ export const AppHeader = () => {
         }}
       >
         <Box direction='row' gap='medium' align='start' flex>
-          <Box direction='row' gap='small' align='center' margin='auto'>
+          <Box
+            direction='row'
+            gap='small'
+            align='center'
+            margin='auto'
+            focusIndicator={false}
+            onClick={() => navigateToPage('/dashboard')}
+          >
             <Hpe size='medium' color='plain' />
             <Box>
               <Text color='text-strong' size='medium' weight='bold'>
@@ -202,9 +215,11 @@ export const AppHeader = () => {
                   <Button
                     label={item.label}
                     key={item.label}
-                    href={item.path}
+                    // href={item.path}
                     style={{ borderRadius: '0' }}
+                    onClick={() => navigateToPage(item.path)}
                     active={window.location.pathname === item.path}
+                    // disabled={window.location.pathname === item.path}
                   />
                 ))}
               </Nav>
@@ -220,18 +235,18 @@ export const AppHeader = () => {
             margin='auto'
           >
             <Button href='/notifications'>
-              <Notification
-                style={{ width: '100%', height: 20 }}
-              ></Notification>
+              <Notification style={{ width: '100%', height: 16 }} />
             </Button>
             <Button href='/help'>
-              <HelpOption style={{ width: '100%', height: 20 }}></HelpOption>
+              <HelpOption style={{ width: '100%', height: 17 }} />
             </Button>
             <Button href='/dashboard'>
-              <Projects style={{ width: '100%', height: 20 }}></Projects>
+              <Projects style={{ width: '100%', height: 17 }} />
             </Button>
             <Button>
-              <Avatar className={classes.mystyle}>{getInitials()}</Avatar>
+              <Avatar className={classes.mystyle} size='30px'>
+                <Text style={{ fontSize: '17px' }}>{getInitials()}</Text>
+              </Avatar>
             </Button>
           </Box>
         </Box>

@@ -17,6 +17,7 @@ import ProjectService from '../../api/ProjectService';
 import AuthenticationUtils from '../../utils/AuthenticationUtils';
 import ProjectUtils from '../../utils/ProjectUtils';
 import statusIcons from '../../config/constants';
+import CommonUtils from '../../utils/CommonUtils';
 
 const filtersConfig = [
   {
@@ -118,14 +119,28 @@ const ServerResults = () => {
     navigate('/logdetails', { state: { data: datum } });
   };
 
+
+
+
   return (
     <Box height='100%' overflow='auto' width='100%' responsive={true}>
       <DataTable
         responsive={true}
-        aria-describedby='servers-heading'
+        aria-describedby='projects-table'
         data={filteredResults}
-        paginate
-        step={10}
+        paginate={{
+          border: 'top',
+          direction: 'row',
+          fill: 'horizontal',
+          flex: false,
+          justify: !['xsmall', 'small'].includes(size) ? 'end' : 'center',
+          pad: { top: 'xsmall' },
+          step:10,
+          numberEdgePages:2,
+          numberMiddlePages:3,
+          
+        }}
+        sortable={true}
         columns={[
           {
             property: 'id',
@@ -133,27 +148,36 @@ const ServerResults = () => {
             pin: ['xsmall', 'small'].includes(size),
             primary: true,
             render: (datum) => datum.id,
+            sortable:false
           },
           {
-            property: 'project_name',
-            header: 'Name',
+            property: 'application_name',
+            header: 'Application',
+            sortable:false,
             render: (datum) => (
               <Button
                 style={{ textDecoration: 'underline' }}
                 onClick={(e) => logDetails(datum, e)}
               >
-                {datum.project_name}
+                {datum.application_name}
               </Button>
             ),
           },
           {
+            property: 'project_name',
+            header: 'Project',
+            render: (datum) => datum.project_name,
+            sortable:false
+          },
+          {
             property: 'created_at',
             header: 'Date',
+            
           },
           {
             property: 'file_size',
             header: 'File Size',
-            render: (datum) => `${datum.file_size} kb`,
+            render: (datum) => CommonUtils.getSize(datum.file_size),
           },
           {
             property: 'analysis_status',
@@ -168,24 +192,25 @@ const ServerResults = () => {
                 '-'
               ),
             align: 'start',
-            sortable: false,
           },
           {
             property: 'view',
             header: 'Reports',
             render: (datum) =>
-              datum.analysis_status === 'analysis successful' ? (
-                <Anchor
-                  style={{ color: 'rgb(111, 111, 111)', fontSize: '16px' }}
+              datum.analysis_status === 'SUCCESS' ? (
+                <Button
+                  style={{ color: 'rgb(111, 111, 111)', fontSize: '16px',textDecoration:'underline', width:'90%' }}
                   onClick={() => {
                     viewPdf(datum.project_name, datum.application_name);
                   }}
                 >
                   View
-                </Anchor>
+                </Button>
               ) : (
-                <Text style={{ color: 'rgb(167,167,167)' }}>View</Text>
+                <Text style={{ color: 'rgb(167,167,167)', fontSize: '16px' }}>View</Text>
               ),
+              sortable:false,
+              align:'center'
           },
         ]}
         pin
