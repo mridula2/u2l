@@ -1,0 +1,17 @@
+FROM mysql:8.0
+
+ENV MYSQL_DATABASE=$MYSQL_DATABASE
+ENV MYSQL_USER=$MYSQL_USER
+ENV MYSQL_PASSWORD=$MYSQL_PASSWORD
+ENV MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD
+ENV MYSQL_PORT=$MYSQL_PORT
+
+ADD data.sql /docker-entrypoint-initdb.d/data.sql
+RUN sed -i \
+        -e "s/MYSQL_DATABASE/$MYSQL_DATABASE/g" \
+        -e "s/MYSQL_USER/$MYSQL_USER/g" \
+        -e "s/MYSQL_PASSWORD/$MYSQL_PASSWORD/g" \
+        /docker-entrypoint-initdb.d/data.sql
+
+
+EXPOSE $MYSQL_PORT
