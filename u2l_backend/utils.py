@@ -3,7 +3,7 @@ import re
 import pandas as pd
 import openpyxl
 from openpyxl import load_workbook
-from models import db, user_details, project_details, os_details, analysis_type, analysis_java, analysis_c, analysis_shell, analysis_status, source_code_inventory, migration_summary, artefacts_summary, java_data, contact_us, analysis_summary_java, celery_job_details
+from models import db, user_details, project_details, os_details, analysis_type, analysis_java, analysis_c, analysis_shell, analysis_status, source_code_inventory, migration_summary, artefacts_summary, java_data, contact_us, analysis_summary_java, celery_job_details, MiddlewareComponent
 from datetime import datetime
 import smtplib
 import logging
@@ -22,10 +22,19 @@ import re
 import numpy as np
 import zipfile
 import openpyxl
+import json
 
 from flask_sse import sse
 from celery import Celery
 from threading import Lock
+
+from bs4 import BeautifulSoup
+import requests
+import pandas as pd
+import os
+import urllib3
+
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # app = Flask(__name__)
 logger = get_task_logger(__name__)
@@ -1758,7 +1767,29 @@ def process_content(lines):
     print(modified_lines)
     return modified_lines
 
-def convert_to_dataframe_move_to_excel(package_name, package_description, java_docs_version):
+def convert_to_dataframe(package_names, package_descriptions, version, package_name):
+    data = {'Deprecated Item Name': [], 'Deprecation Comment': []}
+
+    for item_name, comment in zip(package_names, package_descriptions):
+        data['Deprecated Item Name'].append(item_name)
+        
+        cleaned_comment = " ".join(comment.split())
+        data['Deprecation Comment'].append(cleaned_comment)
+
+    # df = pd.DataFrame(data)
+    df = pd.DataFrame(data).reset_index(drop=True)
+
+    print(df)
+    df[['Package', 'Class']] = df['Deprecated Item Name'].str.rsplit('.', n=1, expand=True)
+    df = df[['Deprecated Item Name', 'Package', 'Class', 'Deprecation Comment']]
+
+    df.insert(0, 'Custom ID', f'{package_name}' + version + '_' + df.index.map(lambda x: f'{x + 1:04d}'))
+    df.columns = ['Custom ID', 'Deprecated Item Name', 'Package', 'Class', 'Deprecation Comment']
+    df.columns = ['RuleId', 'Deprecated List', 'Library to Search', 'Entity to Search', 'Remedy']
+    print(df)
+    return df
+
+def convert_to_dataframe_move_to_excel(package_name, package_description, version, package):
                 
     data = {'Deprecated Item Name': [], 'Deprecation Comment': []}
 
@@ -1771,7 +1802,7 @@ def convert_to_dataframe_move_to_excel(package_name, package_description, java_d
         comment = re.sub(r'\s+', ' ', deprecation_comment.text.strip())
 
         if(comment == ''):
-            comment = openai(item_name, java_docs_version)
+            comment = openai(item_name, version)
 
         data['Deprecated Item Name'].append(item_name)
         data['Deprecation Comment'].append(comment)
@@ -1780,14 +1811,13 @@ def convert_to_dataframe_move_to_excel(package_name, package_description, java_d
     df[['Package', 'Class']] = df['Deprecated Item Name'].str.rsplit('.', n=1, expand=True)
     df = df[['Deprecated Item Name', 'Package', 'Class', 'Deprecation Comment']]
 
-    df.insert(0, 'Custom ID', 'java_' + java_docs_version + '_' + df.index.map(lambda x: f'{x + 1:04d}'))
+    df.insert(0, 'Custom ID', f'{package}'+ '_' + version + '_' + df.index.map(lambda x: f'{x + 1:04d}'))
     df.columns = ['Custom ID', 'Deprecated Item Name', 'Package', 'Class', 'Deprecation Comment']
-    # RuleId	Deprecated List	Library to Search	Entity to Search	Remedy
     df.columns = ['RuleId', 'Deprecated List', 'Library to Search', 'Entity to Search', 'Remedy']
 
     return df
 
-def createDf(deprecated_item, java_docs_version):
+def createDf(deprecated_item, version, package_name):
     df = pd.DataFrame({'Fullname': deprecated_item}).reset_index(drop=True)
     df[['Deprecated Item Name', 'Deprecation Comment']] = df['Fullname'].str.split('\n', 1, expand=True)
     df.drop('Fullname', axis=1, inplace=True)
@@ -1796,7 +1826,7 @@ def createDf(deprecated_item, java_docs_version):
     df['Deprecation Comment'] = df['Deprecation Comment'].str.replace(r'\s+', ' ')
     df = df[['Deprecated Item Name', 'Package', 'Class', 'Deprecation Comment']]
     
-    df.insert(0, 'Custom ID', 'java_' + java_docs_version + '_' + df.index.map(lambda x: f'{x + 1:04d}'))
+    df.insert(0, 'Custom ID', f'{package_name}' + '_' + version + '_' + df.index.map(lambda x: f'{x + 1:04d}'))
     df.columns = ['Custom ID', 'Deprecated Item Name', 'Package', 'Class', 'Deprecation Comment']
     df.columns = ['RuleId', 'Deprecated List', 'Library to Search', 'Entity to Search', 'Remedy']
     return df
@@ -1819,7 +1849,123 @@ def java_doc_sheet(file_path, sheet_name, df):
     next_row = sheet.max_row + 1
     for row in data_to_append:
         sheet.append(row)
-    book.save(file_path)   
+    book.save(file_path) 
+
+def extract_versions(package_name):
+    package_versions = {
+        'Mchange commons java': ['0.2.19', '0.2.20'],
+        'Apache Tomcat': ['11.0', '10.0','9.0','8.0','7.0'],
+        'Geronimo': ['2.0.1', '2.1.3'],
+        'Apache OpenJPA': ['1.0.0','1.0.1','1.0.2','1.0.3','1.0.4','1.1.0','1.2.0','1.2.1','1.2.2','1.2.3','2.0.0','2.0.1','2.1.0','2.1.1','2.2.0','2.2.1','2.2.2','2.3.0','2.4.0','2.4.1','2.4.2','2.4.3','3.0.0','3.1.0','3.1.2','3.2.0','3.2.1','3.2.2'],
+        'POI': ['3.17','4.0','4.1','5.0'],
+        'Quartz scheduler': ['2.5.0-SNAPSHOT','2.3.1-SNAPSHOT','2.3.0','2.2.2','2.1.7','2.0.2','1.8.6'],
+        'XMLBeans': ['1.0.4','2.0.0.','2.1.0','2.2.0','2.4.0','2.6.0','3.0.0','3.1.0','4.0.0','5.0.0']
+    }
+    return package_versions[package_name]      
+
+def deprecated_data_sheet(url, package_name, version):
+    try:
+        response = requests.get(url, verify=False)
+        response.raise_for_status()
+        soup = BeautifulSoup(response.content, 'html.parser')
+
+        deprecated_table = None
+        deprecated_item_names = []
+        deprecation_comments = []
+        deprecated_table = soup.find_all('td', class_='colOne')
+        if not deprecated_table:
+            deprecated_table = soup.find('table', {'border': '1', 'width': '100%', 'cellpadding': '3', 'cellspacing': '0'})
+            if not deprecated_table:
+                deprecated_table = soup.find('table', class_='summary-table')
+                if not deprecated_table:
+                    deprecated_table = soup.find('table', class_='deprecatedSummary')
+                    if not deprecated_table:
+                        deprecated_table = soup.find('div', class_='two-column-summary')
+                        if not deprecated_table:
+                            return f'Error: Unable to find deprecated classes table on {url}'
+                        else:
+                            interface_names = deprecated_table.find_all('div', class_='col-summary-item-name')
+                            deprecation_comments = deprecated_table.find_all('div', class_='col-last')
+
+                            deprecated_item_names = [item_name.find('a').text.strip() for item_name in interface_names]
+                            deprecation_comments = [comment.text.strip().replace('\t', ' ') for comment in deprecation_comments]
+                    else:
+                        deprecated_items = deprecated_table.find_all('tr', class_='altColor' or 'rowColor')
+                        for deprecated_item in deprecated_items:
+                            item_name = deprecated_item.find('a').text.strip()
+
+                            comment_div = deprecated_item.find('div', class_='deprecationComment')
+                            comment = comment_div.text.strip().replace('\t', ' ') if comment_div else ''
+                            # comment = comment_div.text.strip() if comment_div else ''
+
+                            deprecated_item_names.append(item_name)
+                            deprecation_comments.append(comment)
+                else:
+                    deprecated_items = deprecated_table.find_all('tr', class_='alt-color' or 'row-color')
+                    for deprecated_item in deprecated_items:
+                        item_name = deprecated_item.find('a').text.strip()
+
+                        comment_div = deprecated_item.find('div', class_='deprecation-comment')
+                        comment = comment_div.text.strip().replace('\t', ' ') if comment_div else ''
+                        # comment = comment_div.text.strip() if comment_div else ''
+
+                        deprecated_item_names.append(item_name)
+                        deprecation_comments.append(comment)
+            else:
+                deprecated_items = deprecated_table.find_all('tr', class_='TableRowColor')
+                for deprecated_item in deprecated_items:
+                    item_name = deprecated_item.find('a').text.strip()
+                
+                    comment = deprecated_item.find('i').text.strip().replace('\t', ' ') if deprecated_item.find('i') else ''
+
+                    deprecated_item_names.append(item_name)
+                    deprecation_comments.append(comment)
+        else:
+            for deprecated_item in deprecated_table:
+                item_name = deprecated_item.find('a').text.strip()
+
+                comment_div = deprecated_item.find_next('div', class_='block')
+                comment = comment_div.text.strip().replace('\t', ' ') if comment_div else ''
+                # comment = comment_div.text.strip() if comment_div else ''
+
+                deprecated_item_names.append(item_name)
+                deprecation_comments.append(comment)
+
+        df = convert_to_dataframe(deprecated_item_names, deprecation_comments, version, package_name)
+        df = df.reset_index(drop=True)
+
+        output_folder = 'u2l_total_deprecated_data'
+        os.makedirs(output_folder, exist_ok=True)
+        # file_path = os.path.join(output_folder, 'total_deprecated_data.xlsx')
+
+        file_path = os.path.join(output_folder, f'{package_name}_deprecated_data.xlsx')
+        with pd.ExcelWriter(file_path, engine='openpyxl') as writer:
+            df.to_excel(writer, sheet_name='DeprecatedItems', startcol=0, startrow=0, index=False)
+
+        # if os.path.exists(file_path):
+        #     # Check if the sheet exists in the file
+        #     with pd.ExcelFile(file_path) as xls:
+        #         sheet_exists = 'total_deprecated_data' in xls.sheet_names
+
+        #     if sheet_exists:
+        #         existing_data = pd.read_excel(file_path, sheet_name='total_deprecated_data')
+        #         # Concatenate existing data with the new data
+        #         combined_data = pd.concat([existing_data, df], ignore_index=True)
+        #         # Write the combined data back to the sheet
+        #         with pd.ExcelWriter(file_path, mode='a', engine='openpyxl', if_sheet_exists='replace') as writer:
+        #             combined_data.to_excel(writer, sheet_name='total_deprecated_data', startrow=len(existing_data), index=False)
+        #     else:
+        #         # If the sheet doesn't exist, write the new data to it
+        #         with pd.ExcelWriter(file_path, mode='a', engine='openpyxl') as writer:
+        #             df.to_excel(writer, sheet_name='total_deprecated_data', startrow=0, index=False)
+        # else:
+        #     with pd.ExcelWriter(file_path, engine='openpyxl') as writer:
+        #         df.to_excel(writer, sheet_name='total_deprecated_data', startrow=0, index=False)    
+
+        return f'Data collected and saved successfully from {url}'  
+
+    except requests.exceptions.RequestException as e:
+        return f'Error: {str(e)} while processing {url}'
 
 def generate_custom_id(version, index):
     return f'java_{version:02d}_{index + 1:04d}'
@@ -1852,3 +1998,178 @@ def openai(package_name, version):
     result = completion.choices[0].message['content']
     print(result)
     return result
+
+def insert_middleware_component_to_db(key, middleware_component, stack, stack_current_version, stack_upgraded_version, recommendation):
+    logger.info(f"Inserting middleware component with key: {key}")
+    middleware_component_entry = MiddlewareComponent.query.filter_by(key=key).first()
+    if middleware_component_entry:
+        logger.warning("Middleware component already exists. Returning existing recommendation.")
+        return middleware_component_entry.recommendation
+    new_middleware_component = MiddlewareComponent(
+        key=key,
+        middleware_component=middleware_component,
+        stack=stack,
+        stack_current_version=stack_current_version,
+        stack_upgraded_version=stack_upgraded_version,
+        recommendation=recommendation
+    )
+    db.session.add(new_middleware_component)
+    db.session.commit()
+    logger.info("Middleware component inserted successfully.")
+    return recommendation
+
+def get_recommendation(middleware_components, stack, stack_current_version, stack_upgraded_version):
+
+    import openai
+
+    print(f"Prompting IN OPENAI GPT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+    openai.api_type = "azure"
+    openai.api_base = "https://azure-openai-demo1.openai.azure.com/"
+    openai.api_version = "2023-07-01-preview"
+    openai.api_key = "c2c49c25ad2946b98d9e7ca876f7f7cb"
+    recommendations = {}
+
+    for component, details in middleware_components.items():
+        lines = details.get("lines", [])
+        message_text = [
+            {"role": "system", "content": "You are an expert middleware architect."},
+            {"role": "user", "content": f"I have the middleware component {component} and now I want to upgrade the stack {stack} from {stack_current_version} to {stack_upgraded_version}. Please provide recommendations, configuration, and version for the middleware component."},
+        ]
+        completion = openai.ChatCompletion.create(
+            engine="gpt-4-32k",
+            messages=message_text,
+            temperature=0.0,
+            max_tokens=800,
+            top_p=0.95,
+            frequency_penalty=0,
+            presence_penalty=0,
+            timeout=1200,
+            stop=None
+        )
+
+        recommendation = completion.choices[0].message['content']
+        details["recommendation"] = recommendation 
+        recommendations[component] = details
+
+    return recommendations
+
+def java_middleware_extraction(zip_file_path, output_folder, middleware_json_path):
+
+    logging.info(f'Starting middleware extraction for {zip_file_path}')
+    def search_middleware(content, patterns, stack_current_version, stack_upgraded_version):
+        found_components = {}
+        lines = content.split('\n')
+        for component, search_patterns in patterns.items():
+            line_numbers = []
+            for i, line in enumerate(lines, start=1):
+                if any(re.search(r'\b{}\b'.format(pattern), line) for pattern in search_patterns):
+                    line_numbers.append(i)
+            if line_numbers:
+                key = f"{stack_current_version}_{component}_{stack_upgraded_version}"
+                recommendation = insert_middleware_component_to_db(
+                    key=key,
+                    middleware_component=component,
+                    stack="java",
+                    stack_current_version=stack_current_version,
+                    stack_upgraded_version=stack_upgraded_version,
+                    recommendation=""
+                )
+                found_components[key] = {
+                    "component_name": component,
+                    "lines": line_numbers,
+                    "recommendation": recommendation
+                }
+        logger.info(f'Extracting the line number for each middleware component from {zip_file_path}')
+        return found_components
+
+    
+    def search_in_zip(zip_file_path, patterns, stack_current_version, stack_upgraded_version):
+        logging.info(f'Extracting the middleware components from {zip_file_path}')
+        results = []
+
+        with zipfile.ZipFile(zip_file_path, 'r') as zip_file:
+            for file_info in zip_file.infolist():
+                if file_info.filename.endswith('.java'):
+                    with zip_file.open(file_info) as java_file:
+                        content = java_file.read().decode('utf-8')
+                        found_components = search_middleware(content, patterns, stack_current_version, stack_upgraded_version)
+                        for key, details in found_components.items():
+                            recommendation = details.get("recommendation", None)
+                            if (recommendation == ''):
+                                recommendation = get_recommendation(
+                                    {key: details},
+                                    stack="java",
+                                    stack_current_version=stack_current_version,
+                                    stack_upgraded_version=stack_upgraded_version,
+                                ).get(key, {}).get("recommendation", "")
+                                insert_middleware_component_to_db(
+                                    key=key,
+                                    middleware_component=details["component_name"],
+                                    stack="java",
+                                    stack_current_version=stack_current_version,
+                                    stack_upgraded_version=stack_upgraded_version,
+                                    recommendation=recommendation
+                                )
+                            details["recommendation"] = recommendation
+
+                        result = {
+                            "file_name": file_info.filename,
+                            "middleware_components": found_components,
+                        }
+                        results.append(result)
+                        create_dependencies_json(zip_file_path, result, output_folder)
+
+        return results
+
+    def create_dependencies_json(zip_file_path, result, output_folder):
+        logging.info('Writing the middleware components into a json')
+        zip_file_name = os.path.basename(zip_file_path)
+        json_file_name = os.path.splitext(zip_file_name)[0] + "_middleware.json"
+        json_file_path = os.path.join(output_folder, json_file_name)
+        if os.path.exists(json_file_path):
+            with open(json_file_path, 'r') as json_file:
+                try:
+                    existing_data = json.load(json_file)
+                except json.decoder.JSONDecodeError:
+                    print("Existing data is not a valid JSON. Creating a new dictionary.")
+                    existing_data = []
+            existing_data.append(result)
+            with open(json_file_path, 'w') as json_file:
+                json.dump(existing_data, json_file, indent=2)
+            convert_json_to_excel(json_file_path, zip_file_name, output_folder)
+        else:
+            with open(json_file_path, 'w') as json_file:
+                json.dump([result], json_file, indent=2)
+
+    def convert_json_to_excel(json_file_path, zip_file_name, output_folder):
+        workbook = openpyxl.Workbook()
+        sheet = workbook.active
+        with open(json_file_path, 'r') as json_file:
+            data = json.load(json_file)
+        sheet.cell(row=1, column=1, value="File Name")
+        sheet.cell(row=1, column=2, value="Middleware Component")
+        sheet.cell(row=1, column=3, value="Lines")
+        sheet.cell(row=1, column=4, value="Recommendation")
+        for row, item in enumerate(data, start=2):
+            file_name = item['file_name']
+            for component, details in item['middleware_components'].items():
+                lines = ', '.join(map(str, details.get('lines', [])))
+                recommendation = details.get('recommendation', '')
+                sheet.cell(row=row, column=1, value=file_name)
+                sheet.cell(row=row, column=2, value=component)
+                sheet.cell(row=row, column=3, value=lines)
+                sheet.cell(row=row, column=4, value=recommendation)
+                row += 1
+        excel_file_name = os.path.splitext(zip_file_name)[0] + "_middleware.xlsx"
+        excel_file_path = os.path.join(output_folder, excel_file_name)
+        workbook.save(excel_file_path)
+        logging.info(f'Exporting the JSON into an excel file {excel_file_name}')
+    with open(middleware_json_path, 'r') as middleware_file:
+        middleware_patterns = json.load(middleware_file)
+    results = search_in_zip(zip_file_path, middleware_patterns, stack_current_version="11", stack_upgraded_version="17")
+
+    if results:
+        print(f"Results found. JSON and Excel files created for each middleware component.")
+        return 'success'
+    else:
+        print("No results found.")

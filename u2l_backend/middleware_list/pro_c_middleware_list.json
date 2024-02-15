@@ -1,0 +1,248 @@
+{
+    "Oracle Call Interface (OCI)": [
+        "OCI"
+    ],
+    "Pro*C": [
+        "EXEC",
+        "SELECT",
+        "INSERT",
+        "UPDATE",
+        "DELETE"
+    ],
+    "Oracle Pro*Cobol Precompiler": [
+        "PROC",
+        "COPY"
+    ],
+    "Oracle Forms": [
+        "CALL_FORM",
+        "OPEN_FORM",
+        "CLOSE_FORM"
+    ],
+    "Oracle Reports": [
+        "RUN_REPORT_OBJECT"
+    ],
+    "Oracle Application Express (APEX)": [
+        "APEX"
+    ],
+    "Oracle PL/SQL": [
+        "DECLARE",
+        "BEGIN",
+        "END",
+        "PROCEDURE",
+        "FUNCTION",
+        "PACKAGE",
+        "BODY",
+        "TRIGGER"
+    ],
+    "Oracle Database": [
+        "CONNECT",
+        "DISCONNECT",
+        "COMMIT",
+        "ROLLBACK",
+        "DECLARE",
+        "BEGIN",
+        "END"
+    ],
+    "Oracle Advanced Queuing (AQ)": [
+        "DBMS_AQ"
+    ],
+    "Oracle Messaging Gateway": [
+        "DBMS_MGW"
+    ],
+    "Oracle Streams": [
+        "DBMS_STREAMS"
+    ],
+    "Oracle Data Pump": [
+        "DBMS_DATAPUMP"
+    ],
+    "Oracle Data Guard": [
+        "DBMS_DDL",
+        "DBMS_LOGMNR"
+    ],
+    "Oracle XML DB": [
+        "DBMS_XMLDOM",
+        "DBMS_XMLGEN",
+        "DBMS_XSLPROCESSOR"
+    ],
+    "Oracle Multimedia": [
+        "ORDAudio",
+        "ORDVideo",
+        "ORDImage"
+    ],
+    "Oracle Text": [
+        "CTX"
+    ],
+    "Oracle Spatial": [
+        "SDO_GEOMETRY",
+        "SDO_RELATE",
+        "SDO_FILTER"
+    ],
+    "Oracle TimesTen In-Memory Database": [
+        "TT"
+    ],
+    "Oracle GoldenGate": [
+        "GGSCI",
+        "EXTRACT",
+        "REPLICAT"
+    ],
+    "Oracle Coherence": [
+        "COH"
+    ],
+    "Oracle Tuxedo": [
+        "tp",
+        "FML"
+    ],
+    "Oracle WebLogic Server": [
+        "WLS"
+    ],
+    "Oracle WebCenter Content": [
+        "UCM"
+    ],
+    "Oracle Service Bus": [
+        "OSB"
+    ],
+    "Oracle SOA Suite": [
+        "BPEL",
+        "ESB",
+        "BAM"
+    ],
+    "Oracle Identity Management": [
+        "OID",
+        "OVD",
+        "OIM"
+    ],
+    "Oracle Access Manager (OAM)": [
+        "OAM"
+    ],
+    "Oracle Unified Directory (OUD)": [
+        "OUD"
+    ],
+    "Oracle Virtual Directory (OVD)": [
+        "OVD"
+    ],
+    "Oracle Internet Directory (OID)": [
+        "OID"
+    ],
+    "Oracle Business Intelligence (OBIEE)": [
+        "OBIEE"
+    ],
+    "Oracle Essbase": [
+        "ESSCMD",
+        "CALC"
+    ],
+    "Oracle Hyperion Planning": [
+        "HSP"
+    ],
+    "Oracle Hyperion Financial Management (HFM)": [
+        "HFM"
+    ],
+    "Oracle Hyperion Workspace": [
+        "HYP"
+    ],
+    "Oracle Hyperion Smart View": [
+        "HYP"
+    ],
+    "Oracle Crystal Ball": [
+        "CB"
+    ],
+    "Oracle Application Testing Suite": [
+        "OATS"
+    ],
+    "Oracle SQL*Loader": [
+        "SQLLDR"
+    ],
+    "Oracle SQL*Plus": [
+        "SQLPLUS"
+    ],
+    "Oracle Forms and Reports Services": [
+        "FRMWEB",
+        "RWSERVLET"
+    ],
+    "Oracle Enterprise Manager": [
+        "OEM"
+    ],
+    "Oracle JDeveloper": [
+        "JDEV"
+    ],
+    "Oracle Developer Suite": [
+        "DS"
+    ],
+    "Oracle Developer Tools for Visual Studio (ODT)": [
+        "ODT"
+    ],
+    "Oracle SQL Developer": [
+        "SQLDEV"
+    ],
+    "Oracle Application Server": [
+        "OAS"
+    ],
+    "Oracle REST Data Services (ORDS)": [
+        "ORDS"
+    ],
+    "Oracle JET (JavaScript Extension Toolkit)": [
+        "JET"
+    ],
+    "Oracle Berkeley DB": [
+        "DB"
+    ],
+    "Oracle Beehive": [
+        "BEE"
+    ],
+    "Oracle Coherence": [
+        "COH"
+    ],
+    "Oracle Data Integrator (ODI)": [
+        "ODI"
+    ],
+    "Oracle Data Relationship Management (DRM)": [
+        "DRM"
+    ],
+    "Oracle Warehouse Builder (OWB)": [
+        "OWB"
+    ],
+    "Oracle API Gateway": [
+        "OAG"
+    ],
+    "Oracle Communications Converged Application Server (OCCAS)": [
+        "OCCAS"
+    ],
+    "Oracle Secure Global Desktop (SGD)": [
+        "SGD"
+    ],
+    "Oracle NoSQL Database": [
+        "KV"
+    ],
+    "Oracle Berkeley DB XML": [
+        "DBXML"
+    ],
+    "Oracle HTTP Server (OHS)": [
+        "OHS"
+    ],
+    "Oracle Web Cache": [
+        "WEB_CACHE"
+    ],
+    "Oracle XML Publisher": [
+        "XDO"
+    ],
+    "Oracle GlassFish Server": [
+        "GLASSFISH"
+    ],
+    "Oracle WebLogic Portal": [
+        "WLP"
+    ],
+    "Oracle WebLogic Integration": [
+        "WLI"
+    ],
+    "Oracle B2B": [
+        "B2B"
+    ],
+    "Oracle BPM Suite": [
+        "BPM"
+    ],
+    "Oracle Cloud": [
+        "DBCS",
+        "Compute",
+        "Storage",
+        "Functions"
+    ]
+}

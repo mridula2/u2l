@@ -1,0 +1,1707 @@
+{
+  "Apache Tomcat": [
+    "org.apache.catalina",
+    "tomcat"
+  ],
+  "JBoss EAP": [
+    "org.jboss",
+    "jboss"
+  ],
+  "WebSphere": [
+    "com.ibm.websphere",
+    "websphere"
+  ],
+  "WebLogic": [
+    "weblogic"
+  ],
+  "GlassFish": [
+    "glassfish"
+  ],
+  "Apache Kafka": [
+    "org.apache.kafka",
+    "kafka"
+  ],
+  "RabbitMQ": [
+    "com.rabbitmq"
+  ],
+  "ActiveMQ": [
+    "org.apache.activemq",
+    "activemq"
+  ],
+  "IBM MQ": [
+    "com.ibm.mq"
+  ],
+  "JMS": [
+    "javax.jms"
+  ],
+  "JDBC": [
+    "java.sql",
+    "javax.sql"
+  ],
+  "ODBC": [
+    "sun.jdbc.odbc",
+    "java.odbc"
+  ],
+  "ADO.NET": [
+    "System.Data"
+  ],
+  "Apache HTTP Server": [],
+  "NGINX": [],
+  "IIS": [],
+  "LiteSpeed": [],
+  "CORBA": [
+    "org.omg.CORBA"
+  ],
+  "RMI": [
+    "java.rmi"
+  ],
+  "Drupal": [],
+  "Joomla": [],
+  "WordPress": [],
+  "MuleSoft": [],
+  "Dell Boomi": [
+    "com.boomi"
+  ],
+  "Apache Camel": [
+    "org.apache.camel"
+  ],
+  "AWS Lambda": [],
+  "Azure Functions": [],
+  "Google Cloud Functions": [],
+  "gRPC": [
+    "io.grpc"
+  ],
+  "Apache Thrift": [
+    "org.apache.thrift"
+  ],
+  "Apigee": [],
+  "Kong": [],
+  "Swagger": [
+    "io.swagger"
+  ],
+  "OAuth": [
+    "oauth",
+    "OAuth"
+  ],
+  "OpenID Connect": [
+    "openid",
+    "OpenID"
+  ],
+  "SAML": [
+    "saml",
+    "SAML"
+  ],
+  "Tuxedo": [],
+  "CICS": [],
+  "BizTalk Server": [],
+  "Oracle Service Bus": [],
+  "LDAP": [
+    "javax.naming.ldap",
+    "ldap"
+  ],
+  "Active Directory": [
+    "activedirectory"
+  ],
+  "HAProxy": [],
+  "F5 BIG-IP": [],
+  "Memcached": [
+    "net.spy.memcached"
+  ],
+  "Redis": [
+    "redis.clients.jedis"
+  ],
+  "Ehcache": [
+    "net.sf.ehcache"
+  ],
+  "Kerberos": [
+    "javax.security.auth.kerberos",
+    "kerberos"
+  ],
+  "SSL/TLS": [
+    "javax.net.ssl"
+  ],
+  "Spring Framework": [
+    "org.springframework"
+  ],
+  "Hibernate": [
+    "org.hibernate"
+  ],
+  "Apache CXF": [
+    "org.apache.cxf"
+  ],
+  "Jersey (JAX-RS)": [
+    "org.glassfish.jersey"
+  ],
+  "Quarkus": [
+    "io.quarkus"
+  ],
+  "Micronaut": [
+    "io.micronaut"
+  ],
+  "Vert.x": [
+    "io.vertx"
+  ],
+  "Log4j": [
+    "org.apache.logging.log4j"
+  ],
+  "SLF4J": [
+    "org.slf4j"
+  ],
+  "Logback": [
+    "ch.qos.logback"
+  ],
+  "Guava": [
+    "com.google.common"
+  ],
+  "Jackson": [
+    "com.fasterxml.jackson"
+  ],
+  "Gson": [
+    "com.google.gson"
+  ],
+  "JUnit": [
+    "junit"
+  ],
+  "TestNG": [
+    "org.testng"
+  ],
+  "Mockito": [
+    "org.mockito"
+  ],
+  "PowerMock": [
+    "org.powermock"
+  ],
+  "AssertJ": [
+    "org.assertj.core"
+  ],
+  "Apache Commons": [
+    "org.apache.commons"
+  ],
+  "Google Guice": [
+    "com.google.inject"
+  ],
+  "Dagger": [
+    "dagger"
+  ],
+  "Thymeleaf": [
+    "org.thymeleaf"
+  ],
+  "FreeMarker": [
+    "freemarker"
+  ],
+  "Velocity": [
+    "org.apache.velocity"
+  ],
+  "JavaMail": [
+    "javax.mail"
+  ],
+  "Apache POI": [
+    "org.apache.poi"
+  ],
+  "JFreeChart": [
+    "org.jfree.chart"
+  ],
+  "JavaFX": [
+    "javafx"
+  ],
+  "Axon Framework": [
+    "org.axonframework"
+  ],
+  "Vaadin": [
+    "com.vaadin"
+  ],
+  "JHipster": [
+    "io.github.jhipster"
+  ],
+  "Zookeeper": [
+    "org.apache.zookeeper"
+  ],
+  "Apache ZooKeeper": [
+    "org.apache.zookeeper"
+  ],
+  "Curator": [
+    "org.apache.curator"
+  ],
+  "Hazelcast": [
+    "com.hazelcast"
+  ],
+  "Akka": [
+    "com.typesafe.akka"
+  ],
+  "Netty": [
+    "io.netty"
+  ],
+  "RxJava": [
+    "io.reactivex.rxjava3"
+  ],
+  "Elasticsearch": [
+    "org.elasticsearch"
+  ],
+  "Solr": [
+    "org.apache.solr"
+  ],
+  "Kibana": [
+    "org.elasticsearch.kibana"
+  ],
+  "Axon Server": [
+    "io.axoniq.axonserver"
+  ],
+  "JanusGraph": [
+    "org.janusgraph"
+  ],
+  "Neo4j": [
+    "org.neo4j"
+  ],
+  "Cassandra": [
+    "com.datastax.oss"
+  ],
+  "MongoDB": [
+    "org.mongodb"
+  ],
+  "RocksDB": [
+    "org.rocksdb"
+  ],
+  "Kafka Streams": [
+    "org.apache.kafka.streams"
+  ],
+  "Storm": [
+    "org.apache.storm"
+  ],
+  "Hadoop": [
+    "org.apache.hadoop"
+  ],
+  "Flink": [
+    "org.apache.flink"
+  ],
+  "Presto": [
+    "com.facebook.presto"
+  ],
+  "Druid": [
+    "io.druid"
+  ],
+  "Pulsar": [
+    "org.apache.pulsar"
+  ],
+  "HornetQ": [
+    "org.hornetq"
+  ],
+  "RSocket": [
+    "io.rsocket"
+  ],
+  "Hessian": [
+    "com.caucho.hessian"
+  ],
+  "Thrift": [
+    "org.apache.thrift"
+  ],
+  "Avro": [
+    "org.apache.avro"
+  ],
+  "Protocol Buffers": [
+    "com.google.protobuf"
+  ],
+  "Hawkular": [
+    "org.hawkular"
+  ],
+  "Prometheus": [
+    "io.prometheus"
+  ],
+  "Grafana": [
+    "org.grafana"
+  ],
+  "Zipkin": [
+    "io.zipkin"
+  ],
+  "Jaeger": [
+    "io.jaegertracing"
+  ],
+  "Keycloak": [
+    "org.keycloak"
+  ],
+  "Shiro": [
+    "org.apache.shiro"
+  ],
+  "CAS (Central Authentication Service)": [
+    "org.apereo.cas"
+  ],
+  "Jasypt": [
+    "org.jasypt"
+  ],
+  "JWT (JSON Web Token)": [
+    "io.jsonwebtoken"
+  ],
+  "JavaMoney": [
+    "org.javamoney"
+  ],
+  "Joda-Time": [
+    "joda-time"
+  ],
+  "Threeten-Extra": [
+    "org.threeten.extra"
+  ],
+  "Commons Configuration": [
+    "org.apache.commons.configuration2"
+  ],
+  "Typesafe Config": [
+    "com.typesafe.config"
+  ],
+  "Nginx Plus": [
+    "nginx"
+  ],
+  "Microsoft IIS": [
+    "MicrosoftIIS"
+  ],
+  "LiteSpeed Web Server": [
+    "litespeed"
+  ],
+  "Drupal CMS": [
+    "drupal"
+  ],
+  "Joomla CMS": [
+    "joomla"
+  ],
+  "WordPress CMS": [
+    "wordpress"
+  ],
+  "Mule ESB": [
+    "org.mule"
+  ],
+  "Dell Boomi Integration": [
+    "boomi"
+  ],
+  "AWS Step Functions": [
+    "com.amazonaws.services.stepfunctions"
+  ],
+  "Azure Logic Apps": [
+    "com.microsoft.azure.integration"
+  ],
+  "Google Cloud Pub/Sub": [
+    "com.google.cloud.pubsub"
+  ],
+  "Apigee Edge": [
+    "com.apigee"
+  ],
+  "Kong API Gateway": [
+    "io.kong"
+  ],
+  "Swagger Codegen": [
+    "io.swagger.codegen"
+  ],
+  "Spring Cloud": [
+    "org.springframework.cloud"
+  ],
+  "Spring Boot": [
+    "org.springframework.boot"
+  ],
+  "Spring Data": [
+    "org.springframework.data"
+  ],
+  "Spring Security": [
+    "org.springframework.security"
+  ],
+  "Spring Batch": [
+    "org.springframework.batch"
+  ],
+  "Spring Integration": [
+    "org.springframework.integration"
+  ],
+  "Hibernate Validator": [
+    "org.hibernate.validator"
+  ],
+  "Jersey (JAX-RS) 2.0": [
+    "org.glassfish.jersey"
+  ],
+  "Quarkus Framework": [
+    "io.quarkus"
+  ],
+  "Micronaut Framework": [
+    "io.micronaut"
+  ],
+  "Vert.x Reactive Toolkit": [
+    "io.vertx"
+  ],
+  "Log4j 2": [
+    "org.apache.logging.log4j"
+  ],
+  "SLF4J (Simple Logging Facade for Java)": [
+    "org.slf4j"
+  ],
+  "Logback Classic": [
+    "ch.qos.logback"
+  ],
+  "Google Guava": [
+    "com.google.common"
+  ],
+  "Jackson JSON Processor": [
+    "com.fasterxml.jackson"
+  ],
+  "Gson JSON Library": [
+    "com.google.gson"
+  ],
+  "JUnit Testing Framework": [
+    "junit"
+  ],
+  "TestNG Testing Framework": [
+    "org.testng"
+  ],
+  "Mockito Testing Framework": [
+    "org.mockito"
+  ],
+  "PowerMock Testing Framework": [
+    "org.powermock"
+  ],
+  "AssertJ Assertion Library": [
+    "org.assertj.core"
+  ],
+  "Apache Commons Libraries": [
+    "org.apache.commons"
+  ],
+  "Google Guice Dependency Injection": [
+    "com.google.inject"
+  ],
+  "Dagger Dependency Injection": [
+    "dagger"
+  ],
+  "Thymeleaf Template Engine": [
+    "org.thymeleaf"
+  ],
+  "FreeMarker Template Engine": [
+    "freemarker"
+  ],
+  "Apache Velocity Template Engine": [
+    "org.apache.velocity"
+  ],
+  "JavaMail API": [
+    "javax.mail"
+  ],
+  "Apache POI (Poor Obfuscation Implementation)": [
+    "org.apache.poi"
+  ],
+  "JFreeChart Charting Library": [
+    "org.jfree.chart"
+  ],
+  "JavaFX UI Toolkit": [
+    "javafx"
+  ],
+  "Apache Camel Integration Framework": [
+    "org.apache.camel"
+  ],
+  "Axon Framework for CQRS and Event Sourcing": [
+    "org.axonframework"
+  ],
+  "Vaadin Web Framework": [
+    "com.vaadin"
+  ],
+  "JHipster Application Generator": [
+    "io.github.jhipster"
+  ],
+  "Zookeeper Coordination Service": [
+    "org.apache.zookeeper"
+  ],
+  "Curator Framework": [
+    "org.apache.curator"
+  ],
+  "Hazelcast In-Memory Data Grid": [
+    "com.hazelcast"
+  ],
+  "Akka Actor Model Toolkit": [
+    "com.typesafe.akka"
+  ],
+  "Netty Network Application Framework": [
+    "io.netty"
+  ],
+  "RxJava Reactive Extensions for Java": [
+    "io.reactivex.rxjava3"
+  ],
+  "Elasticsearch Search and Analytics Engine": [
+    "org.elasticsearch"
+  ],
+  "Apache Solr Search Platform": [
+    "org.apache.solr"
+  ],
+  "Kibana Visualization Platform": [
+    "org.elasticsearch.kibana"
+  ],
+  "Axon Server for Distributed Event Bus": [
+    "io.axoniq.axonserver"
+  ],
+  "JanusGraph Distributed Graph Database": [
+    "org.janusgraph"
+  ],
+  "Neo4j Graph Database": [
+    "org.neo4j"
+  ],
+  "Apache Cassandra Distributed Database": [
+    "com.datastax.oss"
+  ],
+  "MongoDB Document Database": [
+    "org.mongodb"
+  ],
+  "RocksDB Embedded Key-Value Store": [
+    "org.rocksdb"
+  ],
+  "RabbitMQ Message Broker": [
+    "com.rabbitmq"
+  ],
+  "Kafka Streams Library for Stream Processing": [
+    "org.apache.kafka.streams"
+  ],
+  "Apache Storm Distributed Stream Processing": [
+    "org.apache.storm"
+  ],
+  "Apache Hadoop Distributed Storage and Processing": [
+    "org.apache.hadoop"
+  ],
+  "Apache Flink Stream Processing Framework": [
+    "org.apache.flink"
+  ],
+  "Presto Distributed SQL Query Engine": [
+    "com.facebook.presto"
+  ],
+  "Apache Druid Real-time Analytics Database": [
+    "io.druid"
+  ],
+  "Apache Pulsar Distributed Pub/Sub Messaging": [
+    "org.apache.pulsar"
+  ],
+  "HornetQ Messaging System": [
+    "org.hornetq"
+  ],
+  "RSocket Reactive Socket Communication Protocol": [
+    "io.rsocket"
+  ],
+  "gRPC Remote Procedure Call Framework": [
+    "io.grpc"
+  ],
+  "Hessian Binary Web Service Protocol": [
+    "com.caucho.hessian"
+  ],
+  "Apache Thrift RPC Framework": [
+    "org.apache.thrift"
+  ],
+  "Apache Avro Data Serialization Framework": [
+    "org.apache.avro"
+  ],
+  "Protocol Buffers Serialization Format": [
+    "com.google.protobuf"
+  ],
+  "Hawkular Monitoring and Management": [
+    "org.hawkular"
+  ],
+  "Prometheus Monitoring and Alerting Toolkit": [
+    "io.prometheus"
+  ],
+  "Grafana Open-Source Analytics and Monitoring Platform": [
+    "org.grafana"
+  ],
+  "Zipkin Distributed Tracing System": [
+    "io.zipkin"
+  ],
+  "Jaeger Distributed Tracing System": [
+    "io.jaegertracing"
+  ],
+  "Keycloak Open Source Identity and Access Management": [
+    "org.keycloak"
+  ],
+  "Apache Shiro Security Framework": [
+    "org.apache.shiro"
+  ],
+  "Jasypt Java Simplified Encryption": [
+    "org.jasypt"
+  ],
+  "JWT (JSON Web Token) Support": [
+    "io.jsonwebtoken"
+  ],
+  "JavaMoney Monetary Library": [
+    "org.javamoney"
+  ],
+  "Joda-Time Date and Time API": [
+    "joda-time"
+  ],
+  "Threeten-Extra Date and Time API": [
+    "org.threeten.extra"
+  ],
+  "Commons Configuration Library": [
+    "org.apache.commons.configuration2"
+  ],
+  "Typesafe Config Configuration Library": [
+    "com.typesafe.config"
+  ],
+  "IBM WebSphere MQ": [
+    "com.ibm.mq"
+  ],
+  "IBM MQSeries": [
+    "com.ibm.mq"
+  ],
+  "IBM Integration Bus": [
+    "com.ibm.broker"
+  ],
+  "Tibco EMS": [
+    "com.tibco.tibjms"
+  ],
+  "Tibco RV": [
+    "com.tibco.tibrv"
+  ],
+  "Tibco BusinessWorks": [
+    "com.tibco.businessworks"
+  ],
+  "Tibco ActiveMatrix": [
+    "com.tibco.amx"
+  ],
+  "Tibco Hawk": [
+    "com.tibco.hawk"
+  ],
+  "Microsoft Message Queuing (MSMQ)": [
+    "com.microsoft.msmq"
+  ],
+  "IBM DataPower": [
+    "com.ibm.datapower"
+  ],
+  "WCF (Windows Communication Foundation)": [
+    "System.ServiceModel"
+  ],
+  "Apache Axis": [
+    "org.apache.axis"
+  ],
+  "Restlet": [
+    "org.restlet"
+  ],
+  "Dropwizard": [
+    "io.dropwizard"
+  ],
+  "Play Framework": [
+    "play"
+  ],
+  "Akka HTTP": [
+    "akka.http"
+  ],
+  "Undertow": [
+    "io.undertow"
+  ],
+  "WildFly": [
+    "org.wildfly"
+  ],
+  "Jetty": [
+    "org.eclipse.jetty"
+  ],
+  "Payara Server": [
+    "fish.payara.api"
+  ],
+  "Apache MyFaces": [
+    "org.apache.myfaces"
+  ],
+  "RichFaces": [
+    "org.richfaces"
+  ],
+  "PrimeFaces": [
+    "org.primefaces"
+  ],
+  "IceFaces": [
+    "org.icefaces"
+  ],
+  "Apache Struts": [
+    "org.apache.struts"
+  ],
+  "Apache Shiro": [
+    "org.apache.shiro"
+  ],
+  "Gluu": [
+    "org.gluu"
+  ],
+  "Google App Engine": [
+    "com.google.appengine"
+  ],
+  "Heroku": [
+    "com.heroku"
+  ],
+  "JetBrains TeamCity": [
+    "jetbrains.buildServer"
+  ],
+  "Jenkins": [
+    "jenkins"
+  ],
+  "Travis CI": [
+    "travis"
+  ],
+  "SonarQube": [
+    "org.sonarqube"
+  ],
+  "Nagios": [
+    "nagios"
+  ],
+  "ELK Stack": [
+    "org.elasticsearch",
+    "logstash",
+    "kibana"
+  ],
+  "Splunk": [
+    "com.splunk"
+  ],
+  "Dynatrace": [
+    "com.dynatrace"
+  ],
+  "New Relic": [
+    "com.newrelic"
+  ],
+  "AppDynamics": [
+    "com.appdynamics"
+  ],
+  "Datadog": [
+    "com.datadoghq"
+  ],
+  "Oracle WebLogic Portal": [
+    "oracle.portal"
+  ],
+  "Liferay": [
+    "com.liferay.portal"
+  ],
+  "Magnolia": [
+    "info.magnolia"
+  ],
+  "Adobe Experience Manager (AEM)": [
+    "com.adobe"
+  ],
+  "Sitecore": [
+    "com.sitecore"
+  ],
+  "Kentico": [
+    "cms.kentico"
+  ],
+  "Umbraco": [
+    "umbraco"
+  ],
+  "EPiServer": [
+    "episerver"
+  ],
+  "Drupal Commerce": [
+    "drupal.commerce"
+  ],
+  "Magento": [
+    "com.magento"
+  ],
+  "Shopify": [
+    "com.shopify"
+  ],
+  "BigCommerce": [
+    "com.bigcommerce"
+  ],
+  "SAP Hybris": [
+    "com.hybris"
+  ],
+  "Salesforce Commerce Cloud": [
+    "com.salesforce"
+  ],
+  "OpenCart": [
+    "com.opencart"
+  ],
+  "PrestaShop": [
+    "com.prestashop"
+  ],
+  "WooCommerce": [
+    "com.woocommerce"
+  ],
+  "MuleSoft Anypoint Platform": [
+    "com.mulesoft"
+  ],
+  "Talend": [
+    "org.talend"
+  ],
+  "Informatica PowerCenter": [
+    "com.informatica"
+  ],
+  "Microsoft Azure Logic Apps": [
+    "com.microsoft.azure"
+  ],
+  "Zapier": [
+    "com.zapier"
+  ],
+  "IFTTT": [
+    "com.ifttt"
+  ],
+  "SAP Cloud Platform": [
+    "com.sap.cloud"
+  ],
+  "Google Cloud Platform (GCP)": [
+    "com.google.cloud"
+  ],
+  "Amazon Web Services (AWS)": [
+    "com.amazonaws"
+  ],
+  "Microsoft Azure": [
+    "com.microsoft.azure"
+  ],
+  "Red Hat OpenShift": [
+    "io.openshift"
+  ],
+  "Kubernetes": [
+    "io.kubernetes"
+  ],
+  "Docker": [
+    "com.docker"
+  ],
+  "JFrog Artifactory": [
+    "org.artifactory"
+  ],
+  "Nexus Repository Manager": [
+    "org.sonatype.nexus"
+  ],
+  "Sonatype Nexus IQ": [
+    "org.sonatype.clm"
+  ],
+  "Apache Archiva": [
+    "org.apache.archiva"
+  ],
+  "GitLab": [
+    "com.gitlab"
+  ],
+  "Bitbucket": [
+    "com.atlassian.bitbucket"
+  ],
+  "Jira": [
+    "com.atlassian.jira"
+  ],
+  "Confluence": [
+    "com.atlassian.confluence"
+  ],
+  "Trello": [
+    "com.trello"
+  ],
+  "Microsoft Teams": [
+    "com.microsoft.teams"
+  ],
+  "Slack": [
+    "com.slack"
+  ],
+  "HipChat": [
+    "com.atlassian.hipchat"
+  ],
+  "Zoom": [
+    "us.zoom"
+  ],
+  "Skype": [
+    "com.skype"
+  ],
+  "Cisco WebEx": [
+    "com.cisco.webex"
+  ],
+  "Google Meet": [
+    "com.google.meet"
+  ],
+  "Docusign": [
+    "com.docusign"
+  ],
+  "Adobe Sign": [
+    "com.adobe.echosign"
+  ],
+  "HelloSign": [
+    "com.hellosign"
+  ],
+  "OneSpan Sign": [
+    "com.onespan"
+  ],
+  "BambooHR": [
+    "com.bamboohr"
+  ],
+  "Workday": [
+    "com.workday"
+  ],
+  "SuccessFactors": [
+    "com.successfactors"
+  ],
+  "Oracle HCM Cloud": [
+    "com.oracle.hcm"
+  ],
+  "Cornerstone OnDemand": [
+    "com.csod"
+  ],
+  "BMC Remedy": [
+    "com.bmc.arsys"
+  ],
+  "ServiceNow": [
+    "com.servicenow"
+  ],
+  "Zendesk": [
+    "com.zendesk"
+  ],
+  "Freshdesk": [
+    "com.freshdesk"
+  ],
+  "HubSpot": [
+    "com.hubspot"
+  ],
+  "Salesforce CRM": [
+    "com.salesforce"
+  ],
+  "Microsoft Dynamics 365": [
+    "com.microsoft.dynamics"
+  ],
+  "SugarCRM": [
+    "com.sugarcrm"
+  ],
+  "Zoho CRM": [
+    "com.zoho.crm"
+  ],
+  "Pipedrive": [
+    "com.pipedrive"
+  ],
+  "Airtable": [
+    "com.airtable"
+  ],
+  "Smartsheet": [
+    "com.smartsheet"
+  ],
+  "Monday.com": [
+    "com.monday"
+  ],
+  "Wrike": [
+    "com.wrike"
+  ],
+  "Asana": [
+    "com.asana"
+  ],
+  "Jira Align": [
+    "com.jira.align"
+  ],
+  "Todoist": [
+    "com.todoist"
+  ],
+  "Microsoft To Do": [
+    "com.microsoft.todo"
+  ],
+  "Evernote": [
+    "com.evernote"
+  ],
+  "OneNote": [
+    "com.microsoft.onenote"
+  ],
+  "Google Keep": [
+    "com.google.keep"
+  ],
+  "Notion": [
+    "com.notion"
+  ],
+  "BlueJeans": [
+    "com.bluejeans"
+  ],
+  "Airmeet": [
+    "com.airmeet"
+  ],
+  "Hopin": [
+    "com.hopin"
+  ],
+  "Remo": [
+    "com.remo"
+  ],
+  "Virtual Event Platforms": [
+    "com.virtual.events"
+  ],
+  "Veeam": [
+    "com.veeam"
+  ],
+  "Veritas": [
+    "com.veritas"
+  ],
+  "Commvault": [
+    "com.commvault"
+  ],
+  "Acronis": [
+    "com.acronis"
+  ],
+  "Carbonite": [
+    "com.carbonite"
+  ],
+  "Google Cloud Storage": [
+    "com.google.cloud.storage"
+  ],
+  "Amazon S3": [
+    "com.amazonaws.services.s3"
+  ],
+  "Microsoft Azure Storage": [
+    "com.microsoft.azure.storage"
+  ],
+  "IBM Cloud Object Storage": [
+    "com.ibm.cloud.object.storage"
+  ],
+  "Alibaba Cloud Object Storage": [
+    "com.alibaba.cloud.storage"
+  ],
+  "Backblaze B2": [
+    "com.backblaze.b2"
+  ],
+  "Wasabi Hot Cloud Storage": [
+    "com.wasabi.storage"
+  ],
+  "Oracle Cloud Storage": [
+    "com.oracle.storage"
+  ],
+  "Dell EMC ECS": [
+    "com.dellemc.ecs"
+  ],
+  "NetApp StorageGRID": [
+    "com.netapp.storagegrid"
+  ],
+  "OpenStack Swift": [
+    "org.openstack.swift"
+  ],
+  "Rackspace Cloud Files": [
+    "com.rackspace.files"
+  ],
+  "Cloudian HyperStore": [
+    "com.cloudian.hyperstore"
+  ],
+  "Scality RING": [
+    "com.scality.ring"
+  ],
+  "Pure Storage FlashBlade": [
+    "com.purestorage.flashblade"
+  ],
+  "Hitachi Content Platform (HCP)": [
+    "com.hitachi.hcp"
+  ],
+  "Nutanix Objects": [
+    "com.nutanix.objects"
+  ],
+  "Ceph": [
+    "org.ceph"
+  ],
+  "MinIO": [
+    "io.minio"
+  ],
+  "SwiftStack": [
+    "com.swiftstack"
+  ],
+  "Veritas NetBackup": [
+    "com.veritas.netbackup"
+  ],
+  "Veeam Backup & Replication": [
+    "com.veeam"
+  ],
+  "Acronis Cyber Backup": [
+    "com.acronis.cyber.backup"
+  ],
+  "Dell EMC NetWorker": [
+    "com.dellemc.networker"
+  ],
+  "IBM Spectrum Protect": [
+    "com.ibm.spectrum.protect"
+  ],
+  "Rubrik": [
+    "com.rubrik"
+  ],
+  "Cohesity": [
+    "com.cohesity"
+  ],
+  "Unitrends": [
+    "com.unitrends"
+  ],
+  "Altaro VM Backup": [
+    "com.altaro"
+  ],
+  "Vembu": [
+    "com.vembu"
+  ],
+  "NAKIVO": [
+    "com.nakivo"
+  ],
+  "Microsoft Hyper-V": [
+    "com.microsoft.hyperv"
+  ],
+  "VMware vSphere": [
+    "com.vmware.vsphere"
+  ],
+  "Citrix Hypervisor": [
+    "com.citrix.hypervisor"
+  ],
+  "KVM (Kernel-based Virtual Machine)": [
+    "org.linux.kvm"
+  ],
+  "Xen Project": [
+    "org.xenproject"
+  ],
+  "Proxmox Virtual Environment": [
+    "org.proxmox"
+  ],
+  "oVirt": [
+    "org.ovirt"
+  ],
+  "Red Hat Virtualization": [
+    "com.redhat.virtualization"
+  ],
+  "Amazon EC2": [
+    "com.amazonaws.services.ec2"
+  ],
+  "Microsoft Azure Virtual Machines": [
+    "com.microsoft.azure.compute"
+  ],
+  "Google Compute Engine": [
+    "com.google.cloud.compute"
+  ],
+  "IBM Virtual Servers": [
+    "com.ibm.virtual.servers"
+  ],
+  "Alibaba Cloud Elastic Compute Service (ECS)": [
+    "com.alibaba.cloud.ecs"
+  ],
+  "Oracle Cloud Infrastructure Compute": [
+    "com.oracle.compute"
+  ],
+  "DigitalOcean": [
+    "com.digitalocean"
+  ],
+  "Vultr": [
+    "com.vultr"
+  ],
+  "Linode": [
+    "com.linode"
+  ],
+  "UpCloud": [
+    "com.upcloud"
+  ],
+  "Hetnzer Cloud": [
+    "com.hetzner.cloud"
+  ],
+  "OVHcloud": [
+    "com.ovhcloud"
+  ],
+  "Scaleway": [
+    "com.scaleway"
+  ],
+  "Azure DevOps": [
+    "dev.azure"
+  ],
+  "Sonatype Nexus Repository": [
+    "org.sonatype.nexus"
+  ],
+  "GitHub": [
+    "com.github"
+  ],
+  "Subversion (SVN)": [
+    "org.apache.subversion"
+  ],
+  "Mercurial": [
+    "org.selenic.mercurial"
+  ],
+  "Perforce Helix Core": [
+    "com.perforce"
+  ],
+  "IBM Rational ClearCase": [
+    "com.ibm.clearcase"
+  ],
+  "Microsoft Team Foundation Server (TFS)": [
+    "com.microsoft.tfs"
+  ],
+  "TeamCity": [
+    "jetbrains.buildServer"
+  ],
+  "CircleCI": [
+    "com.circleci"
+  ],
+  "GitLab CI/CD": [
+    "com.gitlab.ci"
+  ],
+  "Bitbucket Pipelines": [
+    "com.atlassian.bitbucket.pipelines"
+  ],
+  "Azure Pipelines": [
+    "dev.azure.pipelines"
+  ],
+  "Jira Software": [
+    "com.atlassian.jira.software"
+  ],
+  "Targetprocess": [
+    "com.targetprocess"
+  ],
+  "VersionOne": [
+    "com.collabnet.versionone"
+  ],
+  "AgileCraft": [
+    "com.agilecraft"
+  ],
+  "Rally Software": [
+    "com.rallysoftware"
+  ],
+  "SwiftKanban": [
+    "com.digite.swiftkanban"
+  ],
+  "Kanbanize": [
+    "com.kanbanize"
+  ],
+  "LeanKit": [
+    "com.leankit"
+  ],
+  "Microsoft Planner": [
+    "com.microsoft.planner"
+  ],
+  "Redmine": [
+    "org.redmine"
+  ],
+  "MantisBT": [
+    "org.mantisbt"
+  ],
+  "Bugzilla": [
+    "org.bugzilla"
+  ],
+  "Jira Service Management": [
+    "com.atlassian.jira.servicemanagement"
+  ],
+  "Zendesk Support": [
+    "com.zendesk.support"
+  ],
+  "Intercom": [
+    "com.intercom"
+  ],
+  "Help Scout": [
+    "com.helpscout"
+  ],
+  "Desk.com": [
+    "com.desk"
+  ],
+  "Zoho Desk": [
+    "com.zoho.desk"
+  ],
+  "Salesforce Service Cloud": [
+    "com.salesforce.servicecloud"
+  ],
+  "Oracle Service Cloud": [
+    "com.oracle.servicecloud"
+  ],
+  "SAP Service Cloud": [
+    "com.sap.servicecloud"
+  ],
+  "Microsoft Dynamics 365 Customer Service": [
+    "com.microsoft.dynamics.customerservice"
+  ],
+  "LiveChat": [
+    "com.livechat"
+  ],
+  "Olark": [
+    "com.olark"
+  ],
+  "SnapEngage": [
+    "com.snapengage"
+  ],
+  "Comm100": [
+    "com.comm100"
+  ],
+  "PureChat": [
+    "com.purechat"
+  ],
+  "Zendesk Chat": [
+    "com.zendesk.chat"
+  ],
+  "Drift": [
+    "com.drift"
+  ],
+  "Freshchat": [
+    "com.freshchat"
+  ],
+  "Crisp": [
+    "com.crisp"
+  ],
+  "Userlike": [
+    "com.userlike"
+  ],
+  "LiveAgent": [
+    "com.liveagent"
+  ],
+  "Black Duck": [
+    "com.synopsys.blackduck"
+  ],
+  "Veracode": [
+    "com.veracode"
+  ],
+  "Checkmarx": [
+    "com.checkmarx"
+  ],
+  "Fortify": [
+    "com.fortify"
+  ],
+  "Coverity": [
+    "com.synopsys.coverity"
+  ],
+  "WhiteSource": [
+    "com.whitesourcesoftware"
+  ],
+  "Snyk": [
+    "io.snyk"
+  ],
+  "Node Security Platform": [
+    "org.nsp"
+  ],
+  "OWASP Dependency-Check": [
+    "org.owasp.dependencycheck"
+  ],
+  "Retire.js": [
+    "retire.js"
+  ],
+  "Retire.Net": [
+    "retire.net"
+  ],
+  "Retire.rb": [
+    "retire.rb"
+  ],
+  "Netsparker": [
+    "com.netsparker"
+  ],
+  "Acunetix": [
+    "com.acunetix"
+  ],
+  "AppSpider": [
+    "com.rapid7.appspider"
+  ],
+  "Burp Suite": [
+    "com.portswigger.burp"
+  ],
+  "Qualys Web Application Scanning (WAS)": [
+    "com.qualys.was"
+  ],
+  "Rapid7 InsightAppSec": [
+    "com.rapid7.insightappsec"
+  ],
+  "IBM Security AppScan": [
+    "com.ibm.security.appscan"
+  ],
+  "HP WebInspect": [
+    "com.hp.webinspect"
+  ],
+  "Tenable.io Web Application Scanning": [
+    "com.tenable.io"
+  ],
+  "Trustwave App Scanner": [
+    "com.trustwave.appscanner"
+  ],
+  "Contrast Security": [
+    "com.contrastsecurity"
+  ],
+  "OWASP ZAP": [
+    "org.owasp.zap"
+  ],
+  "Arachni": [
+    "com.arachni"
+  ],
+  "Loggly": [
+    "com.loggly"
+  ],
+  "Sumo Logic": [
+    "com.sumologic"
+  ],
+  "Logentries": [
+    "org.logentries"
+  ],
+  "Papertrail": [
+    "com.papertrail"
+  ],
+  "Graylog": [
+    "org.graylog"
+  ],
+  "Fluentd": [
+    "org.fluentd"
+  ],
+  "Logstash": [
+    "org.logstash"
+  ],
+  "Filebeat": [
+    "org.elasticsearch.beats"
+  ],
+  "NXLog": [
+    "com.nxlog"
+  ],
+  "Rsyslog": [
+    "org.rsyslog"
+  ],
+  "Syslog-ng": [
+    "org.syslog_ng"
+  ],
+  "SolarWinds Log & Event Manager (LEM)": [
+    "com.solarwinds.log_event_manager"
+  ],
+  "EventLog Analyzer": [
+    "com.eventloganalyzer"
+  ],
+  "ManageEngine Log360": [
+    "com.manageengine.log360"
+  ],
+  "Netwrix Auditor": [
+    "com.netwrix.auditor"
+  ],
+  "LepideAuditor": [
+    "com.lepide.auditor"
+  ],
+  "Varonis DataPrivilege": [
+    "com.varonis.dataprivilege"
+  ],
+  "Symantec Data Loss Prevention (DLP)": [
+    "com.symantec.dlp"
+  ],
+  "McAfee Total Protection for Data Loss Prevention": [
+    "com.mcafee.dlp"
+  ],
+  "Digital Guardian": [
+    "com.digitalguardian"
+  ],
+  "Code42": [
+    "com.code42"
+  ],
+  "Symantec Endpoint Protection": [
+    "com.symantec.endpointprotection"
+  ],
+  "McAfee Endpoint Security": [
+    "com.mcafee.endpointsecurity"
+  ],
+  "Sophos Intercept X": [
+    "com.sophos.interceptx"
+  ],
+  "CrowdStrike Falcon": [
+    "com.crowdstrike.falcon"
+  ],
+  "Trend Micro Apex One": [
+    "com.trendmicro.apexone"
+  ],
+  "Kaspersky Endpoint Security": [
+    "com.kaspersky.endpointsecurity"
+  ],
+  "CylancePROTECT": [
+    "com.cylanceprotect"
+  ],
+  "Carbon Black": [
+    "com.carbonblack"
+  ],
+  "Symantec Ghost Solution Suite": [
+    "com.symantec.ghostsolutionsuite"
+  ],
+  "Acronis Snap Deploy": [
+    "com.acronis.snapdeploy"
+  ],
+  "Microsoft Deployment Toolkit (MDT)": [
+    "com.microsoft.mdt"
+  ],
+  "SmartDeploy": [
+    "com.smartdeploy"
+  ],
+  "Parallels Desktop for Mac": [
+    "com.parallels.desktop"
+  ],
+  "VMware Fusion": [
+    "com.vmware.fusion"
+  ],
+  "VirtualBox": [
+    "org.virtualbox"
+  ],
+  "Boot Camp": [
+    "com.apple.bootcamp"
+  ],
+  "QEMU": [
+    "org.qemu"
+  ],
+  "Raspberry Pi OS": [
+    "org.raspberrypi"
+  ],
+  "Arduino": [
+    "org.arduino"
+  ],
+  "PlatformIO": [
+    "io.platformio"
+  ],
+  "MicroPython": [
+    "org.micropython"
+  ],
+  "Espressif IoT Development Framework (ESP-IDF)": [
+    "org.esp-idf"
+  ],
+  "Zephyr Project": [
+    "org.zephyr"
+  ],
+  "RIOT": [
+    "org.riot-os"
+  ],
+  "ARM Mbed OS": [
+    "org.mbed"
+  ],
+  "Apache Mynewt": [
+    "org.apache.mynewt"
+  ],
+  "Contiki": [
+    "org.contiki"
+  ],
+  "TinyOS": [
+    "org.tinyos"
+  ],
+  "FreeRTOS": [
+    "org.freertos"
+  ],
+  "ChibiOS/RT": [
+    "org.chibios"
+  ],
+  "CMSIS": [
+    "org.arm.cmsis"
+  ],
+  "NuttX": [
+    "org.nuttx"
+  ],
+  "mbed TLS": [
+    "org.mbedtls"
+  ],
+  "wolfSSL": [
+    "com.wolfssl"
+  ],
+  "MatrixSSL": [
+    "com.matrixssl"
+  ],
+  "Bouncy Castle": [
+    "org.bouncycastle"
+  ],
+  "Java Cryptography Architecture (JCA)": [
+    "java.security"
+  ],
+  "Java Cryptography Extension (JCE)": [
+    "javax.crypto"
+  ],
+  "OpenSSL": [
+    "org.openssl"
+  ],
+  "Libsodium": [
+    "org.libsodium"
+  ],
+  "GnuTLS": [
+    "org.gnutls"
+  ],
+  "NSS (Network Security Services)": [
+    "org.mozilla.nss"
+  ],
+  "Catalina.out": [
+    "org.apache.catalina.core.ApplicationDispatcher",
+    "org.apache.catalina.core.StandardEngineValve",
+    "org.apache.catalina.core.StandardHostValve",
+    "org.apache.catalina.core.StandardContextValve",
+    "org.apache.catalina.core.StandardWrapperValve",
+    "org.apache.catalina.core.ApplicationFilterChain",
+    "org.apache.catalina.core.StandardWrapperFacade",
+    "org.apache.catalina.core.ApplicationHttpRequest",
+    "org.apache.catalina.core.ApplicationHttpResponse"
+  ],
+  "JBoss/WildFly": [
+    "org.jboss.as.server.deployment.DeploymentUnitProcessor",
+    "org.jboss.as.ee.component.deployers.EEModuleConfigurationProcessor",
+    "org.jboss.as.server.deployment.module.DeploymentRootMountProcessor",
+    "org.jboss.as.server.deployment.module.LocalModuleDependencyProcessor",
+    "org.jboss.as.server.deployment.module.ResourceRootMountProcessor",
+    "org.jboss.as.server.deployment.module.LocalResourcesProcessor",
+    "org.jboss.as.server.deployment.module.ManifestClassPathProcessor",
+    "org.jboss.as.server.deployment.module.MetaInfMountProcessor",
+    "org.jboss.as.server.deployment.module.DeferredModuleConfigProcessor",
+    "org.jboss.as.server.deployment.module.ManifestDependencyProcessor",
+    "org.jboss.as.server.deployment.module.ModuleResourceRootProcessor",
+    "org.jboss.as.server.deployment.module.PackageAnnotationsProcessor",
+    "org.jboss.as.server.deployment.module.ServiceLoaderProcessor",
+    "org.jboss.as.server.deployment.module.DelegatingHandlerProcessor",
+    "org.jboss.as.server.deployment.module.ModuleConfigProcessor",
+    "org.jboss.as.server.deployment.module.ModuleClassLoaderProcessor",
+    "org.jboss.as.server.deployment.module.ModuleDependencyProcessor",
+    "org.jboss.as.server.deployment.module.ModuleAttachProcessor",
+    "org.jboss.as.server.deployment.module.GlobalModuleProcessor",
+    "org.jboss.as.server.deployment.module.ExtensionListAddProcessor",
+    "org.jboss.as.server.deployment.module.ModuleClassPathProcessor",
+    "org.jboss.as.server.deployment.module.AllXMLFilesProcessor",
+    "org.jboss.as.server.deployment.module.ExtensionParsingProcessor",
+    "org.jboss.as.server.deployment.module.InterceptorDependenciesProcessor",
+    "org.jboss.as.server.deployment.module.ResourceRootConfigProcessor",
+    "org.jboss.as.server.deployment.module.AdditionalModuleProcessor",
+    "org.jboss.as.server.deployment.module.ResourceRootProcessor",
+    "org.jboss.as.server.deployment.module.DelegatingProcessor",
+    "org.jboss.as.server.deployment.module.ResourceRootConfigCreateProcessor",
+    "org.jboss.as.server.deployment.module.AnnotationsProcessor",
+    "org.jboss.as.server.deployment.module.JndiBindingDependencyProcessor",
+    "org.jboss.as.server.deployment.module.DeploymentStructureDescriptorParser",
+    "org.jboss.as.server.deployment.module.DependencyRedeployProcessor",
+    "org.jboss.as.server.deployment.module.ModuleConfigCreateProcessor",
+    "org.jboss.as.server.deployment.module.XSLTSubDeployerProcessor",
+    "org.jboss.as.server.deployment.module.ManifestXMLFilesProcessor",
+    "org.jboss.as.server.deployment.module.ModuleJMXRegistrationProcessor",
+    "org.jboss.as.server.deployment.module.XSLTDeploymentProcessor",
+    "org.jboss.as.server.deployment.module.DelegatingSubDeployerProcessor",
+    "org.jboss.as.server.deployment.module.ManifestAttachmentProcessor",
+    "org.jboss.as.server.deployment.module.MetadataXMLFilesProcessor",
+    "org.jboss.as.server.deployment.module.ModuleConfigDescriptorProcessor",
+    "org.jboss.as.server.deployment.module.AttachmentsProcessor",
+    "org.jboss.as.server.deployment.module.PojoIndexerProcessor",
+    "org.jboss.as.server.deployment.module.DeploymentRootProcessor",
+    "org.jboss.as.server.deployment.module.TempTableStructureProcessor",
+    "org.jboss.as.server.deployment.module.TempTableDeploymentProcessor",
+    "org.jboss.as.server.deployment.module.TempTableDeploymentProcessorOne",
+    "org.jboss.as.server.deployment.module.TempTableStructureProcessorOne",
+    "org.jboss.as.server.deployment.module.TempTableDeploymentProcessorTwo",
+    "org.jboss.as.server.deployment.module.TempTableStructureProcessorTwo",
+    "org.jboss.as.server.deployment.module.TempTableDeploymentProcessorThree",
+    "org.jboss.as.server.deployment.module.TempTableStructureProcessorThree",
+    "org.jboss.as.server.deployment.module.TempTableDeploymentProcessorFour",
+    "org.jboss.as.server.deployment.module.TempTableStructureProcessorFour",
+    "org.jboss.as.server.deployment.module.TempTableDeploymentProcessorFive",
+    "org.jboss.as.server.deployment.module.TempTableStructureProcessorFive",
+    "org.jboss.as.server.deployment.module.TempTableDeploymentProcessorSix",
+    "org.jboss.as.server.deployment.module.TempTableStructureProcessorSix",
+    "org.jboss.as.server.deployment.module.TempTableDeploymentProcessorSeven",
+    "org.jboss.as.server.deployment.module.TempTableStructureProcessorSeven",
+    "org.jboss.as.server.deployment.module.TempTableDeploymentProcessorEight",
+    "org.jboss.as.server.deployment.module.TempTableStructureProcessorEight",
+    "org.jboss.as.server.deployment.module.TempTableDeploymentProcessorNine",
+    "org.jboss.as.server.deployment.module.TempTableStructureProcessorNine",
+    "org.jboss.as.server.deployment.module.TempTableDeploymentProcessorTen",
+    "org.jboss.as.server.deployment.module.TempTableStructureProcessorTen",
+    "org.jboss.as.server.deployment.module.TempTableDeploymentProcessorEleven",
+    "org.jboss.as.server.deployment.module.TempTableStructureProcessorEleven",
+    "org.jboss.as.server.deployment.module.TempTableDeploymentProcessorTwelve",
+    "org.jboss.as.server.deployment.module.TempTableStructureProcessorTwelve",
+    "org.jboss.as.server.deployment.module.TempTableDeploymentProcessorThirteen",
+    "org.jboss.as.server.deployment.module.TempTableStructureProcessorThirteen",
+    "org.jboss.as.server.deployment.module.TempTableDeploymentProcessorFourteen",
+    "org.jboss.as.server.deployment.module.TempTableStructureProcessorFourteen",
+    "org.jboss.as.server.deployment.module.TempTableDeploymentProcessorFifteen",
+    "org.jboss.as.server.deployment.module.TempTableStructureProcessorFifteen",
+    "org.jboss.as.server.deployment.module.TempTableDeploymentProcessorSixteen",
+    "org.jboss.as.server.deployment.module.TempTableStructureProcessorSixteen",
+    "org.jboss.as.server.deployment.module.TempTableDeploymentProcessorSeventeen",
+    "org.jboss.as.server.deployment.module.TempTableStructureProcessorSeventeen",
+    "org.jboss.as.server.deployment.module.TempTableDeploymentProcessorEighteen",
+    "org.jboss.as.server.deployment.module.TempTableStructureProcessorEighteen",
+    "org.jboss.as.server.deployment.module.TempTableDeploymentProcessorNineteen",
+    "org.jboss.as.server.deployment.module.TempTableStructureProcessorNineteen",
+    "org.jboss.as.server.deployment.module.TempTableDeploymentProcessorTwenty",
+    "org.jboss.as.server.deployment.module.TempTableStructureProcessorTwenty",
+    "org.jboss.as.server.deployment.module.DeploymentClassPathProcessor",
+    "org.jboss.as.server.deployment.module.ExtensionListRemoveProcessor",
+    "org.jboss.as.server.deployment.module.ExtensionParsingDeploymentProcessor",
+    "org.jboss.as.server.deployment.module.SubDeploymentParsingProcessor",
+    "org.jboss.as.server.deployment.module.DeploymentContentValidatorsProcessor",
+    "org.jboss.as.server.deployment.module.ModulePoolsProcessor",
+    "org.jboss.as.server.deployment.module.ModuleDependenciesProcessor",
+    "org.jboss.as.server.deployment.module.ModuleDeploymentProcessor",
+    "org.jboss.as.server.deployment.module.ResourceRootSearchProcessor",
+    "org.jboss.as.server.deployment.module.GlobalModulesProcessor",
+    "org.jboss.as.server.deployment.module.ModuleExtensionDependencyProcessor",
+    "org.jboss.as.server.deployment.module.ModuleResourceProcessor",
+    "org.jboss.as.server.deployment.module.ResourceRootPropertiesProcessor",
+    "org.jboss.as.server.deployment.module.ResourceRootXmlLocationProcessor",
+    "org.jboss.as.server.deployment.module.ManifestExtensionListProcessor",
+    "org.jboss.as.server.deployment.module.ModuleExtensionParsingProcessor",
+    "org.jboss.as.server.deployment.module.ParsingDeploymentProcessor",
+    "org.jboss.as.server.deployment.module.ManifestClassPathXmlProcessor",
+    "org.jboss.as.server.deployment.module.ModuleClassPathXmlProcessor",
+    "org.jboss.as.server.deployment.module.MetaInfXmlProcessor",
+    "org.jboss.as.server.deployment.module.ModuleExtensionProcessingProcessor",
+    "org.jboss.as.server.deployment.module.ModuleContentsProcessor",
+    "org.jboss.as.server.deployment.module.SubDeploymentXmlProcessor",
+    "org.jboss.as.server.deployment.module.SubDeploymentClassPathProcessor",
+    "org.jboss.as.server.deployment.module.DelegatingClassPathProcessor",
+    "org.jboss.as.server.deployment.module.ExtensionClassPathProcessor",
+    "org.jboss.as.server.deployment.module.ManifestClassPathXmlLocationProcessor",
+    "org.jboss.as.server.deployment.module.ParsingClassPathXmlProcessor",
+    "org.jboss.as.server.deployment.module.ParsingClassPathXmlLocationProcessor",
+    "org.jboss.as.server.deployment.module.ModuleConfigXmlProcessor",
+    "org.jboss.as.server.deployment.module.DeploymentDependentMetadataProcessor",
+    "org.jboss.as.server.deployment.module.ModuleDependencyXmlProcessor",
+    "org.jboss.as.server.deployment.module.ModuleClassLoaderXmlProcessor",
+    "org.jboss.as.server.deployment.module.ModuleClassLoaderXmlLocationProcessor",
+    "org.jboss.as.server.deployment.module.ModulePathXmlProcessor",
+    "org.jboss.as.server.deployment.module.ManifestDependencyXmlProcessor"
+  ]
+}

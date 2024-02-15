@@ -347,4 +347,21 @@ class celery_logs(db.Model):
         self.task_id = task_id
         self.task_status = task_status
         self.task_log = task_log        
-    
+
+class MiddlewareComponent(db.Model):
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    key = db.Column(db.String(255), unique=True, nullable=False)
+    middleware_component = db.Column(db.String(255), nullable=False)
+    stack = db.Column(db.String(50), nullable=False)
+    stack_current_version = db.Column(db.String(50), nullable=False)
+    stack_upgraded_version = db.Column(db.String(50), nullable=False)
+    recommendation = db.Column(db.Text)
+
+    def __init__(self, key, middleware_component, stack, stack_current_version, stack_upgraded_version, recommendation):
+        self.key = key
+        self.middleware_component = middleware_component
+        self.stack = stack
+        self.stack_current_version = stack_current_version
+        self.stack_upgraded_version = stack_upgraded_version
+        self.recommendation = recommendation
+  

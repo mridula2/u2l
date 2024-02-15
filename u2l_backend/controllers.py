@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request, Response, Flask, stream_with_context
-from utils import validate_email, generate_workbook, sheet_transfer, fetch_store_java_data, send_email, summary_sheet_generation, testing_task, run_cppcheck, get_task_queue_name, convert_to_dataframe_move_to_excel, createDf, java_doc_sheet
+from utils import validate_email, generate_workbook, sheet_transfer, fetch_store_java_data, send_email, summary_sheet_generation, testing_task, run_cppcheck, get_task_queue_name, convert_to_dataframe , convert_to_dataframe_move_to_excel, createDf, java_doc_sheet, extract_versions, deprecated_data_sheet, insert_middleware_component_to_db, get_recommendation, java_middleware_extraction
 from models import *
 import datetime
 import os
@@ -28,6 +28,7 @@ import redis
 
 redis_client = redis.StrictRedis(host='localhost', port=6379, db=0)
 
+logging.basicConfig(filename='middleware_extraction.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 authentication_controller = Blueprint('authentication', __name__)
 analysis_bp = Blueprint('analysis', __name__)
@@ -2650,8 +2651,11 @@ def collectdatademo():
 @authentication_controller.route('/collectdata', methods=['POST'])
 def collectdata():
 
-    java_docs_version = request.form['java_doc_version']
+    json_data = request.get_json()
+    java_docs_version = json_data['java_doc_version']
+    # java_docs_version = request.form['java_doc_version']
     java_docs_version_int = int(java_docs_version)
+    package_name = 'java'
 
     if ((java_docs_version_int > 10) and (java_docs_version_int < 20)):
         # 11, 12, 13, 14, 15, 16, 17, 18, 19
@@ -2665,7 +2669,7 @@ def collectdata():
     try:
 
         deprecated_excel_file_path = '/usr/u2l/u2l_backend/deprecated_data.xlsx'
-        sheet_name = 'JDK'
+        sheet_name = 'JDK_Depricated'
         response = requests.get(url)
         response.raise_for_status()
 
@@ -2680,17 +2684,17 @@ def collectdata():
             elif (java_docs_version_int == 9):
 
                 deprecated_item_names_alt = [item.text.strip() for item in soup.find_all('tr', class_='altColor')]
-                df1 = createDf(deprecated_item_names_alt, java_docs_version)
+                df1 = createDf(deprecated_item_names_alt, java_docs_version, 'jdk')
 
                 deprecated_item_names_row = [item.text.strip() for item in soup.find_all('tr', class_='rowColor')]
-                df2 = createDf(deprecated_item_names_row, java_docs_version)
+                df2 = createDf(deprecated_item_names_row, java_docs_version, 'jdk')
 
                 df = df1.append(df2, ignore_index=True)
                 java_doc_sheet(deprecated_excel_file_path, sheet_name, df)
 
                 return f'Data collected and saved to successfully'
 
-            df = createDf(deprecated_item_names, java_docs_version)
+            df = createDf(deprecated_item_names, java_docs_version, 'jdk')
             print(df)
             java_doc_sheet(deprecated_excel_file_path, sheet_name, df)
 
@@ -2701,7 +2705,7 @@ def collectdata():
 
             deprecated_item_names = soup.find_all('th', class_='colDeprecatedItemName')
             deprecation_comments = soup.find_all('td', class_='colLast')
-            df = convert_to_dataframe_move_to_excel(deprecated_item_names, deprecation_comments, java_docs_version)
+            df = convert_to_dataframe_move_to_excel(deprecated_item_names, deprecation_comments, java_docs_version, package_name)
 
             ## OpenAI Implementation
 
@@ -2718,12 +2722,104 @@ def collectdata():
                 deprecated_item_names = soup.find_all('div', class_=['col-summary-item-name', 'col-first'])
 
             deprecation_comments = soup.find_all('div', class_='col-last')
-            df = convert_to_dataframe_move_to_excel(deprecated_item_names, deprecation_comments, java_docs_version)
+            df = convert_to_dataframe_move_to_excel(deprecated_item_names, deprecation_comments, java_docs_version, package_name)
             java_doc_sheet(deprecated_excel_file_path, sheet_name, df)
 
             return f'Data collected and saved to successfully'
 
         return 'Requested URL not found !!'
+
+    except requests.exceptions.RequestException as e:
+        return jsonify({'error': str(e)})
+
+@authentication_controller.route('/collect_other_libraries', methods=['POST'])
+def collect_other_libraries():
+
+    try:
+        
+        urls_dict = {
+        'Angus Activation': 'https://eclipse-ee4j.github.io/angus-activation/api/deprecated-list.html',
+        'ECJ': 'https://javadoc.io/doc/org.eclipse.jdt.core.compiler/ecj/latest/deprecated-list.html',
+        'JavaHamcrest': 'https://hamcrest.org/JavaHamcrest/javadoc/2.2/deprecated-list.html',
+        'Mchange commons java': 'https://www.mchange.com/projects/mchange-commons-java-versions/{package_version}/apidocs/deprecated-list.html',
+        'Micrometer Core': 'https://javadoc.io/doc/io.micrometer/micrometer-core/latest/deprecated-list.html',
+        'okhttp': 'https://square.github.io/okhttp/1.x/okhttp/deprecated-list.html',
+        'zip4j': 'https://javadoc.io/doc/net.lingala.zip4j/zip4j/latest/deprecated-list.html',
+        'Apache Tomcat': 'https://tomcat.apache.org/tomcat-{package_version}-doc/api/deprecated-list.html',
+        'Apache ANT': 'https://ant.apache.org/manual/api/deprecated-list.html',
+        'aspectjweaver': 'https://javadoc.io/doc/org.aspectj/aspectjweaver/latest/deprecated-list.html',
+        'aspectjrt': 'https://javadoc.io/doc/org.aspectj/aspectjrt/latest/deprecated-list.html',
+        'Axis': 'https://axis.apache.org/axis/java/apiDocs/deprecated-list.html',
+        'Bouncycastle': 'https://www.bouncycastle.org/docs/pkixdocs1.5on/index.html?deprecated-list.html',
+        'cglib-nodep': 'https://javadoc.io/doc/cglib/cglib-nodep/latest/deprecated-list.html',
+        'Commons Beanutils': 'https://commons.apache.org/proper/commons-beanutils/apidocs/deprecated-list.html',
+        'Commons Configuration': 'https://commons.apache.org/proper/commons-configuration/apidocs/deprecated-list.html',
+        'Commons Dbcp': 'https://commons.apache.org/proper/commons-dbcp/apidocs/deprecated-list.html',
+        'Commons Digester': 'https://commons.apache.org/proper/commons-digester/apidocs/deprecated-list.html',
+        'Commons Discovery': 'https://commons.apache.org/dormant/commons-discovery/apidocs/deprecated-list.html',
+        'Commons Lang': 'https://commons.apache.org/proper/commons-lang/javadocs/api-2.6/index.html?deprecated-list.html',
+        'Commons Collections': 'https://commons.apache.org/proper/commons-collections/apidocs/deprecated-list.html',
+        'Commons Codec': 'https://commons.apache.org/proper/commons-codec/apidocs/deprecated-list.html',
+        'Apache Commons IO': 'https://javadoc.scijava.org/Apache-Commons-IO/deprecated-list.html',
+        'Commons Pool': 'https://commons.apache.org/proper/commons-pool/apidocs/deprecated-list.html',
+        'Commons Logging': 'https://commons.apache.org/proper/commons-logging/apidocs/deprecated-list.html',
+        'Diffutils': 'https://javadoc.io/static/io.github.java-diff-utils/java-diff-utils/4.5/deprecated-list.html',
+        'Geronimo': 'https://geronimo.apache.org/apidocs/{package_version}/deprecated-list.html',
+        'Groovy-lang': 'https://docs.groovy-lang.org/latest/html/api/deprecated-list.html',
+        'Hazelcast': 'https://docs.hazelcast.org/docs/latest/javadoc/deprecated-list.html',
+        'HTTPcore': 'https://javadoc.io/doc/org.apache.httpcomponents/httpcore/latest/deprecated-list.html',
+        'HTTPclient': 'https://javadoc.io/doc/org.apache.httpcomponents/httpclient/latest/index.html',
+        'Imap': 'https://javadoc.io/doc/com.sun.mail/imap/latest/deprecated-list.html',
+        'IText': 'https://javadoc.io/doc/com.itextpdf/itextpdf/latest/deprecated-list.html',
+        'Jasper Reports': 'https://jasperreports.sourceforge.net/api/deprecated-list.html',
+        'Jaxrpc': 'https://docs.jboss.org/jbossas/javadoc/4.0.3SP1/jaxrpc/deprecated-list.html',
+        'Jcifs': 'https://javadoc.io/docs/org.codelibs/jcifs/latest/deprecated-list.html',
+        'Jcommon': 'https://www.jfree.org/jcommon/api/index.html?deprecated-list.html',
+        'Jdom': 'http://www.jdom.org/docs/apidocs/deprecated-list.html',
+        'Jfreechart': 'https://www.jfree.org/jfreechart/javadoc/deprecated-list.html',
+        'Jsch Documentation': 'https://epaul.github.io/jsch-documentation/javadoc/deprecated-list.html',
+        'Juddi Client': 'https://juddi.apache.org/juddi-client/apidocs/deprecated-list.html',
+        'Apache OpenJPA': 'https://openjpa.apache.org/builds/{package_version}/apidocs/deprecated-list.html',
+        'Mybatis': 'https://mybatis.org/mybatis-3/apidocs/deprecated-list.html',
+        'Mybatis Spring': 'https://mybatis.org/spring/apidocs/deprecated-list.html',
+        'Opencsv': 'https://javadoc.io/doc/com.opencsv/opencsv/latest/deprecated-list.html',
+        'POI': 'https://poi.apache.org/apidocs/{package_version}/deprecated-list.html',
+        'Quartz scheduler': 'https://www.quartz-scheduler.org/api/{package_version}/deprecated-list.html',
+        'slf4j': 'https://www.slf4j.org/api/deprecated-list.html',
+        'wsdl4j': 'https://javadoc.io/doc/wsdl4j/wsdl4j/latest/index.html',
+        'XMLBeans': 'https://xmlbeans.apache.org/docs/{package_version}/reference/deprecated-list.html'
+        }
+
+        json_data = request.get_json()
+        package_name = json_data['package_name']
+        package_version = json_data['package_version']
+        package_url = json_data['package_url']
+
+        # package_name = request.form['package_name']
+        # package_version = request.form['package_version'] #optional
+        # package_url = request.form['package_url'] #optional
+
+        if package_url == '':
+            if(package_name in urls_dict.keys()):
+                url = urls_dict[package_name]
+                if '{package_version}' in url:
+                    # If package version is not provided, extract available versions
+                    if not package_version:
+                        available_versions = extract_versions(package_name)
+                        # Iterate over available versions and collect data
+                        for version in available_versions:
+                            version_url = url.replace('{package_version}', version)
+                            result = deprecated_data_sheet(version_url, package_name, version)
+                            print(result)
+                    else:
+                        url = url.replace('{package_version}', package_version)
+                result = deprecated_data_sheet(url, package_name, package_version)
+            else:
+                print("Package not found in the list")
+        else:
+            result = deprecated_data_sheet(package_url, package_name, 1)
+            print(result)
+        return 'Package found successfully'
 
     except requests.exceptions.RequestException as e:
         return jsonify({'error': str(e)})
@@ -2754,3 +2850,72 @@ def openai():
     result = completion.choices[0].message['content']
     print(result)
     return result
+
+@authentication_controller.route('/check_website', methods=['POST'])
+def check_website():
+    data = request.get_json()
+
+    if data and 'url' in data:
+        website_url = data['url']
+        try:
+            response = requests.head(website_url, timeout=10)
+            if response.status_code == 200:
+                return jsonify({'status': 'reachable'}), 200
+            else:
+                return jsonify({'status': 'unreachable', 'reason': 'HTTP Status Code: {}'.format(response.status_code)})
+        except requests.ConnectionError:
+            return jsonify({'status': 'unreachable', 'reason': 'Connection Error'}), 404
+        except requests.Timeout:
+            return jsonify({'status': 'unreachable', 'reason': 'Timeout'}), 404
+        except Exception as e:
+            return jsonify({'status': 'unreachable', 'reason': str(e)}), 404
+    else:
+        return jsonify({'error': 'Missing or invalid URL in the request body'}), 404
+
+@authentication_controller.route('/extract_middleware', methods=['POST'])
+def extract_middleware():
+
+    file = request.files['file_name']
+    tool_analysis_type = request.form['tool_analysis_type']
+
+    file_name = file.filename
+    temp_tuple = os.path.splitext(file_name)
+    if temp_tuple[1] != '.zip':
+        error_message = {'error' :"Upload .zip files only"}
+        return jsonify(error_message), 404
+
+    cur_date = datetime.datetime.now()
+
+    file_name = temp_tuple[0]
+
+    year_month_day = str(cur_date).split(" ")
+    global yMD
+    yMD = year_month_day[0].replace("-", "")
+
+    hour_min_sec = os.path.splitext(year_month_day[1])
+    global hMS
+    hMS = hour_min_sec[0].replace(":", "")
+
+    file_name = file_name + "_" + yMD + "_" + hMS 
+    directory = '/usr/u2l/u2l_backend/midextract/' + file_name
+    os.makedirs(directory)
+    file.save(os.path.join(directory, file_name +'.zip'))
+
+    zip_file_path = directory + '/' + file_name + '.zip'
+
+    if(tool_analysis_type == 'javaanalysis'):
+        middleware_json_path = '/usr/u2l/u2l_backend/middleware_list/java_middleware_list.json'
+    elif(tool_analysis_type == 'shellanalysis'):
+        middleware_json_path = '/usr/u2l/u2l_backend/middleware_list/shell_middleware_list.json'
+    elif(tool_analysis_type == 'canalysis'):
+        middleware_json_path = '/usr/u2l/u2l_backend/middleware_list/c_middleware_list.json'
+
+    output_folder = '/usr/u2l/u2l_backend/middleware-output/java-middleware'
+    results = java_middleware_extraction(zip_file_path, output_folder, middleware_json_path)
+
+    if (results == 'success'):
+        return jsonify({'message': 'Middleware extraction completed', 'results': results}), 200
+    else:
+        return jsonify({'message': 'No results found.'}), 404
+
+    return 'Success'

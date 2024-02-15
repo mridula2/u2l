@@ -1,0 +1,691 @@
+{
+    "LibCURL": [
+        "curl.h"
+    ],
+    "OpenSSL": [
+        "openssl/ssl.h",
+        "openssl/evp.h"
+    ],
+    "SQLite": [
+        "sqlite3.h"
+    ],
+    "Boost": [
+        "boost/"
+    ],
+    "GTK+": [
+        "gtk/gtk.h"
+    ],
+    "Qt": [
+        "QtWidgets/QApplication",
+        "QtGui/QMainWindow"
+    ],
+    "FFmpeg": [
+        "libavformat/avformat.h",
+        "libavcodec/avcodec.h"
+    ],
+    "SDL (Simple DirectMedia Layer)": [
+        "SDL.h"
+    ],
+    "NCurses": [
+        "ncurses.h"
+    ],
+    "Zlib": [
+        "zlib.h"
+    ],
+    "libpng": [
+        "png.h"
+    ],
+    "libjpeg": [
+        "jpeglib.h"
+    ],
+    "libtiff": [
+        "tiffio.h"
+    ],
+    "libxml2": [
+        "libxml/parser.h",
+        "libxml/tree.h"
+    ],
+    "ZeroMQ": [
+        "zmq.h"
+    ],
+    "libevent": [
+        "event2/event.h"
+    ],
+    "libwebsockets": [
+        "libwebsockets.h"
+    ],
+    "Poco": [
+        "Poco/Net/HTTPClient.h",
+        "Poco/Foundation.h"
+    ],
+    "Glib": [
+        "glib.h"
+    ],
+    "libudev": [
+        "libudev.h"
+    ],
+    "DBus": [
+        "dbus/dbus.h"
+    ],
+    "cJSON": [
+        "cJSON.h"
+    ],
+    "libuuid": [
+        "uuid/uuid.h"
+    ],
+    "libvorbis": [
+        "vorbis/codec.h"
+    ],
+    "libogg": [
+        "ogg/ogg.h"
+    ],
+    "libyaml": [
+        "yaml.h"
+    ],
+    "libbson": [
+        "bson/bson.h"
+    ],
+    "libcurl": [
+        "curl/curl.h"
+    ],
+    "libzip": [
+        "zip.h"
+    ],
+    "libgit2": [
+        "git2.h"
+    ],
+    "libffi": [
+        "ffi.h"
+    ],
+    "librsvg": [
+        "librsvg/rsvg.h"
+    ],
+    "libarchive": [
+        "archive.h"
+    ],
+    "libpq (PostgreSQL)": [
+        "libpq-fe.h"
+    ],
+    "libxmlsec": [
+        "xmlsec/xmlsec.h"
+    ],
+    "libssl (OpenSSL)": [
+        "openssl/ssl.h"
+    ],
+    "libcrypto (OpenSSL)": [
+        "openssl/crypto.h"
+    ],
+    "libpcre": [
+        "pcre.h"
+    ],
+    "libexpat": [
+        "expat.h"
+    ],
+    "libpcap": [
+        "pcap.h"
+    ],
+    "libmosquitto": [
+        "mosquitto.h"
+    ],
+    "libmongoc": [
+        "mongoc/mongoc.h"
+    ],
+    "libjwt": [
+        "jwt.h"
+    ],
+    "libjwt (JSON Web Token)": [
+        "jwt.h"
+    ],
+    "libavro": [
+        "avro.h"
+    ],
+    "libmbedtls": [
+        "mbedtls/config.h"
+    ],
+    "libsodium": [
+        "sodium.h"
+    ],
+    "libyaml": [
+        "yaml.h"
+    ],
+    "libprotobuf": [
+        "google/protobuf-c/protobuf-c.h"
+    ],
+    "libmariadb": [
+        "mariadb/mysql.h"
+    ],
+    "libmsgpack": [
+        "msgpack.h"
+    ],
+    "libopencv": [
+        "opencv2/opencv.hpp"
+    ],
+    "libglfw": [
+        "GLFW/glfw3.h"
+    ],
+    "libnfc": [
+        "nfc/nfc.h"
+    ],
+    "libusb": [
+        "libusb-1.0/libusb.h"
+    ],
+    "libvips": [
+        "vips/vips.h"
+    ],
+    "libmodbus": [
+        "modbus/modbus.h"
+    ],
+    "libxmlrpc": [
+        "xmlrpc-c/base.h"
+    ],
+    "libjson-c": [
+        "json-c/json.h"
+    ],
+    "libmicrohttpd": [
+        "microhttpd.h"
+    ],
+    "libsecp256k1": [
+        "secp256k1.h"
+    ],
+    "libmariadb": [
+        "mariadb/mysql.h"
+    ],
+    "libmaxminddb": [
+        "maxminddb.h"
+    ],
+    "libgit2": [
+        "git2.h"
+    ],
+    "libgit2 (Git)": [
+        "git2.h"
+    ],
+    "libcmocka": [
+        "cmocka.h"
+    ],
+    "libcurl (CURL)": [
+        "curl/curl.h"
+    ],
+    "libarchive": [
+        "archive.h"
+    ],
+    "libsndfile": [
+        "sndfile.h"
+    ],
+    "libhiredis": [
+        "hiredis/hiredis.h"
+    ],
+    "libzmq": [
+        "zmq.h"
+    ],
+    "libssh": [
+        "libssh/libssh.h"
+    ],
+    "libwebsockets": [
+        "libwebsockets.h"
+    ],
+    "libatasmart": [
+        "atasmart.h"
+    ],
+    "liblz4": [
+        "lz4.h"
+    ],
+    "liblzma": [
+        "lzma.h"
+    ],
+    "libunistring": [
+        "unistr.h"
+    ],
+    "libzip": [
+        "zip.h"
+    ],
+    "libev": [
+        "ev.h"
+    ],
+    "libevent": [
+        "event2/event.h"
+    ],
+    "libconfig": [
+        "libconfig.h"
+    ],
+    "libcoap": [
+        "coap2/coap.h"
+    ],
+    "libgmp": [
+        "gmp.h"
+    ],
+    "libgnutls": [
+        "gnutls/gnutls.h"
+    ],
+    "libgpg-error": [
+        "gpg-error.h"
+    ],
+    "libgsasl": [
+        "gsasl.h"
+    ],
+    "libgvc (Graphviz)": [
+        "gvc.h"
+    ],
+    "libidn2": [
+        "idn2.h"
+    ],
+    "libjansson": [
+        "jansson.h"
+    ],
+    "libltdl": [
+        "ltdl.h"
+    ],
+    "libmicrohttpd": [
+        "microhttpd.h"
+    ],
+    "libnettle": [
+        "nettle/nettle-types.h"
+    ],
+    "libnghttp2": [
+        "nghttp2/nghttp2.h"
+    ],
+    "libpsl": [
+        "libpsl.h"
+    ],
+    "libpthreads": [
+        "pthread.h"
+    ],
+    "libqrencode": [
+        "qrencode.h"
+    ],
+    "librt (Realtime)": [
+        "time.h"
+    ],
+    "libserf": [
+        "serf.h"
+    ],
+    "libssh2": [
+        "libssh2.h"
+    ],
+    "libstemmer": [
+        "libstemmer.h"
+    ],
+    "libtiff": [
+        "tiffio.h"
+    ],
+    "libusb-1.0": [
+        "libusb-1.0/libusb.h"
+    ],
+    "libuv": [
+        "uv.h"
+    ],
+    "libv8": [
+        "v8.h"
+    ],
+    "libxmlrpc": [
+        "xmlrpc-c/xmlrpc-c.h"
+    ],
+    "libyaml": [
+        "yaml.h"
+    ],
+    "libyajl": [
+        "yajl/yajl_common.h"
+    ],
+    "libz": [
+        "zlib.h"
+    ],
+    "libzdb": [
+        "zdb.h"
+    ],
+    "libzip": [
+        "zip.h"
+    ],
+    "libzmq": [
+        "zmq.h"
+    ],
+    "libzstd": [
+        "zstd.h"
+    ],
+    "libossp-uuid": [
+        "uuid.h"
+    ],
+    "libwebsockets": [
+        "libwebsockets.h"
+    ],
+    "libvdeplug": [
+        "vdeplug.h"
+    ],
+    "libverto": [
+        "verto.h"
+    ],
+    "libyang": [
+        "libyang.h"
+    ],
+    "libxslt": [
+        "libxslt/xslt.h"
+    ],
+    "libyuv": [
+        "libyuv.h"
+    ],
+    "libmodbus": [
+        "modbus/modbus.h"
+    ],
+    "libnfc": [
+        "nfc/nfc.h"
+    ],
+    "libtirpc": [
+        "rpc/rpc.h"
+    ],
+    "librsvg": [
+        "librsvg/rsvg.h"
+    ],
+    "librrd": [
+        "rrd.h"
+    ],
+    "libresolv": [
+        "resolv.h"
+    ],
+    "libsane": [
+        "sane/sane.h"
+    ],
+    "libseccomp": [
+        "seccomp.h"
+    ],
+    "libsecret": [
+        "libsecret-1/libsecret.h"
+    ],
+    "libsigrok": [
+        "libsigrok.h"
+    ],
+    "libsoup": [
+        "libsoup/soup.h"
+    ],
+    "libsox": [
+        "sox.h"
+    ],
+    "libspeechd": [
+        "speech-dispatcher/libspeechd.h"
+    ],
+    "libsqlite": [
+        "sqlite3.h"
+    ],
+    "libsrtp": [
+        "srtp.h"
+    ],
+    "libsodium": [
+        "sodium.h"
+    ],
+    "libssh": [
+        "libssh/libssh.h"
+    ],
+    "libssl": [
+        "openssl/ssl.h"
+    ],
+    "libssl (OpenSSL)": [
+        "openssl/ssl.h"
+    ],
+    "libstdc++": [
+        "bits/stdc++.h"
+    ],
+    "libswresample": [
+        "libswresample/swresample.h"
+    ],
+    "libswscale": [
+        "libswscale/swscale.h"
+    ],
+    "libtbb": [
+        "tbb/tbb.h"
+    ],
+    "libtdb": [
+        "tdb.h"
+    ],
+    "libtevent": [
+        "tevent.h"
+    ],
+    "libthai": [
+        "thai/thai.h"
+    ],
+    "libtheora": [
+        "theora/theora.h"
+    ],
+    "libtiff": [
+        "tiffio.h"
+    ],
+    "libtidy": [
+        "tidy/tidy.h"
+    ],
+    "libtirpc": [
+        "rpc/rpc.h"
+    ],
+    "libtool": [
+        "libtool.h"
+    ],
+    "libtorrent": [
+        "libtorrent/torrent.h"
+    ],
+    "libubox": [
+        "libubox/blobmsg_json.h"
+    ],
+    "libudev": [
+        "libudev.h"
+    ],
+    "libudis86": [
+        "udis86.h"
+    ],
+    "libunistring": [
+        "unistr.h"
+    ],
+    "libusb": [
+        "libusb-1.0/libusb.h"
+    ],
+    "libuuid": [
+        "uuid/uuid.h"
+    ],
+    "libv4l": [
+        "libv4lconvert.h"
+    ],
+    "libva": [
+        "va/va.h"
+    ],
+    "libvdpau": [
+        "vdpau/vdpau.h"
+    ],
+    "libvirt": [
+        "libvirt/libvirt.h"
+    ],
+    "libvorbis": [
+        "vorbis/codec.h"
+    ],
+    "libvpx": [
+        "vpx/vpx_decoder.h"
+    ],
+    "libvte": [
+        "vte/vte.h"
+    ],
+    "libvterm": [
+        "vterm.h"
+    ],
+    "libwacom": [
+        "libwacom.h"
+    ],
+    "libwebsockets": [
+        "libwebsockets.h"
+    ],
+    "libwebp": [
+        "webp/encode.h"
+    ],
+    "libwmf": [
+        "libwmf.h"
+    ],
+    "libwnck": [
+        "libwnck/libwnck.h"
+    ],
+    "libwpd": [
+        "libwpd-0.10/libwpd/libwpd.h"
+    ],
+    "libwpg": [
+        "libwpg-0.3/libwpg/libwpg.h"
+    ],
+    "libwps": [
+        "libwps-0.4/libwps/libwps.h"
+    ],
+    "libwrap": [
+        "tcpd.h"
+    ],
+    "libxapian": [
+        "xapian/xapian.h"
+    ],
+    "libxaw": [
+        "X11/Xaw/Box.h"
+    ],
+    "libxcb": [
+        "xcb/xcb.h"
+    ],
+    "Boost C++ Libraries": [
+        "boost"
+    ],
+    "OpenSSL": [
+        "openssl"
+    ],
+    "Poco C++ Libraries": [
+        "Poco"
+    ],
+    "Qt": [
+        "Qt"
+    ],
+    "ACE (Adaptive Communication Environment)": [
+        "ACE"
+    ],
+    "CORBA": [
+        "CORBA"
+    ],
+    "gRPC (gRPC for C++)": [
+        "grpc"
+    ],
+    "ZeroMQ": [
+        "zmq"
+    ],
+    "RabbitMQ C++ Client": [
+        "AMQP"
+    ],
+    "Apache Thrift (Thrift for C++)": [
+        "thrift"
+    ],
+    "Protocol Buffers (protobuf for C++)": [
+        "protobuf"
+    ],
+    "CppCMS": [
+        "cppcms"
+    ],
+    "CppRESTSDK (Casablanca)": [
+        "cpprest"
+    ],
+    "C++ RESTful SDK (Crow)": [
+        "crow"
+    ],
+    "SFML (Simple and Fast Multimedia Library)": [
+        "sfml"
+    ],
+    "FLTK (Fast, Light Toolkit)": [
+        "fltk"
+    ],
+    "wxWidgets": [
+        "wxWidgets"
+    ],
+    "OpenCV": [
+        "opencv"
+    ],
+    "Boost.Asio": [
+        "boost::asio"
+    ],
+    "Boost.Serialization": [
+        "boost::serialization"
+    ],
+    "Boost.Thread": [
+        "boost::thread"
+    ],
+    "Boost.Log": [
+        "boost::log"
+    ],
+    "Boost.PropertyTree": [
+        "boost::property_tree"
+    ],
+    "Boost.FileSystem": [
+        "boost::filesystem"
+    ],
+    "Boost.Regex": [
+        "boost::regex"
+    ],
+    "Boost.Date_Time": [
+        "boost::date_time"
+    ],
+    "Boost.Graph": [
+        "boost::graph"
+    ],
+    "Boost.Interprocess": [
+        "boost::interprocess"
+    ],
+    "Boost.Unit_Test_Framework": [
+        "boost::unit_test"
+    ],
+    "Boost.MPL": [
+        "boost::mpl"
+    ],
+    "Boost.Fusion": [
+        "boost::fusion"
+    ],
+    "Boost.Geometry": [
+        "boost::geometry"
+    ],
+    "Boost.Program_options": [
+        "boost::program_options"
+    ],
+    "Boost.UUID": [
+        "boost::uuid"
+    ],
+    "Boost.Spirit": [
+        "boost::spirit"
+    ],
+    "Boost.JSON": [
+        "boost::json"
+    ],
+    "Boost.Beast": [
+        "boost::beast"
+    ],
+    "Boost.Coroutine": [
+        "boost::coroutine"
+    ],
+    "Boost.Compute": [
+        "boost::compute"
+    ],
+    "Boost.ICL": [
+        "boost::icl"
+    ],
+    "Boost.Flyweight": [
+        "boost::flyweight"
+    ],
+    "Boost.Asynchronous": [
+        "boost::asynchronous"
+    ],
+    "Boost.Hana": [
+        "boost::hana"
+    ],
+    "Boost.Variant": [
+        "boost::variant"
+    ],
+    "Boost.Accumulators": [
+        "boost::accumulators"
+    ],
+    "Boost.Contract": [
+        "boost::contract"
+    ],
+    "Boost.Di": [
+        "boost::di"
+    ],
+    "Boost.SML (Boost.Statechart)": [
+        "boost::sml"
+    ],
+    "Boost.Histogram": [
+        "boost::histogram"
+    ],
+    "Boost.Process": [
+        "boost::process"
+    ],
+    "Boost.Compute": [
+        "boost::compute"
+    ]
+}

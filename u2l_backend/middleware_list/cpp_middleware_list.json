@@ -1,0 +1,662 @@
+{
+    "Boost C++ Libraries": [
+        "boost"
+    ],
+    "Qt Framework": [
+        "Qt"
+    ],
+    "STL (Standard Template Library)": [
+        "std:: :"
+    ],
+    "POCO (Portable Components)": [
+        "Poco"
+    ],
+    "ACE (Adaptive Communication Environment)": [
+        "ACE"
+    ],
+    "gRPC (gRPC for C++)": [
+        "grpc"
+    ],
+    "ZeroMQ": [
+        "zmq"
+    ],
+    "Protocol Buffers (protobuf)": [
+        "google: :protobuf"
+    ],
+    "CppCMS": [
+        "cppcms"
+    ],
+    "cpp-netlib": [
+        "boost: :network"
+    ],
+    "TBB (Threading Building Blocks)": [
+        "tbb"
+    ],
+    "OpenMP": [
+        "omp"
+    ],
+    "C++ REST SDK (Casablanca)": [
+        "web: :http"
+    ],
+    "Apache Thrift": [
+        "apache: :thrift"
+    ],
+    "Ice (Internet Communications Engine)": [
+        "Ice"
+    ],
+    "CMake": [
+        "cmake"
+    ],
+    "Conan (C/C++ Package Manager)": [
+        "conan"
+    ],
+    "Hunter Package Manager": [
+        "hunter"
+    ],
+    "JUCE": [
+        "juce"
+    ],
+    "FLTK (Fast, Light Toolkit)": [
+        "FL"
+    ],
+    "VTK (Visualization Toolkit)": [
+        "vtk"
+    ],
+    "Eigen": [
+        "Eigen"
+    ],
+    "OpenCV": [
+        "cv: :"
+    ],
+    "POCL (Portable Computing Language)": [
+        "pocl"
+    ],
+    "OpenCL": [
+        "cl: :"
+    ],
+    "OpenGL": [
+        "gl"
+    ],
+    "CUDA": [
+        "cuda"
+    ],
+    "Vulkan": [
+        "vk"
+    ],
+    "SFML (Simple and Fast Multimedia Library)": [
+        "sf"
+    ],
+    "Boost.Asio": [
+        "boost: :asio"
+    ],
+    "Boost.Thread": [
+        "boost: :thread"
+    ],
+    "Boost.Interprocess": [
+        "boost: :interprocess"
+    ],
+    "Boost.Filesystem": [
+        "boost: :filesystem"
+    ],
+    "Boost.PropertyTree": [
+        "boost: :property_tree"
+    ],
+    "Boost.Program_options": [
+        "boost: :program_options"
+    ],
+    "Boost.Graph": [
+        "boost: :graph"
+    ],
+    "Boost.Python": [
+        "boost: :python"
+    ],
+    "OpenSSL": [
+        "openssl"
+    ],
+    "CppUnit": [
+        "CppUnit"
+    ],
+    "Google Test (gtest)": [
+        "testing: :"
+    ],
+    "Catch2": [
+        "Catch"
+    ],
+    "Doctest": [
+        "doctest"
+    ],
+    "C++ Builder": [
+        "bds"
+    ],
+    "FLAC++": [
+        "FLAC"
+    ],
+    "OpenAL": [
+        "AL"
+    ],
+    "FMOD": [
+        "FMOD"
+    ],
+    "RapidJSON": [
+        "rapidjson"
+    ],
+    "nlohmann: :json": [
+        "nlohmann: :json"
+    ],
+    "cereal": [
+        "cereal"
+    ],
+    "msgpack-c": [
+        "msgpack"
+    ],
+    "Boost.Serialization": [
+        "boost: :serialization"
+    ],
+    "Apache Avro": [
+        "avro"
+    ],
+    "Cap’n Proto": [
+        "capnp"
+    ],
+    "FlatBuffers": [
+        "flatbuffers"
+    ],
+    "Re2 (RE2 Regular Expression Library)": [
+        "re2"
+    ],
+    "LevelDB": [
+        "leveldb"
+    ],
+    "RocksDB": [
+        "rocksdb"
+    ],
+    "cpp_redis": [
+        "cpp_redis"
+    ],
+    "SimpleAmqpClient": [
+        "SimpleAmqpClient"
+    ],
+    "SQLiteCpp": [
+        "SQLite"
+    ],
+    "MariaDB Connector/C": [
+        "mysql"
+    ],
+    "MongoDB C++ Driver": [
+        "mongocxx"
+    ],
+    "cppkafka": [
+        "cppkafka"
+    ],
+    "Crow (C++ REST Framework)": [
+        "crow"
+    ],
+    "Wt (Web Toolkit)": [
+        "Wt"
+    ],
+    "CppCMS": [
+        "cppcms"
+    ],
+    "Seastar": [
+        "seastar"
+    ],
+    "Dlib": [
+        "dlib"
+    ],
+    "RESTinio": [
+        "restinio"
+    ],
+    "Tntnet": [
+        "tntnet"
+    ],
+    "HDF5": [
+        "H5"
+    ],
+    "Eigen3ToPython": [
+        "Eigen"
+    ],
+    "Ogre3D": [
+        "Ogre"
+    ],
+    "Cinder": [
+        "cinder"
+    ],
+    "FLANN (Fast Library for Approximate Nearest Neighbors)": [
+        "flann"
+    ],
+    "V8 JavaScript Engine": [
+        "v8"
+    ],
+    "CGAL (Computational Geometry Algorithms Library)": [
+        "CGAL"
+    ],
+    "SOIL (Simple OpenGL Image Library)": [
+        "SOIL"
+    ],
+    "CppCheck": [
+        "cppcheck"
+    ],
+    "Valgrind": [
+        "valgrind"
+    ],
+    "C++ AMP": [
+        "Concurrency"
+    ],
+    "Boost.Compute": [
+        "boost: :compute"
+    ],
+    "OpenMP (for C++)": [
+        "omp"
+    ],
+    "C++/WinRT": [
+        "winrt"
+    ],
+    "C++ Builder": [
+        "bds"
+    ],
+    "FMX (FireMonkey)": [
+        "FMX"
+    ],
+    "Appmethod": [
+        "appmethod"
+    ],
+    "Folly": [
+        "folly"
+    ],
+    "Libevent": [
+        "event"
+    ],
+    "µWebSockets": [
+        "uWS"
+    ],
+    "Beast (Boost.Beast)": [
+        "boost: :beast"
+    ],
+    "Proxygen": [
+        "proxygen"
+    ],
+    "Pistache (C++ REST Framework)": [
+        "Pistache"
+    ],
+    "Restbed": [
+        "Corvusoft"
+    ],
+    "cpp-httplib": [
+        "httplib"
+    ],
+    "C++ Requests": [
+        "cpr"
+    ],
+    "Simple-Web-Server": [
+        "SimpleWeb"
+    ],
+    "QtWebApp": [
+        "QtWebApp"
+    ],
+    "Wt (Web Toolkit)": [
+        "Wt"
+    ],
+    "Restbed": [
+        "Corvusoft"
+    ],
+    "Tufao": [
+        "Tufao"
+    ],
+    "Beast (Boost.Beast)": [
+        "boost: :beast"
+    ],
+    "Libwebsockets": [
+        "lws"
+    ],
+    "QtWebApp": [
+        "QtWebApp"
+    ],
+    "C++ Requests": [
+        "cpr"
+    ],
+    "Wt (Web Toolkit)": [
+        "Wt"
+    ],
+    "Restbed": [
+        "Corvusoft"
+    ],
+    "Simple-Web-Server": [
+        "SimpleWeb"
+    ],
+    "Tufao": [
+        "Tufao"
+    ],
+    "Libwebsockets": [
+        "lws"
+    ],
+    "Boost.Beast HTTP and WebSocket library": [
+        "boost: :beast"
+    ],
+    "Pistache (C++ REST Framework)": [
+        "Pistache"
+    ],
+    "Restbed": [
+        "Corvusoft"
+    ],
+    "cpp-httplib": [
+        "httplib"
+    ],
+    "C++ Requests": [
+        "cpr"
+    ],
+    "Simple-Web-Server": [
+        "SimpleWeb"
+    ],
+    "QtWebApp": [
+        "QtWebApp"
+    ],
+    "Wt (Web Toolkit)": [
+        "Wt"
+    ],
+    "Tufao": [
+        "Tufao"
+    ],
+    "Libwebsockets": [
+        "lws"
+    ],
+    "CppCMS": [
+        "cppcms"
+    ],
+    "Restbed": [
+        "Corvusoft"
+    ],
+    "Tufao": [
+        "Tufao"
+    ],
+    "Beast (Boost.Beast)": [
+        "boost: :beast"
+    ],
+    "Libmicrohttpd": [
+        "MHD"
+    ],
+    "Cpp-HTTPLib": [
+        "httplib"
+    ],
+    "Civetweb": [
+        "Civet"
+    ],
+    "uWebSockets": [
+        "uWS"
+    ],
+    "Drogon": [
+        "drogon"
+    ],
+    "Silicon C++ Web Framework": [
+        "silicon"
+    ],
+    "TreeFrog Framework": [
+        "treefrog"
+    ],
+    "Wt (Web Toolkit)": [
+        "Wt"
+    ],
+    "CppCMS": [
+        "cppcms"
+    ],
+    "Restbed": [
+        "Corvusoft"
+    ],
+    "Tufao": [
+        "Tufao"
+    ],
+    "Boost.Chrono": [
+        "boost::chrono"
+    ],
+    "Boost.DateTime": [
+        "boost::date_time"
+    ],
+    "Boost.Fusion": [
+        "boost::fusion"
+    ],
+    "Boost.Geometry": [
+        "boost::geometry"
+    ],
+    "Boost.Heap": [
+        "boost::heap"
+    ],
+    "Boost.Interval": [
+        "boost::interval"
+    ],
+    "Boost.Lambda": [
+        "boost::lambda"
+    ],
+    "Boost.Locale": [
+        "boost::locale"
+    ],
+    "Boost.Math": [
+        "boost::math"
+    ],
+    "Boost.MPL": [
+        "boost::mpl"
+    ],
+    "Boost.Phoenix": [
+        "boost::phoenix"
+    ],
+    "Boost.Polygon": [
+        "boost::polygon"
+    ],
+    "Boost.PropertyMap": [
+        "boost::property_map"
+    ],
+    "Boost.QVM": [
+        "boost::qvm"
+    ],
+    "Boost.Range": [
+        "boost::range"
+    ],
+    "Boost.Ratio": [
+        "boost::ratio"
+    ],
+    "Boost.ScopeExit": [
+        "boost::scope_exit"
+    ],
+    "Boost.Spirit": [
+        "boost::spirit"
+    ],
+    "Boost.Thread": [
+        "boost::thread"
+    ],
+    "Boost.Tuple": [
+        "boost::tuple"
+    ],
+    "Boost.TypeErasure": [
+        "boost::type_erasure"
+    ],
+    "Boost.Uuid": [
+        "boost::uuid"
+    ],
+    "Boost.Variant": [
+        "boost::variant"
+    ],
+    "Boost.Wave": [
+        "boost::wave"
+    ],
+    "Boost.Xpressive": [
+        "boost::xpressive"
+    ],
+    "EASTL (Electronic Arts STL)": [
+        "eastl"
+    ],
+    "Qt WebEngine": [
+        "QtWebEngine"
+    ],
+    "Qt Multimedia": [
+        "QtMultimedia"
+    ],
+    "Qt QML": [
+        "QtQml"
+    ],
+    "Qt Quick": [
+        "QtQuick"
+    ],
+    "Qt Charts": [
+        "QtCharts"
+    ],
+    "Qt Data Visualization": [
+        "QtDataVisualization"
+    ],
+    "Qt Serial Port": [
+        "QtSerialPort"
+    ],
+    "Qt Bluetooth": [
+        "QtBluetooth"
+    ],
+    "Qt XML Patterns": [
+        "QtXmlPatterns"
+    ],
+    "Qt Location": [
+        "QtLocation"
+    ],
+    "Qt Sensors": [
+        "QtSensors"
+    ],
+    "Qt WebSockets": [
+        "QtWebSockets"
+    ],
+    "Qt Network Authorization": [
+        "QtNetworkAuthorization"
+    ],
+    "Qt Test": [
+        "QtTest"
+    ],
+    "Qt Android Extras": [
+        "QtAndroidExtras"
+    ],
+    "Qt Mac Extras": [
+        "QtMacExtras"
+    ],
+    "Qt Win Extras": [
+        "QtWinExtras"
+    ],
+    "Qt X11 Extras": [
+        "QtX11Extras"
+    ],
+    "Qt Gamepad": [
+        "QtGamepad"
+    ],
+    "Qt Virtual Keyboard": [
+        "QtVirtualKeyboard"
+    ],
+    "Qt Remote Objects": [
+        "QtRemoteObjects"
+    ],
+    "Qt Speech": [
+        "QtSpeech"
+    ],
+    "Qt Wayland Compositor": [
+        "QtWaylandCompositor"
+    ],
+    "Qt Wayland Shell Integration": [
+        "QtWaylandShellIntegration"
+    ],
+    "Qt Wayland Extras": [
+        "QtWaylandExtras"
+    ],
+    "Qt Wayland Scanner": [
+        "QtWaylandScanner"
+    ],
+    "Qt Wayland Server": [
+        "QtWaylandServer"
+    ],
+    "Qt Wayland Client": [
+        "QtWaylandClient"
+    ],
+    "Qt Wayland Quick Compositor": [
+        "QtWaylandQuickCompositor"
+    ],
+    "Qt Wayland Quick Shell Integration": [
+        "QtWaylandQuickShellIntegration"
+    ],
+    "Qt Wayland Quick Compositor Extras": [
+        "QtWaylandQuickCompositorExtras"
+    ],
+    "Qt Wayland Quick Compositor Scanner": [
+        "QtWaylandQuickCompositorScanner"
+    ],
+    "Qt Wayland Quick Server": [
+        "QtWaylandQuickServer"
+    ],
+    "Qt Wayland Quick Client": [
+        "QtWaylandQuickClient"
+    ],
+    "Qt Wayland Quick Server Extras": [
+        "QtWaylandQuickServerExtras"
+    ],
+    "Qt Wayland Quick Server Scanner": [
+        "QtWaylandQuickServerScanner"
+    ],
+    "Qt Wayland Compositor QML": [
+        "QtWaylandCompositorQml"
+    ],
+    "Qt Wayland QML Compositor Scanner": [
+        "QtWaylandQmlCompositorScanner"
+    ],
+    "Qt Wayland Scanner": [
+        "QtWaylandScanner"
+    ],
+    "Qt Wayland Shell Scanner": [
+        "QtWaylandShellScanner"
+    ],
+    "Qt Wayland Shell Integration": [
+        "QtWaylandShellIntegration"
+    ],
+    "Qt Wayland Shell Scanner": [
+        "QtWaylandShellScanner"
+    ],
+    "Qt Wayland Shell Integration Scanner": [
+        "QtWaylandShellIntegrationScanner"
+    ],
+    "Qt Wayland Extras Scanner": [
+        "QtWaylandExtrasScanner"
+    ],
+    "Qt Wayland Scanner": [
+        "QtWaylandScanner"
+    ],
+    "Qt Wayland Scanner": [
+        "QtWaylandScanner"
+    ],
+    "Qt Wayland Quick Scanner": [
+        "QtWaylandQuickScanner"
+    ],
+    "Qt Wayland Quick Compositor Scanner": [
+        "QtWaylandQuickCompositorScanner"
+    ],
+    "Qt Wayland Quick Compositor Extras Scanner": [
+        "QtWaylandQuickCompositorExtrasScanner"
+    ],
+    "Qt Wayland Quick Server Scanner": [
+        "QtWaylandQuickServerScanner"
+    ],
+    "Qt Wayland Quick Server Extras Scanner": [
+        "QtWaylandQuickServerExtrasScanner"
+    ],
+    "Qt Wayland Quick Server Extras Scanner": [
+        "QtWaylandQuickServerExtrasScanner"
+    ],
+    "Qt Wayland Quick Server Scanner": [
+        "QtWaylandQuickServerScanner"
+    ],
+    "Qt Wayland Quick Server Extras Scanner": [
+        "QtWaylandQuickServerExtrasScanner"
+    ],
+    "Qt Wayland Quick Server Extras Scanner": [
+        "QtWaylandQuickServerExtrasScanner"
+    ],
+    "Qt Wayland Compositor QML Scanner": [
+        "QtWaylandCompositorQmlScanner"
+    ],
+    "Qt Wayland QML Compositor Scanner": [
+        "QtWaylandQmlCompositorScanner"
+    ],
+    "Qt Wayland Compositor Scanner": [
+        "QtWaylandCompositorScanner"
+    ],
+    "Qt Wayland Compositor QML Scanner": [
+        "QtWaylandCompositorQmlScanner"
+    ]
+}

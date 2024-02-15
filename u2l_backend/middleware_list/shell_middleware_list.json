@@ -1,0 +1,632 @@
+{
+    "GNU Parallel": [
+        "parallel"
+    ],
+    "jq": [
+        "jq"
+    ],
+    "xargs": [
+        "xargs"
+    ],
+    "find": [
+        "find"
+    ],
+    "sort": [
+        "sort"
+    ],
+    "uniq": [
+        "uniq"
+    ],
+    "cut": [
+        "cut"
+    ],
+    "paste": [
+        "paste"
+    ],
+    "tr": [
+        "tr"
+    ],
+    "tee": [
+        "tee"
+    ],
+    "curl": [
+        "curl"
+    ],
+    "wget": [
+        "wget"
+    ],
+    "nc (Netcat)": [
+        "nc"
+    ],
+    "rsync": [
+        "rsync"
+    ],
+    "tmux": [
+        "tmux"
+    ],
+    "screen": [
+        "screen"
+    ],
+    "dialog": [
+        "dialog"
+    ],
+    "expect": [
+        "expect"
+    ],
+    "sed": [
+        "sed"
+    ],
+    "awk": [
+        "awk"
+    ],
+    "grep": [
+        "grep"
+    ],
+    "ack": [
+        "ack"
+    ],
+    "rg (RipGrep)": [
+        "rg"
+    ],
+    "fd (fd-find)": [
+        "fd"
+    ],
+    "fzf": [
+        "fzf"
+    ],
+    "entr": [
+        "entr"
+    ],
+    "ripgrep": [
+        "rg"
+    ],
+    "bat": [
+        "bat"
+    ],
+    "htop": [
+        "htop"
+    ],
+    "Glances": [
+        "glances"
+    ],
+    "ncdu": [
+        "ncdu"
+    ],
+    "GoAccess": [
+        "goaccess"
+    ],
+    "ncurses": [
+        "ncurses"
+    ],
+    "socat": [
+        "socat"
+    ],
+    "mosh": [
+        "mosh"
+    ],
+    "logrotate": [
+        "logrotate"
+    ],
+    "awkward": [
+        "awkward"
+    ],
+    "tldr": [
+        "tldr"
+    ],
+    "autojump": [
+        "autojump"
+    ],
+    "fpp (Facebook Path Picker)": [
+        "fpp"
+    ],
+    "exa": [
+        "exa"
+    ],
+    "dtrx": [
+        "dtrx"
+    ],
+    "figlet": [
+        "figlet"
+    ],
+    "lolcat": [
+        "lolcat"
+    ],
+    "fortune": [
+        "fortune"
+    ],
+    "cowsay": [
+        "cowsay"
+    ],
+    "toilet": [
+        "toilet"
+    ],
+    "taskwarrior": [
+        "task"
+    ],
+    "tig": [
+        "tig"
+    ],
+    "hub": [
+        "hub"
+    ],
+    "git-flow": [
+        "git-flow"
+    ],
+    "git-lfs": [
+        "git-lfs"
+    ],
+    "gh (GitHub CLI)": [
+        "gh"
+    ],
+    "sd (Stringify Data)": [
+        "sd"
+    ],
+    "pup": [
+        "pup"
+    ],
+    "yq": [
+        "yq"
+    ],
+    "bash-it": [
+        "bash-it"
+    ],
+    "zsh-syntax-highlighting": [
+        "zsh-syntax-highlighting"
+    ],
+    "oh-my-zsh": [
+        "oh-my-zsh"
+    ],
+    "zplug": [
+        "zplug"
+    ],
+    "tmuxinator": [
+        "tmuxinator"
+    ],
+    "zsh-autosuggestions": [
+        "zsh-autosuggestions"
+    ],
+    "bash-completion": [
+        "bash-completion"
+    ],
+    "ShellCheck": [
+        "shellcheck"
+    ],
+    "Sedna (Data extraction and transformation)": [
+        "sedna"
+    ],
+    "fswatch (File System Watcher)": [
+        "fswatch"
+    ],
+    "inotify-tools": [
+        "inotifywait",
+        "inotifywatch"
+    ],
+    "jqplay": [
+        "jqplay"
+    ],
+    "pandoc": [
+        "pandoc"
+    ],
+    "asciinema": [
+        "asciinema"
+    ],
+    "tuptime": [
+        "tuptime"
+    ],
+    "Mosh (Mobile Shell)": [
+        "mosh"
+    ],
+    "parallel": [
+        "parallel"
+    ],
+    "Zenity": [
+        "zenity"
+    ],
+    "KDialog": [
+        "kdialog"
+    ],
+    "tmate": [
+        "tmate"
+    ],
+    "byobu": [
+        "byobu"
+    ],
+    "Liquid Prompt": [
+        "liquidprompt"
+    ],
+    "mosh (Mobile Shell)": [
+        "mosh"
+    ],
+    "Zsh Pure Theme": [
+        "pure"
+    ],
+    "Zsh Powerlevel10k Theme": [
+        "powerlevel10k"
+    ],
+    "Zsh spaceship-prompt Theme": [
+        "spaceship-prompt"
+    ],
+    "Ack (Better than grep)": [
+        "ack"
+    ],
+    "Alacritty": [
+        "alacritty"
+    ],
+    "Tilix": [
+        "tilix"
+    ],
+    "Tmuxinator": [
+        "tmuxinator"
+    ],
+    "Xonsh": [
+        "xonsh"
+    ],
+    "Go Fish (Cross-platform package manager)": [
+        "go-fish"
+    ],
+    "yadm (Yet Another Dotfiles Manager)": [
+        "yadm"
+    ],
+    "fdupes": [
+        "fdupes"
+    ],
+    "Shelltrap (Shell script obfuscator)": [
+        "shelltrap"
+    ],
+    "Crontab (Scheduling tasks)": [
+        "crontab"
+    ],
+    "at (Run jobs at specified times)": [
+        "at"
+    ],
+    "locate": [
+        "locate"
+    ],
+    "ncdu (NCurses Disk Usage)": [
+        "ncdu"
+    ],
+    "Cmus (Console Music Player)": [
+        "cmus"
+    ],
+    "htop": [
+        "htop"
+    ],
+    "iotop": [
+        "iotop"
+    ],
+    "Glances": [
+        "glances"
+    ],
+    "ranger (Terminal File Manager)": [
+        "ranger"
+    ],
+    "tig (Text-mode interface for Git)": [
+        "tig"
+    ],
+    "tree": [
+        "tree"
+    ],
+    "exa (Modern replacement for ls)": [
+        "exa"
+    ],
+    "bat (Syntax highlighting for cat)": [
+        "bat"
+    ],
+    "fpp (Facebook Path Picker)": [
+        "fpp"
+    ],
+    "The Silver Searcher (ag)": [
+        "ag"
+    ],
+    "htop (Interactive Process Viewer)": [
+        "htop"
+    ],
+    "lsof (List Open Files)": [
+        "lsof"
+    ],
+    "ht (Highlight Text)": [
+        "ht"
+    ],
+    "entr (Run arbitrary commands when files change)": [
+        "entr"
+    ],
+    "ack (A Code Searching Tool)": [
+        "ack"
+    ],
+    "vim-plug (Vim Plugin Manager)": [
+        "vim-plug"
+    ],
+    "oh-my-tmux": [
+        "oh-my-tmux"
+    ],
+    "bash-git-prompt": [
+        "bash-git-prompt"
+    ],
+    "z.lua": [
+        "z.lua"
+    ],
+    "fasd (Command-line productivity booster)": [
+        "fasd"
+    ],
+    "fzf (Command-line fuzzy finder)": [
+        "fzf"
+    ],
+    "Zsh Autosuggestions": [
+        "zsh-autosuggestions"
+    ],
+    "zsh-completions": [
+        "zsh-completions"
+    ],
+    "Bpytop (Resource monitor)": [
+        "bpytop"
+    ],
+    "Htop (Interactive Process Viewer)": [
+        "htop"
+    ],
+    "CMatrix (Console Matrix Screensaver)": [
+        "cmatrix"
+    ],
+    "neofetch (System Information Tool)": [
+        "neofetch"
+    ],
+    "figlet (ASCII Art Generator)": [
+        "figlet"
+    ],
+    "toilet (Colorful Text Art)": [
+        "toilet"
+    ],
+    "lolcat (Colorize Cat)": [
+        "lolcat"
+    ],
+    "fortune (Random Fortune Generator)": [
+        "fortune"
+    ],
+    "cowsay (Talking ASCII Characters)": [
+        "cowsay"
+    ],
+    "nyancat (Nyancat in your terminal)": [
+        "nyancat"
+    ],
+    "pipes.sh (Animated Pipes)": [
+        "pipes.sh"
+    ],
+    "timg (Terminal Image Viewer)": [
+        "timg"
+    ],
+    "tty-clock (Digital Clock in Terminal)": [
+        "tty-clock"
+    ],
+    "qrcode-terminal (QR Code Generator)": [
+        "qrcode-terminal"
+    ],
+    "cheat (Command-line Cheat Sheet Tool)": [
+        "cheat"
+    ],
+    "how2 (Stack Overflow from the terminal)": [
+        "how2"
+    ],
+    "tldr (Simplified and community-driven man pages)": [
+        "tldr"
+    ],
+    "thefuck (Correcting previous command)": [
+        "thefuck"
+    ],
+    "entr (Run arbitrary commands when files change)": [
+        "entr"
+    ],
+    "pyenv (Python Version Manager)": [
+        "pyenv"
+    ],
+    "nodenv (Node.js Version Manager)": [
+        "nodenv"
+    ],
+    "rbenv (Ruby Version Manager)": [
+        "rbenv"
+    ],
+    "direnv (Environment switcher for the shell)": [
+        "direnv"
+    ],
+    "autojump (Jump to your favorite directories)": [
+        "autojump"
+    ],
+    "fasd (Quick access to files and directories)": [
+        "fasd"
+    ],
+    "fd (A simple, fast and user-friendly alternative to find)": [
+        "fd"
+    ],
+    "ripgrep (Search tool like grep and The Silver Searcher)": [
+        "rg"
+    ],
+    "fzf (Command-line fuzzy finder)": [
+        "fzf"
+    ],
+    "ripgrep-all (ripgrep, but also search in PDFs, E-Books, Office documents, zip, tar.gz, etc.)": [
+        "rga"
+    ],
+    "fdupes (Find and manage duplicate files)": [
+        "fdupes"
+    ],
+    "ncdu (NCurses Disk Usage)": [
+        "ncdu"
+    ],
+    "mc (Midnight Commander)": [
+        "mc"
+    ],
+    "ag (The Silver Searcher)": [
+        "ag"
+    ],
+    "dtrx (Do The Right Extraction)": [
+        "dtrx"
+    ],
+    "glow (Render markdown on the command-line)": [
+        "glow"
+    ],
+    "broot (A new way to see and navigate directory trees)": [
+        "broot"
+    ],
+    "ripgrep-all (ripgrep, but also search in PDFs, E-Books, Office documents, zip, tar.gz, etc.)": [
+        "rga"
+    ],
+    "dog (Command-line DNS client)": [
+        "dog"
+    ],
+    "fd-find (A simple, fast and user-friendly alternative to find)": [
+        "fd"
+    ],
+    "ripgrep-all (ripgrep, but also search in PDFs, E-Books, Office documents, zip, tar.gz, etc.)": [
+        "rga"
+    ],
+    "youtube-dl (Download videos from YouTube and other sites)": [
+        "youtube-dl"
+    ],
+    "wget (Non-interactive downloader)": [
+        "wget"
+    ],
+    "curl (Command-line tool for making HTTP requests)": [
+        "curl"
+    ],
+    "httpie (User-friendly cURL alternative with syntax highlighting and more)": [
+        "httpie"
+    ],
+    "axel (Lightweight command-line download accelerator)": [
+        "axel"
+    ],
+    "aria2 (Lightweight multi-protocol & multi-source command-line download utility)": [
+        "aria2"
+    ],
+    "Bash": [
+        "bash"
+    ],
+    "Shell Scripting": [
+        "sh",
+        "bash"
+    ],
+    "AWK": [
+        "awk"
+    ],
+    "SED": [
+        "sed"
+    ],
+    "Command-Line Utilities": [
+        "grep",
+        "awk",
+        "sed",
+        "cut",
+        "paste",
+        "tr"
+    ],
+    "Version Control (Git)": [
+        "git"
+    ],
+    "Package Management": [
+        "apt",
+        "yum",
+        "brew"
+    ],
+    "System Administration": [
+        "sudo",
+        "systemctl",
+        "service"
+    ],
+    "File Operations": [
+        "cp",
+        "mv",
+        "rm",
+        "touch",
+        "mkdir"
+    ],
+    "Process Management": [
+        "ps",
+        "kill",
+        "pkill"
+    ],
+    "Text Processing": [
+        "cat",
+        "echo",
+        "printf"
+    ],
+    "Shell Variables": [
+        "$",
+        "export"
+    ],
+    "Conditional Statements": [
+        "if",
+        "else",
+        "elif",
+        "[",
+        "]"
+    ],
+    "Looping": [
+        "for",
+        "while",
+        "until"
+    ],
+    "Functions": [
+        "function",
+        "()",
+        "$()"
+    ],
+    "Error Handling": [
+        "set -e",
+        "set -o errexit"
+    ],
+    "Environment Variables": [
+        "export"
+    ],
+    "Regular Expressions": [
+        "grep",
+        "sed",
+        "awk"
+    ],
+    "File Redirection": [
+        ">",
+        ">>",
+        "<"
+    ],
+    "Pipelines": [
+        "|"
+    ],
+    "Command Substitution": [
+        "$(command)"
+    ],
+    "Job Control": [
+        "&",
+        "bg",
+        "fg",
+        "jobs"
+    ],
+    "File Permissions": [
+        "chmod",
+        "chown"
+    ],
+    "Networking": [
+        "ping",
+        "curl",
+        "wget"
+    ],
+    "SSH": [
+        "ssh",
+        "scp"
+    ],
+    "Compression/Archiving": [
+        "tar",
+        "zip",
+        "unzip",
+        "gzip",
+        "gunzip"
+    ],
+    "Text Editors": [
+        "vi",
+        "vim",
+        "nano"
+    ],
+    "Shell Configuration Files": [
+        ".bashrc",
+        ".bash_profile",
+        ".zshrc"
+    ],
+    "Shell Scripting Best Practices": [
+        "shellcheck"
+    ]
+}
