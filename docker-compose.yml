@@ -39,16 +39,16 @@ services:
        ports:
            - 6379:6379
 
-    # worker:
-    #   container_name: celery
-    #   build:
-    #    context: ./u2l_backend
-    #   restart: always
-    #   #entrypoint: celery
-    #   #command: celery -A celery_setup worker --loglevel=info -n celeryTaskWorker
-    #   user: nobody
-    #   depends_on:
-    #      - redis
+    worker:
+      container_name: celery
+      build:
+       context: ./u2l_backend
+      restart: always
+      entrypoint: celery
+      command: celery -A celery_setup worker --loglevel=info -n celeryTaskWorker
+      user: nobody
+      depends_on:
+         - redis
 
 
     u2l_frontend:
@@ -57,7 +57,7 @@ services:
             context: ./u2l_frontend
             
         ports:
-            - 8081:80
+            - 80:80
         depends_on:
           -  u2l_backend
              

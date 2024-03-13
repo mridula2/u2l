@@ -34,7 +34,8 @@ const LogDetails = () => {
 
   const projectDetails = location.state.data;
   useEffect(() => {
-    const sse = new EventSource(`${url}/stream_logs/${projectDetails.task_id}`);
+    const url_backend = url;
+    const sse = new EventSource(`/stream_logs/${projectDetails.task_id}`);
 
     const handleStream = (e) => {
       // ['### CODE ASSESSMENT STARTED ###', 'Tool Installation Completed.',

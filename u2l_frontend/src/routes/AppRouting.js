@@ -19,6 +19,7 @@ import WizardValidationExample from '../components/Wizard/Wizard';
 import AuthenticatedRoute from './AuthenticatedRoute';
 import AdminPursuitCustomerAuthorizedRoute from './AdminPursuitCustomerAuthorizedRoute';
 import url from '../config/url';
+import Middleware from '../pages/Middleware';
 
 const AppRouting = () => {
   const navigate = useNavigate();
@@ -35,7 +36,7 @@ const AppRouting = () => {
   //   }
   //   return config;
   // });
-  axios.defaults.baseURL = url;
+  // axios.defaults.baseURL = url;
   axios.interceptors.request.use(
     (request) => {
       // console.log(request);
@@ -50,18 +51,18 @@ const AppRouting = () => {
     }
   );
 
-  axios.interceptors.response.use(
-    (response) => {
-      return response;
-    },
-    (error) => {
-      if (error.response && error.response.status === 401) {
-        AuthenticationUtils.removeUserDetails();
-        navigate('/');
-      }
-      return error;
-    }
-  );
+  // axios.interceptors.response.use(
+  //   (response) => {
+  //     return response;
+  //   },
+  //   (error) => {
+  //     if (error.response && error.response.status === 401) {
+  //       AuthenticationUtils.removeUserDetails();
+  //       navigate('/');
+  //     }
+  //     return Promise.reject(error);
+  //   }
+  // );
 
   // let location = useLocation();
   return (
@@ -84,6 +85,7 @@ const AppRouting = () => {
         <Route element={<AdminPursuitCustomerAuthorizedRoute />}>
           <Route path='/documentation' element={<Documentation />} />
           <Route path='/rules' element={<Rules />} />
+          <Route path='/middleware' element={<Middleware />} />
         </Route>
       </Route>
     </Routes>

@@ -3,7 +3,7 @@ import re
 import pandas as pd
 import openpyxl
 from openpyxl import load_workbook
-from models import db, user_details, project_details, os_details, analysis_type, analysis_java, analysis_c, analysis_shell, analysis_status, source_code_inventory, migration_summary, artefacts_summary, java_data, contact_us, analysis_summary_java, celery_job_details, MiddlewareComponent
+from models import db, user_details, project_details, os_details, analysis_type, analysis_java, analysis_c, analysis_shell, analysis_status, source_code_inventory, migration_summary, artefacts_summary, java_data, contact_us, analysis_summary_java, celery_job_details, MiddlewareComponent, Package, Version
 from datetime import datetime
 import smtplib
 import logging
@@ -41,7 +41,7 @@ logger = get_task_logger(__name__)
 
 import redis
 
-redis_client = redis.StrictRedis(host='localhost', port=6379, db=0)
+redis_client = redis.StrictRedis(host='redis', port=6379, db=0)
 
 def validate_email(email):
     pattern = r'^[\w\.-]+@[\w\.-]+\.\w+$'
@@ -254,6 +254,8 @@ def testing_task(yMD, hMS, tool_analysis_type, framework_type, file_name, script
         response = jsonify({'error': str(e)})
         response.status_code = 500
         return response
+    
+
     
     try:
         if(tool_analysis_type == 'canalysis' or tool_analysis_type == 'shellanalysis'):
@@ -1935,7 +1937,9 @@ def deprecated_data_sheet(url, package_name, version):
         df = df.reset_index(drop=True)
 
         output_folder = 'u2l_total_deprecated_data'
+        print("Creating folder")
         os.makedirs(output_folder, exist_ok=True)
+        print("Folder created")
         # file_path = os.path.join(output_folder, 'total_deprecated_data.xlsx')
 
         file_path = os.path.join(output_folder, f'{package_name}_deprecated_data.xlsx')
@@ -2173,3 +2177,89 @@ def java_middleware_extraction(zip_file_path, output_folder, middleware_json_pat
         return 'success'
     else:
         print("No results found.")
+
+def populate_database():
+    package_versions = {
+        'Mchange commons java': ['0.2.19', '0.2.20'],
+        'Apache Tomcat': ['11.0', '10.0','9.0','8.0','7.0'],
+        'Geronimo': ['2.0.1', '2.1.3'],
+        'Apache OpenJPA': ['1.0.0','1.0.1','1.0.2','1.0.3','1.0.4','1.1.0','1.2.0','1.2.1','1.2.2','1.2.3','2.0.0','2.0.1','2.1.0','2.1.1','2.2.0','2.2.1','2.2.2','2.3.0','2.4.0','2.4.1','2.4.2','2.4.3','3.0.0','3.1.0','3.1.2','3.2.0','3.2.1','3.2.2'],
+        'POI': ['3.17','4.0','4.1','5.0'],
+        'Quartz scheduler': ['2.5.0-SNAPSHOT','2.3.1-SNAPSHOT','2.3.0','2.2.2','2.1.7','2.0.2','1.8.6'],
+        'XMLBeans': ['1.0.4','2.0.0.','2.1.0','2.2.0','2.4.0','2.6.0','3.0.0','3.1.0','4.0.0','5.0.0']
+    }
+
+    urls_dict = {
+        'Angus Activation': 'https://eclipse-ee4j.github.io/angus-activation/api/deprecated-list.html',
+        'ECJ': 'https://javadoc.io/doc/org.eclipse.jdt.core.compiler/ecj/latest/deprecated-list.html',
+        'JavaHamcrest': 'https://hamcrest.org/JavaHamcrest/javadoc/2.2/deprecated-list.html',
+        'Mchange commons java': 'https://www.mchange.com/projects/mchange-commons-java-versions/{package_version}/apidocs/deprecated-list.html',
+        'Micrometer Core': 'https://javadoc.io/doc/io.micrometer/micrometer-core/latest/deprecated-list.html',
+        'okhttp': 'https://square.github.io/okhttp/1.x/okhttp/deprecated-list.html',
+        'zip4j': 'https://javadoc.io/doc/net.lingala.zip4j/zip4j/latest/deprecated-list.html',
+        'Apache Tomcat': 'https://tomcat.apache.org/tomcat-{package_version}-doc/api/deprecated-list.html',
+        'Apache ANT': 'https://ant.apache.org/manual/api/deprecated-list.html',
+        'aspectjweaver': 'https://javadoc.io/doc/org.aspectj/aspectjweaver/latest/deprecated-list.html',
+        'aspectjrt': 'https://javadoc.io/doc/org.aspectj/aspectjrt/latest/deprecated-list.html',
+        'Axis': 'https://axis.apache.org/axis/java/apiDocs/deprecated-list.html',
+        'Bouncycastle': 'https://www.bouncycastle.org/docs/pkixdocs1.5on/index.html?deprecated-list.html',
+        'cglib-nodep': 'https://javadoc.io/doc/cglib/cglib-nodep/latest/deprecated-list.html',
+        'Commons Beanutils': 'https://commons.apache.org/proper/commons-beanutils/apidocs/deprecated-list.html',
+        'Commons Configuration': 'https://commons.apache.org/proper/commons-configuration/apidocs/deprecated-list.html',
+        'Commons Dbcp': 'https://commons.apache.org/proper/commons-dbcp/apidocs/deprecated-list.html',
+        'Commons Digester': 'https://commons.apache.org/proper/commons-digester/apidocs/deprecated-list.html',
+        'Commons Discovery': 'https://commons.apache.org/dormant/commons-discovery/apidocs/deprecated-list.html',
+        'Commons Lang': 'https://commons.apache.org/proper/commons-lang/javadocs/api-2.6/index.html?deprecated-list.html',
+        'Commons Collections': 'https://commons.apache.org/proper/commons-collections/apidocs/deprecated-list.html',
+        'Commons Codec': 'https://commons.apache.org/proper/commons-codec/apidocs/deprecated-list.html',
+        'Apache Commons IO': 'https://javadoc.scijava.org/Apache-Commons-IO/deprecated-list.html',
+        'Commons Pool': 'https://commons.apache.org/proper/commons-pool/apidocs/deprecated-list.html',
+        'Commons Logging': 'https://commons.apache.org/proper/commons-logging/apidocs/deprecated-list.html',
+        'Diffutils': 'https://javadoc.io/static/io.github.java-diff-utils/java-diff-utils/4.5/deprecated-list.html',
+        'Geronimo': 'https://geronimo.apache.org/apidocs/{package_version}/deprecated-list.html',
+        'Groovy-lang': 'https://docs.groovy-lang.org/latest/html/api/deprecated-list.html',
+        'Hazelcast': 'https://docs.hazelcast.org/docs/latest/javadoc/deprecated-list.html',
+        'HTTPcore': 'https://javadoc.io/doc/org.apache.httpcomponents/httpcore/latest/deprecated-list.html',
+        'HTTPclient': 'https://javadoc.io/doc/org.apache.httpcomponents/httpclient/latest/index.html',
+        'Imap': 'https://javadoc.io/doc/com.sun.mail/imap/latest/deprecated-list.html',
+        'IText': 'https://javadoc.io/doc/com.itextpdf/itextpdf/latest/deprecated-list.html',
+        'Jasper Reports': 'https://jasperreports.sourceforge.net/api/deprecated-list.html',
+        'Jaxrpc': 'https://docs.jboss.org/jbossas/javadoc/4.0.3SP1/jaxrpc/deprecated-list.html',
+        'Jcifs': 'https://javadoc.io/docs/org.codelibs/jcifs/latest/deprecated-list.html',
+        'Jcommon': 'https://www.jfree.org/jcommon/api/index.html?deprecated-list.html',
+        'Jdom': 'http://www.jdom.org/docs/apidocs/deprecated-list.html',
+        'Jfreechart': 'https://www.jfree.org/jfreechart/javadoc/deprecated-list.html',
+        'Jsch Documentation': 'https://epaul.github.io/jsch-documentation/javadoc/deprecated-list.html',
+        'Juddi Client': 'https://juddi.apache.org/juddi-client/apidocs/deprecated-list.html',
+        'Apache OpenJPA': 'https://openjpa.apache.org/builds/{package_version}/apidocs/deprecated-list.html',
+        'Mybatis': 'https://mybatis.org/mybatis-3/apidocs/deprecated-list.html',
+        'Mybatis Spring': 'https://mybatis.org/spring/apidocs/deprecated-list.html',
+        'Opencsv': 'https://javadoc.io/doc/com.opencsv/opencsv/latest/deprecated-list.html',
+        'POI': 'https://poi.apache.org/apidocs/{package_version}/deprecated-list.html',
+        'Quartz scheduler': 'https://www.quartz-scheduler.org/api/{package_version}/deprecated-list.html',
+        'slf4j': 'https://www.slf4j.org/api/deprecated-list.html',
+        'wsdl4j': 'https://javadoc.io/doc/wsdl4j/wsdl4j/latest/index.html',
+        'XMLBeans': 'https://xmlbeans.apache.org/docs/{package_version}/reference/deprecated-list.html'
+    }
+
+    # for package_name, url in urls_dict.items():
+    #     package = Package(name=package_name, url=url)
+    #     db.session.add(package)
+    #     if package_name in package_versions:
+    #         for version in package_versions[package_name]:
+    #             package.versions.append(Version(version=version))
+
+    for package_name, url in urls_dict.items():
+        existing_package = Package.query.filter_by(name=package_name).first()
+        if existing_package:
+            existing_package.url = url
+            db.session.add(existing_package)
+        else:
+            new_package = Package(name=package_name, url=url)
+            db.session.add(new_package)
+        db.session.commit()
+        if package_name in package_versions:
+            for version in package_versions[package_name]:
+                package = existing_package if existing_package else new_package
+                package.versions.append(Version(version=version))
+    db.session.commit()

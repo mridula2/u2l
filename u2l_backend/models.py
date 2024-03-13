@@ -364,4 +364,14 @@ class MiddlewareComponent(db.Model):
         self.stack_current_version = stack_current_version
         self.stack_upgraded_version = stack_upgraded_version
         self.recommendation = recommendation
-  
+
+class Package(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), unique=True, nullable=False)
+    url = db.Column(db.String(200))
+    versions = db.relationship('Version', backref='package', lazy=True, cascade="all, delete-orphan", passive_deletes=True)
+
+class Version(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    version = db.Column(db.String(20))
+    package_id = db.Column(db.Integer, db.ForeignKey('package.id', ondelete='CASCADE'), nullable=False)  

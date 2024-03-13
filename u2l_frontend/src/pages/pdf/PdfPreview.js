@@ -443,10 +443,8 @@ const PdfPreview = () => {
       try {
         const url_backend = url;
         const response = await fetch(
-          `${url_backend}/report/${
-            projectDetails.project_details[0].project_name
-          }/${
-            projectDetails.project_details[0].application_name
+          `/report/${projectDetails.project_details[0].project_name
+          }/${projectDetails.project_details[0].application_name
           }/${AuthenticationUtils.getEmail()}`,
           {
             method: 'GET',
@@ -893,13 +891,11 @@ const PdfPreview = () => {
         </p>
         <div style={{ textAlign: 'left', marginBottom: '5%' }}>
           <p style={styles.normalText}>
-            {`Effort percentage for ${
-              projectDetails.project_details[0].project_name
-            } is ${
-              projectDetails.percent
-            }%. So your project requires ${PdfUtils.getEffort(
-              projectDetails.percent
-            )}`}
+            {`Effort percentage for ${projectDetails.project_details[0].project_name
+              } is ${projectDetails.percent
+              }%. So your project requires ${PdfUtils.getEffort(
+                projectDetails.percent
+              )}`}
           </p>
         </div>
       </div>
@@ -929,13 +925,11 @@ const PdfPreview = () => {
       <div style={{ marginTop: '4%', marginBottom: '20%' }}>
         <div style={{ textAlign: 'left' }}>
           <p style={styles.normalText}>
-            {`The score to migrate ${
-              projectDetails.project_details[0].application_name
-            } is ${projectDetails.percent}%. Therefore, the application ${
-              projectDetails.project_details[0].application_name
-            } requires ${PdfUtils.getEffort(
-              projectDetails.percent
-            )} for migration.`}
+            {`The score to migrate ${projectDetails.project_details[0].application_name
+              } is ${projectDetails.percent}%. Therefore, the application ${projectDetails.project_details[0].application_name
+              } requires ${PdfUtils.getEffort(
+                projectDetails.percent
+              )} for migration.`}
           </p>
         </div>
         <div style={{ textAlign: 'left' }}>
@@ -969,35 +963,35 @@ const PdfPreview = () => {
           )}
           {projectDetails.analysis_type[0].analysis_type ===
             'shellanalysis' && (
-            <div>
-              <p style={styles.normalText}>
-                Very Low Effort (0% - 10%): Minimal updates, such as minor file
-                path adjustments. Slight modifications to accommodate
-                Linux-specific configurations.
-              </p>
-              <p style={styles.normalText}>
-                Low Effort (11% - 30%): Basic shell script adjustments and
-                replacements of specific Unix commands with Linux equivalents.
-              </p>
-              <p style={styles.normalText}>
-                Medium Effort (31% - 60%): Adaptation of shell scripts using
-                Unix-specific features to work in the Linux environment. Updates
-                to system-specific configurations or environment variables.
-              </p>
-              <p style={styles.normalText}>
-                High Effort (61% - 80%): Significant modifications to shell
-                scripts and utilities to align with Linux environment
-                requirements. Handling differences between Unix and Linux
-                filesystems.
-              </p>
-              <p style={styles.normalText}>
-                Very High Effort (81% - 100%): Substantial rewrites of shell
-                scripts and utilities that are heavily tied to Unix environment
-                assumptions. Extensive changes to core logic to ensure
-                compatibility with Linux.
-              </p>
-            </div>
-          )}
+              <div>
+                <p style={styles.normalText}>
+                  Very Low Effort (0% - 10%): Minimal updates, such as minor file
+                  path adjustments. Slight modifications to accommodate
+                  Linux-specific configurations.
+                </p>
+                <p style={styles.normalText}>
+                  Low Effort (11% - 30%): Basic shell script adjustments and
+                  replacements of specific Unix commands with Linux equivalents.
+                </p>
+                <p style={styles.normalText}>
+                  Medium Effort (31% - 60%): Adaptation of shell scripts using
+                  Unix-specific features to work in the Linux environment. Updates
+                  to system-specific configurations or environment variables.
+                </p>
+                <p style={styles.normalText}>
+                  High Effort (61% - 80%): Significant modifications to shell
+                  scripts and utilities to align with Linux environment
+                  requirements. Handling differences between Unix and Linux
+                  filesystems.
+                </p>
+                <p style={styles.normalText}>
+                  Very High Effort (81% - 100%): Substantial rewrites of shell
+                  scripts and utilities that are heavily tied to Unix environment
+                  assumptions. Extensive changes to core logic to ensure
+                  compatibility with Linux.
+                </p>
+              </div>
+            )}
         </div>
       </div>
       {/* ========================= Footer Page 8 ================== */}

@@ -56,7 +56,7 @@ const Dashboard = (containerRef) => {
   const [selected, setSelected] = useState('');
   const size = useContext(ResponsiveContext);
   const [numFiles, setNumFiles] = useState(0);
-  const onSubmit = ({ value, touched }) => {};
+  const onSubmit = ({ value, touched }) => { };
   const [show, setShow] = useState(false);
   const [showspinner, setShowspinner] = useState('');
   const [projects, setProjects] = useState([]);
@@ -86,9 +86,9 @@ const Dashboard = (containerRef) => {
         })
         .catch((error) => {
           console.log(error);
-          setNotificationMessage('Error while fetching projects');
-          setStatus('critical');
-          setNotificationVisible(true);
+          // setNotificationMessage('Error while fetching projects');
+          // setStatus('critical');
+          // setNotificationVisible(true);
         });
     };
 
@@ -124,7 +124,7 @@ const Dashboard = (containerRef) => {
           margin='medium'
           responsive={true}
           style={image}
-          // flex='shrink'
+        // flex='shrink'
         >
           <Box justifyContent='center'>
             <Cards

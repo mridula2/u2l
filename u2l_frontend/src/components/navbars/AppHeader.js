@@ -20,7 +20,7 @@ import {
 import { Link, useNavigate } from 'react-router-dom';
 import classes from './AppHeader.module.css';
 import AuthenticationUtils from '../../utils/AuthenticationUtils';
-                           
+
 export const AppHeader = () => {
   const size = useContext(ResponsiveContext);
   const [focused, setFocused] = useState(false);
@@ -42,6 +42,7 @@ export const AppHeader = () => {
         navigate(headerLinks[1].path);
       },
     },
+
   ];
   AuthenticationUtils.getUserRole() !== 'Delivery' &&
     headerLinks.push({
@@ -149,7 +150,7 @@ export const AppHeader = () => {
                   key={item.label}
                   onClick={() => navigateToPage(item.path)}
                   active={window.location.pathname === item.path}
-                  // disabled={window.location.pathname === item.path}
+                // disabled={window.location.pathname === item.path}
                 />
               ))}
             </Nav>
@@ -219,7 +220,7 @@ export const AppHeader = () => {
                     style={{ borderRadius: '0' }}
                     onClick={() => navigateToPage(item.path)}
                     active={window.location.pathname === item.path}
-                    // disabled={window.location.pathname === item.path}
+                  // disabled={window.location.pathname === item.path}
                   />
                 ))}
               </Nav>

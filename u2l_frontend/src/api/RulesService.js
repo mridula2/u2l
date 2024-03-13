@@ -24,7 +24,7 @@ const addJavaLibraries = (data) => {
       'Content-Type': 'application/json',
     },
     data: {
-      package_language: `${data.package_language}`,
+      package_language: `Java`,
       package_url: `${data.package_url}`,
       package_name: `${data.package_name}`,
       package_version: `${data.package_version}`,
@@ -41,10 +41,20 @@ const checkURL = (url) => {
   };
   return axios(config);
 };
+
+const getJavaLibrariesDetails = () => {
+  let config = {
+    method: 'get',
+    url: `/javalib`,
+  };
+  return axios(config);
+};
+
 const RulesService = {
   addRules,
   checkURL,
   addJavaLibraries,
+  getJavaLibrariesDetails
 };
 
 export default RulesService;

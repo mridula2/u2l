@@ -20,6 +20,7 @@ import AuthenticationService from '../../api/AuthenticationService';
 import CommonUtils from '../../utils/CommonUtils';
 import AuthenticationUtils from '../../utils/AuthenticationUtils';
 import { FormView, Hide } from 'grommet-icons';
+import axios from 'axios';
 
 const ResetPassword = ({ closeLayer, email }) => {
   const [formValues, setFormValues] = useState({ resetEmail: email });
@@ -182,8 +183,8 @@ const LoginForm = () => {
           setNotificationVisible(true);
         }
       });
-  };
 
+  }
   const changeShowPassword = () => {
     setShowPassword((prev) => !prev);
   };

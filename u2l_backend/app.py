@@ -11,7 +11,7 @@ app = Flask(__name__)
 CORS(app)
 
 app.register_blueprint(authentication_controller)
-app.config['REDIS_URL'] = 'redis://localhost:6379/0'
+app.config['REDIS_URL'] = 'redis://redis:6379/0'
 
 app.register_blueprint(sse, url_prefix="/stream")
 
@@ -33,4 +33,4 @@ app.app_context().push()
 insert_user_details_task('admin@hpe.com', 'UGFzc3dvcmRAMTIz', 'admin', 'admin', 'admin')
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0',debug=True)

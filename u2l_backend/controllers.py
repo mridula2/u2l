@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request, Response, Flask, stream_with_context
-from utils import validate_email, generate_workbook, sheet_transfer, fetch_store_java_data, send_email, summary_sheet_generation, testing_task, run_cppcheck, get_task_queue_name, convert_to_dataframe , convert_to_dataframe_move_to_excel, createDf, java_doc_sheet, extract_versions, deprecated_data_sheet, insert_middleware_component_to_db, get_recommendation, java_middleware_extraction
+from utils import validate_email, generate_workbook, sheet_transfer, fetch_store_java_data, send_email, summary_sheet_generation, testing_task, run_cppcheck, get_task_queue_name, convert_to_dataframe , convert_to_dataframe_move_to_excel, createDf, java_doc_sheet, extract_versions, deprecated_data_sheet, insert_middleware_component_to_db, get_recommendation, java_middleware_extraction, populate_database
 from models import *
 import datetime
 import os
@@ -26,7 +26,7 @@ from celery.result import AsyncResult
 from flask_sse import sse
 import redis
 
-redis_client = redis.StrictRedis(host='localhost', port=6379, db=0)
+redis_client = redis.StrictRedis(host='redis', port=6379, db=0)
 
 logging.basicConfig(filename='middleware_extraction.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -2624,28 +2624,26 @@ def apitest():
 
     return 'success'
 
-@authentication_controller.route('/collectdatademo', methods=['GET'])
-def collectdatademo():
+# @authentication_controller.route('/extract_middleware', methods=['POST'])
+# def extract_middleware():
 
-    import requests
-    from bs4 import BeautifulSoup
+#     if(tool_analysis_type == 'javaanalysis'):
+#         middleware_json_path = '/usr/u2l/u2l_backend/project/' + file_name + '/middleware_list/java_middleware_list.json'
+#     elif(tool_analysis_type == 'shellanalysis'):
+#         middleware_json_path = '/usr/u2l/u2l_backend/project/' + file_name + '/middleware_list/shell_middleware_list.json'
+#     elif(tool_analysis_type == 'canalysis'):
+#         middleware_json_path = '/usr/u2l/u2l_backend/project/' + file_name + '/middleware_list/c_middleware_list.json'
 
-    url = 'https://docs.oracle.com/en/java/javase/17/docs/api/deprecated-list.html'
+#     middleware_file_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/' + file_name + '.zip'
+#     output_folder = '/usr/u2l/u2l_backend/projects/' + file_name
+#     results = java_middleware_extraction(middleware_file_path, output_folder, middleware_json_path)
 
-    try:
-        response = requests.get(url)
-        response.raise_for_status()
+#     # if (results == 'success'):
+#     #     return jsonify({'message': 'Middleware extraction completed', 'results': results}), 200
+#     # else:
+#     #     return jsonify({'message': 'No results found.'}), 404
 
-        soup = BeautifulSoup(response.content, 'html.parser')
-
-        deprecated_item_names = soup.find_all('div', class_=['col-summary-item-name', 'col-first'])
-        deprecation_comments = soup.find_all('div', class_='col-last')
-        convert_to_dataframe_move_to_excel(deprecated_item_names, deprecation_comments)
-
-        return 'Package found successfully'
-
-    except requests.exceptions.RequestException as e:
-        return jsonify({'error': str(e)})
+#     return 'Success'
 
 # Java SE 10-19 doc for all deprecated items
 @authentication_controller.route('/collectdata', methods=['POST'])
@@ -2732,11 +2730,27 @@ def collectdata():
     except requests.exceptions.RequestException as e:
         return jsonify({'error': str(e)})
 
+@authentication_controller.route('/javalib', methods=['GET'])
+def javalib():
+    populate_database()
+    packages = Package.query.all()
+    package_data = []
+    for package in packages:
+        package_versions = [version.version for version in package.versions] if package.versions else []
+        package_info = {
+            'package_name': package.name,
+            'package_url': package.url if package.url else "",
+            'package_version': package_versions
+        }
+        package_data.append(package_info)
+    return jsonify(package_data)
+
 @authentication_controller.route('/collect_other_libraries', methods=['POST'])
 def collect_other_libraries():
 
     try:
         
+        print('Inside collect other libraries')
         urls_dict = {
         'Angus Activation': 'https://eclipse-ee4j.github.io/angus-activation/api/deprecated-list.html',
         'ECJ': 'https://javadoc.io/doc/org.eclipse.jdt.core.compiler/ecj/latest/deprecated-list.html',
@@ -2790,17 +2804,17 @@ def collect_other_libraries():
         'XMLBeans': 'https://xmlbeans.apache.org/docs/{package_version}/reference/deprecated-list.html'
         }
 
+        print('Test 1')
         json_data = request.get_json()
         package_name = json_data['package_name']
         package_version = json_data['package_version']
         package_url = json_data['package_url']
+        print('Test 2')
 
-        # package_name = request.form['package_name']
-        # package_version = request.form['package_version'] #optional
-        # package_url = request.form['package_url'] #optional
-
-        if package_url == '':
+        if (package_url == ''):
+            print('Test 3')
             if(package_name in urls_dict.keys()):
+                print('Test 4')
                 url = urls_dict[package_name]
                 if '{package_version}' in url:
                     # If package version is not provided, extract available versions
@@ -2812,14 +2826,17 @@ def collect_other_libraries():
                             result = deprecated_data_sheet(version_url, package_name, version)
                             print(result)
                     else:
+                        print('Test 5')
                         url = url.replace('{package_version}', package_version)
                 result = deprecated_data_sheet(url, package_name, package_version)
             else:
+                print('Test 6')
                 print("Package not found in the list")
         else:
+            print('Test 7')
             result = deprecated_data_sheet(package_url, package_name, 1)
             print(result)
-        return 'Package found successfully'
+        return 'Package found successfully : Updated'
 
     except requests.exceptions.RequestException as e:
         return jsonify({'error': str(e)})
@@ -2874,48 +2891,513 @@ def check_website():
 
 @authentication_controller.route('/extract_middleware', methods=['POST'])
 def extract_middleware():
+    try:
+        print(request)
+        print('Test')
+        tool_analysis_type = request.form['tool_analysis_type']
+        print('Test1')
+        file = request.files['file_name']
+        c_analysis_types = ['C', 'C++', 'Pro*C', 'C/Pro*C', 'C++/Pro*C']
+        print('Test1')
+        if(tool_analysis_type == 'Java'):
+            tool_analysis_type = 'javaanalysis'
+            print('Test2')
+        elif(tool_analysis_type in c_analysis_types):
+            if(tool_analysis_type == 'Pro*C'):
+                tool_analysis_type = 'canalysis'
+            elif(tool_analysis_type == 'C' or tool_analysis_type == 'C++'):
+                print('Accepting C Parameters!')
+                tool_analysis_type = 'canalysis'
+            elif(tool_analysis_type == 'C/Pro*C' or tool_analysis_type == 'C++/Pro*C'):
+                tool_analysis_type = 'canalysis'
+        elif(tool_analysis_type == 'Shell'):  
+            tool_analysis_type = 'shellanalysis'
 
-    file = request.files['file_name']
-    tool_analysis_type = request.form['tool_analysis_type']
+        analysis_types = ['javaanalysis', 'canalysis', 'shellanalysis']
+        if tool_analysis_type not in analysis_types:
+            error_message = {'error' :"Invalid analysis type"}
+            return jsonify(error_message), 404
 
-    file_name = file.filename
-    temp_tuple = os.path.splitext(file_name)
-    if temp_tuple[1] != '.zip':
-        error_message = {'error' :"Upload .zip files only"}
-        return jsonify(error_message), 404
+        file_name = file.filename
+        temp_tuple = os.path.splitext(file_name)
+        if temp_tuple[1] != '.zip':
+            error_message = {'error' :"Upload .zip files only"}
+            return jsonify(error_message), 404
 
-    cur_date = datetime.datetime.now()
+        cur_date = datetime.datetime.now()
 
-    file_name = temp_tuple[0]
+        file_name = temp_tuple[0]
 
-    year_month_day = str(cur_date).split(" ")
-    global yMD
-    yMD = year_month_day[0].replace("-", "")
+        year_month_day = str(cur_date).split(" ")
+        global yMD
+        yMD = year_month_day[0].replace("-", "")
 
-    hour_min_sec = os.path.splitext(year_month_day[1])
-    global hMS
-    hMS = hour_min_sec[0].replace(":", "")
+        hour_min_sec = os.path.splitext(year_month_day[1])
+        global hMS
+        hMS = hour_min_sec[0].replace(":", "")
 
-    file_name = file_name + "_" + yMD + "_" + hMS 
-    directory = '/usr/u2l/u2l_backend/midextract/' + file_name
-    os.makedirs(directory)
-    file.save(os.path.join(directory, file_name +'.zip'))
+        file_name = file_name + "_" + yMD + "_" + hMS 
+        directory = '/usr/u2l/u2l_backend/midextract/' + file_name
+        os.makedirs(directory)
+        file.save(os.path.join(directory, file_name +'.zip'))
 
-    zip_file_path = directory + '/' + file_name + '.zip'
+        zip_file_path = directory + '/' + file_name + '.zip'
 
-    if(tool_analysis_type == 'javaanalysis'):
-        middleware_json_path = '/usr/u2l/u2l_backend/middleware_list/java_middleware_list.json'
-    elif(tool_analysis_type == 'shellanalysis'):
-        middleware_json_path = '/usr/u2l/u2l_backend/middleware_list/shell_middleware_list.json'
-    elif(tool_analysis_type == 'canalysis'):
-        middleware_json_path = '/usr/u2l/u2l_backend/middleware_list/c_middleware_list.json'
+        if(tool_analysis_type == 'javaanalysis'):
+            middleware_json_path = '/usr/u2l/u2l_backend/middleware_list/java_middleware_list.json'
+            print('Test3')
+        elif(tool_analysis_type == 'shellanalysis'):
+            middleware_json_path = '/usr/u2l/u2l_backend/middleware_list/shell_middleware_list.json'
+        elif(tool_analysis_type == 'canalysis'):
+            middleware_json_path = '/usr/u2l/u2l_backend/middleware_list/c_middleware_list.json'
 
-    output_folder = '/usr/u2l/u2l_backend/middleware-output/java-middleware'
-    results = java_middleware_extraction(zip_file_path, output_folder, middleware_json_path)
-
-    if (results == 'success'):
-        return jsonify({'message': 'Middleware extraction completed', 'results': results}), 200
-    else:
-        return jsonify({'message': 'No results found.'}), 404
+        output_folder = '/usr/u2l/u2l_backend/middleware-output/java-middleware'
+        print('Before result')
+        results = java_middleware_extraction(zip_file_path, output_folder, middleware_json_path)
+        print('After result')
+        if (results):
+            print('In result')
+            return jsonify({'message': 'Middleware extraction completed', 'results': results}), 200
+        else:
+            return jsonify({'message': 'No results found.'}), 404
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500     
 
     return 'Success'
+
+@authentication_controller.route('/invoke_container2', methods=['POST'])
+def invoke_container2():
+    import docker
+    client = docker.from_env()
+    image, logs = client.images.build(path='dockerfile/', tag='my-image')
+    java_version = '8'
+    command = f'/usr/lib/jvm/java-{java_version}-openjdk-amd64/bin/javac MyFile.java'
+    container = client.containers.run(image, command=command, remove=True)
+
+    print(container.logs().decode('utf-8'))
+
+@authentication_controller.route('/invoke_container', methods=['POST'])
+def invoke_container():
+    java_source_code = request.json.get('source_code')
+    java_version = request.json.get('java_version')
+
+    if java_version == "8":
+        docker_command = ["docker", "run", "--rm", "-i", "openjdk:8", "javac", "-"]
+    elif java_version == "11":
+        docker_command = ["docker", "run", "--rm", "-i", "openjdk:11", "javac", "-"]
+    else:
+        return jsonify({"error": "Unsupported Java version"}), 400
+
+    try:
+        result = subprocess.run(docker_command, input=java_source_code.encode(), capture_output=True, text=True, check=True)
+        return jsonify({"stdout": result.stdout, "stderr": result.stderr})
+    except subprocess.CalledProcessError as e:
+        return jsonify({"error": "Compilation failed", "stderr": e.stderr}), 500
+
+@authentication_controller.route('/compile_java2', methods=['POST'])
+def compile_java2():
+    from javax.tools import DiagnosticCollector, JavaCompiler, ToolProvider
+    try:
+        source_code = request.form['source_code']
+        compiler = ToolProvider.getSystemJavaCompiler()
+        diagnostics = DiagnosticCollector()
+        file_manager = compiler.getStandardFileManager(diagnostics, None, None)
+        compilation_units = [SimpleJavaFileObject('Main.java', JavaFileObject.Kind.SOURCE, source_code)]
+        compiler.getTask(None, file_manager, diagnostics, None, None, compilation_units).call()
+        
+        errors = []
+        for diagnostic in diagnostics.getDiagnostics():
+            error = {
+                'message': str(diagnostic.getMessage(None)),
+                'line': diagnostic.getLineNumber(),
+                'column': diagnostic.getColumnNumber()
+            }
+            errors.append(error)
+        return jsonify({'message': 'Compilation successful'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@authentication_controller.route('/compile_java', methods=['POST'])
+def compile_java():
+    try:
+        jdk_version = request.json.get('jdk_version')
+        jdk_version = '11'
+        # java_home = subprocess.check_output(['which', f'java-{jdk_version}']).decode().strip()
+        # if not java_home:
+        #     return jsonify({'error': f'JDK version {jdk_version} not found'}), 400
+
+        # os.environ["JAVA_HOME"] = java_home
+        # source_folder = request.json.get('source_folder')
+        source_folder = "/usr/u2l/u2l_backend/pet-store-master"
+
+        for file_name in os.listdir("/usr/u2l/u2l_backend/pet-store-master"):
+            if file_name.endswith('.java'):
+                print('1')
+                file_path = os.path.join(source_folder, file_name)
+                compile_process = subprocess.Popen(['javac', file_path], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                stdout, stderr = compile_process.communicate()
+                if compile_process.returncode != 0:
+                    return jsonify({'error': f'Compilation failed for {file_name}', 'stderr': stderr.decode()}), 400
+
+        return jsonify({'message': 'Compilation successful'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@authentication_controller.route('/creports', methods=['POST'])
+def creports():
+    c_report_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/c_report.xlsx'
+    c_remediation_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/c_remediation_report.xlsx'
+    c_inventory_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/c_inventory_report.xlsx'
+
+    form_source_ver = 'HP-UX'
+    # redis_client.rpush(redis_queue_name, '7/40::Executing Scan Source Script')
+    source_versions = ["AIX", "Solaris", "HP-UX"]
+    if form_source_ver not in source_versions:
+        error_message = {'error' :"Invalid Source Vesion"}
+        return jsonify(error_message), 404
+
+    # file_name = "UNIX_HPE_20231128_054027"
+    file_path = re.sub(r'_\d{8}_\d{6}', '', file_name)
+    print(file_path)
+    source_path = '/usr/u2l/u2l_backend/projects/'+ file_name + '/U2L/c-vfunction_'+ yMD + '_' + hMS +'/work/canalysis/' + file_path
+    print(source_path)
+    script_path = '/usr/u2l/u2l_backend/scan_source.sh'
+    source_ver = form_source_ver
+    target_ver = 'RHEL'
+    command = ['sh', script_path, source_path, source_ver, target_ver]
+    process = subprocess.Popen(command, stdout=subprocess.PIPE)
+    output = process.communicate()[0].decode().strip()
+    lines = output.split('\n')
+    print(lines)
+    # redis_client.rpush(redis_queue_name, '8/40::Completed Executing Scan Source Script')
+    # redis_client.rpush(redis_queue_name, '9/40::Generating Final Report')
+
+    ic_lines = []
+    with open('/usr/u2l/u2l_backend/final_report.csv', 'r') as file:
+        for line in file:
+            if line.strip().startswith('/usr/'):
+                ic_lines.append(line)
+
+    with open('/usr/u2l/u2l_backend/final_report.csv', 'w') as file:
+        file.write(''.join(ic_lines))
+
+    ic_lines = []
+    with open('/usr/u2l/u2l_backend/final_report.csv', 'r') as file:
+        for line in file:
+            modified_line = line.replace(':', ',', 1)
+            ic_lines.append(modified_line)
+
+    with open('/usr/u2l/u2l_backend/final_report.csv', 'w') as file:
+        file.write(''.join(ic_lines))
+
+    final_report_path = '/usr/u2l/u2l_backend/final_report.csv'
+    if os.path.isfile(final_report_path) and os.path.getsize(final_report_path) > 0:
+        df = pd.read_csv(final_report_path, sep='?', engine='python', header=None, index_col=None)
+        df.columns = ["FILE PATH","LINE NUMBER","SOURCE CODE","ERROR MESSAGE","REMEDIATION"]
+        df = df.drop(df.index[0])
+        O28 = df['FILE PATH'].nunique()
+        P28 = df['FILE PATH'].count()
+        print(df)
+
+    generate_workbook(df, c_report_path,'Source Scan Remedy Detail')
+    # redis_client.rpush(redis_queue_name, '10/40::Reports almost ready')
+
+    # redis_client.rpush(redis_queue_name, '11/40::Performing cppcheck !!')
+
+    source_path = '/usr/u2l/u2l_backend/projects/'+ file_name + '/U2L/c-vfunction_'+ yMD + '_' + hMS +'/work/canalysis/' + file_path
+    # source_path = '/usr/u2l/u2l_backend/projects/' + file_name +'/'+ file_name + '.zip'
+    stdout, stderr = run_cppcheck(source_path)
+
+    with open("cppcheck_output.txt", "w") as file:
+        file.write(stderr)
+
+    with open('cppcheck_output.txt', 'r') as file:
+        content = file.readlines()
+
+    file_paths = []
+    line_numbers = []
+    error_messages = []
+    error_lines = []
+
+    pattern = re.compile(r'^(.*?):(\d+):\d+: (.*?): (.*)$')
+
+    current_error_lines = []
+
+    for line in content:
+        match = pattern.match(line)
+        if match:
+            if current_error_lines:
+                error_lines.append(current_error_lines)
+                current_error_lines = []
+            
+            file_paths.append(match.group(1))
+            line_numbers.append(int(match.group(2)))
+            error_messages.append(match.group(4))
+        else:
+            current_error_lines.append(line)
+
+    if current_error_lines:
+        error_lines.append(current_error_lines)
+
+    data = {
+        'File Path': file_paths,
+        'Line Number': line_numbers,
+        'Error Message': error_messages,
+        'Error Lines': [''.join(lines) for lines in error_lines]
+    }
+
+    df = pd.DataFrame(data)
+    df.columns = ['FILE PATH', 'LINE NUMBER', 'ERROR MESSAGE', 'ERROR LINES']
+    O29 = df['FILE PATH'].nunique()
+    P29 = df['FILE PATH'].count()
+
+    df.reset_index(drop=True, inplace=True)
+    df.index = df.index + 1
+
+    book = load_workbook(c_report_path)
+    # writer = pd.ExcelWriter(c_report_path, engine='openpyxl')
+    # writer.book = book
+    sheet_name = 'Compilation Warning Detail'
+    sheet = book[sheet_name]
+    for r_idx, row in enumerate(dataframe_to_rows(df, index=False, header=False), 1):
+        for c_idx, value in enumerate(row, 0):
+            sheet.cell(row=r_idx, column=c_idx+1, value=value)
+    book.save(c_report_path)
+    # writer.sheets = dict((ws.title, ws) for ws in book.worksheets)
+    # df.to_excel(writer, sheet_name=sheet_name, startcol=0, startrow=1, header=False)
+    # writer.save()
+    # redis_client.rpush(redis_queue_name, '12/40::Compilation reports are ready')
+
+    sheet_transfer('Source Scan Remedy Detail', '1. Source Scan Remedy Detail', 6, 1, c_report_path, c_remediation_path)
+    sheet_transfer('Compilation Warning Detail', '2. Compilation Warning Detail', 6, 1, c_report_path, c_remediation_path)
+    # sheet_transfer('Source Code Inventory', 'Source Code Inventory', 1, 0, c_report_path, c_inventory_path)
+    # sheet_transfer('Source Code Inventory', 'Source Code Inventory', 6, 1, c_report_path, c_remediation_path)
+
+    print("Start 13 : Source Code Inventory")
+    # redis_client.rpush(redis_queue_name, '35/40::Generating logs for Inventory')
+    regex = r'^.*$'
+    source_code_c_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/c-vfunction_'+ yMD + '_' + hMS + '/log/' + tool_analysis_type + '/Log_Source_Analysis_' + yMD + '.log'
+    print(source_code_c_path)
+    if os.path.isfile(source_code_c_path) and os.path.getsize(source_code_c_path) > 0:
+        
+        with open(source_code_c_path, 'r') as f:
+            data = f.read()
+        lines = data.split('\n')
+        log_entries = []
+        for line in lines:
+            match = re.match(regex, line)
+            if match:
+                log_entries.append(match.group())
+        df = pd.DataFrame(log_entries, columns=['log_message'])
+
+        start_str = '###########  Execution 0001_stepcounter Starts  ###########'
+        end_str = '###########  Execution 0001_stepcounter Ends ###########'
+        start_df = df[df['log_message'].str.contains(start_str)]
+        end_df = df[df['log_message'].str.contains(end_str)]
+
+        start_index = start_df.index[0]
+        end_index = end_df.index[0]
+        extracted_df = df.iloc[start_index+1:end_index]
+
+        result_df = extracted_df[extracted_df['log_message'].str.startswith('./')]
+        result_df[['Directory', 'Type', 'col2', 'Actual Nr of Lines', 'Nr Blank Lines', 'Nr Commented Lines', 'Total Nr LoC']] = result_df['log_message'].str.split(',', expand=True)
+        result_df = result_df.replace(r'^\s*$', np.nan, regex=True)
+        result_df = result_df.dropna(subset=['Actual Nr of Lines', 'Nr Blank Lines', 'Nr Commented Lines', 'Total Nr LoC'])
+        result_df = result_df.drop(['log_message', 'col2'], axis=1)
+        result_df = result_df.reset_index(drop=True)
+        result_df.index += 1
+
+        artefact_type_dict = result_df['Type'].unique()                                     # ['C/C++' 'CShell' 'KShell']
+        type_counts = result_df['Type'].value_counts()
+        type_counts_dict = type_counts.to_dict()                                            # {'C/C++': 690, 'KShell': 107, 'CShell': 1}
+        F6 = sum(type_counts_dict.values())
+        result_df['Actual Nr of Lines'] = result_df['Actual Nr of Lines'].astype(int)
+        autual_by_type = result_df.groupby('Type')['Actual Nr of Lines'].sum().reset_index()
+        autual_by_type_dict = autual_by_type.set_index('Type')['Actual Nr of Lines'].to_dict()    # {'Java': 231, 'KShell': 3716}
+        O6 = sum(autual_by_type_dict.values())
+        result_df['Total Nr LoC'] = result_df['Total Nr LoC'].astype(int)
+        total_by_type = result_df.groupby('Type')['Total Nr LoC'].sum().reset_index()
+        total_by_type_dict = total_by_type.set_index('Type')['Total Nr LoC'].to_dict()      # {'C/C++': 958392, 'CShell': 9, 'KShell': 9689}
+
+        generate_workbook(result_df, c_report_path,'Source Code Inventory')
+
+        sheet_transfer('Source Code Inventory', 'Source Code Inventory', 1, 0, c_report_path, c_inventory_path)
+        sheet_transfer('Source Code Inventory', 'Source Code Inventory', 6, 1, c_report_path, c_remediation_path)
+        print('Transfer Completed !!')
+        # redis_client.rpush(redis_queue_name, '36/40::Inventory reports are ready')
+
+    wb = load_workbook(c_remediation_path)
+    print('1')
+    ws = wb['Environment Information']
+    print('2')
+    start_row = 22
+    start_col = 2
+    col_actual = 2
+    col_total = 3
+
+    for row_idx, artefact_type in enumerate(artefact_type_dict, start=start_row):
+        col_idx = start_col
+        ws.cell(row=row_idx, column=col_idx, value=artefact_type)
+
+        value = type_counts_dict.get(artefact_type, 0)
+        col_idx = start_col + 1
+        ws.cell(row=row_idx, column=col_idx, value=value)
+
+        actual_value = autual_by_type_dict.get(artefact_type, 0)
+        col_idx = start_col + col_actual
+        ws.cell(row=row_idx, column=col_idx, value=actual_value)
+
+        actual_value = total_by_type_dict.get(artefact_type, 0)
+        col_idx = start_col + col_total
+        ws.cell(row=row_idx, column=col_idx, value=actual_value)
+
+    wb.save(c_remediation_path)
+
+    wb = load_workbook(c_inventory_path)
+    print('1')
+    ws = wb['Scope of Artefacts']
+    print('2')
+    start_row = 2
+    start_col = 1
+    col_total = 2
+
+    for row_idx, artefact_type in enumerate(artefact_type_dict, start=start_row):
+        col_idx = start_col
+        ws.cell(row=row_idx, column=col_idx, value=artefact_type)
+
+        value = type_counts_dict.get(artefact_type, 0)
+        col_idx = start_col + 1
+        ws.cell(row=row_idx, column=col_idx, value=value)
+
+        actual_value = total_by_type_dict.get(artefact_type, 0)
+        col_idx = start_col + col_total
+        ws.cell(row=row_idx, column=col_idx, value=actual_value)
+
+    wb.save(c_inventory_path)
+
+    summary_sheet_generation(c_remediation_path, '2. Compilation Warning Detail', '2. Compilation Warning Summary', 5, 3, c_remediation_path, 7, 2)
+    summary_sheet_generation(c_remediation_path, '1. Source Scan Remedy Detail', '1. Source Scan Remedy Summary', 5, 5, c_remediation_path, 7, 2)
+
+    print("Sheet : Source Code Inventory : CREATED")
+    print("End 13 : Source Code Inventory")
+
+    print("Start 17 : Other inventory")
+    # redis_client.rpush(redis_queue_name, '37/40::Generating logs for other inventory if present')
+    yyyy_mmdd = yMD[:4] + '-' + yMD[4:]
+
+    # Convert check_files.out
+    check_files_dir_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/c-vfunction_'+ yMD + '_' + hMS + '/log/' + tool_analysis_type + '/srccheck/' + yyyy_mmdd + '/check_files.out'
+    other_inventory_df1 = None
+    if os.path.isfile(check_files_dir_path) and os.path.getsize(check_files_dir_path) > 0:
+        other_inventory_df1 = pd.read_csv(check_files_dir_path, sep='\n', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
+        other_inventory_df1.index = other_inventory_df1.index + 1
+        print(other_inventory_df1)
+
+    # Convert exclude_files.out
+    exclude_files_dir_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/c-vfunction_'+ yMD + '_' + hMS + '/log/' + tool_analysis_type + '/srccheck/' + yyyy_mmdd + '/exclude_files.out'
+    other_inventory_df2 = None
+    if os.path.isfile(exclude_files_dir_path) and os.path.getsize(exclude_files_dir_path) > 0:
+        other_inventory_df2 = pd.read_csv(exclude_files_dir_path, sep='\n', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
+        other_inventory_df2.index = other_inventory_df2.index + 1
+        print(other_inventory_df2)
+
+    # Convert c_files.out
+    c_files_dir_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/c-vfunction_'+ yMD + '_' + hMS + '/log/' + tool_analysis_type + '/srccheck/' + yyyy_mmdd + '/c_files.out'
+    other_inventory_df3 = None
+    if os.path.isfile(c_files_dir_path) and os.path.getsize(c_files_dir_path) > 0:
+        other_inventory_df3 = pd.read_csv(c_files_dir_path, sep='\n', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
+        other_inventory_df3.index = other_inventory_df3.index + 1
+        print(other_inventory_df3)
+
+    # Convert csh_list.out
+    csh_list_dir_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/c-vfunction_'+ yMD + '_' + hMS + '/log/' + tool_analysis_type + '/srccheck/' + yyyy_mmdd + '/csh_list.out'
+    other_inventory_df4 = None
+    if os.path.isfile(csh_list_dir_path) and os.path.getsize(csh_list_dir_path) > 0:
+        other_inventory_df4 = pd.read_csv(csh_list_dir_path, sep='\n', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
+        other_inventory_df4.index = other_inventory_df4.index + 1
+        print(other_inventory_df4)    
+
+    # Convert ksh_list.out
+    ksh_list_dir_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/c-vfunction_'+ yMD + '_' + hMS + '/log/' + tool_analysis_type + '/srccheck/' + yyyy_mmdd + '/ksh_list.out'
+    other_inventory_df5 = None
+    if os.path.isfile(ksh_list_dir_path) and os.path.getsize(ksh_list_dir_path) > 0:
+        other_inventory_df5 = pd.read_csv(ksh_list_dir_path, sep='\n', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
+        other_inventory_df5.index = other_inventory_df5.index + 1
+        print(other_inventory_df5)
+
+    # Convert ot2_list.out
+    ot2_list_dir_path = '/usr/u2l/u2l_backend/projects/' + file_name + '/U2L/c-vfunction_'+ yMD + '_' + hMS + '/log/' + tool_analysis_type + '/srccheck/' + yyyy_mmdd + '/ot2_list.out'
+    other_inventory_df6 = None
+    if os.path.isfile(ot2_list_dir_path) and os.path.getsize(ot2_list_dir_path) > 0:
+        other_inventory_df6 = pd.read_csv(ot2_list_dir_path, sep='\n', header=None, index_col=None, error_bad_lines=False, warn_bad_lines=True)
+        other_inventory_df6.index = other_inventory_df6.index + 1
+        print(other_inventory_df6)   
+
+
+    other_inventory_combined_df = pd.concat([other_inventory_df1, other_inventory_df2, other_inventory_df3, other_inventory_df4, other_inventory_df5, other_inventory_df6], ignore_index=True)
+    other_inventory_combined_df = other_inventory_combined_df.drop_duplicates()
+    print(other_inventory_combined_df)
+
+    writer = pd.ExcelWriter(c_inventory_path, engine='openpyxl', mode='a')
+    book = load_workbook(c_inventory_path)
+    writer.book = book
+    writer.sheets = dict((ws.title, ws) for ws in book.worksheets)
+    other_inventory_combined_df.to_excel(writer, sheet_name='Other Inventory', index=False, startrow=6, startcol=1, header=False)
+    writer.save()
+    print('c_inventory other inventory added')
+
+    writer = pd.ExcelWriter(c_remediation_path, engine='openpyxl', mode='a')
+    book = load_workbook(c_remediation_path)
+    writer.book = book
+    writer.sheets = dict((ws.title, ws) for ws in book.worksheets)
+    other_inventory_combined_df.to_excel(writer, sheet_name='Other Inventory', index=False, startrow=6, startcol=1, header=False)
+    writer.save()
+    print('c_remediation other inventory added')
+
+    print("Sheet : Other Inventory : CREATED")
+    print("End 17 : Other inventory\n")
+    # redis_client.rpush(redis_queue_name, '38/40::Other Inventory check is complete')
+
+    middleware_type = 'Tuxedo'
+    if(middleware_type != 'Tuxedo'):
+        filename = c_remediation_path
+        sheet_name = '6. Middleware-Tuxedo'
+        workbook = load_workbook(filename)
+
+        if sheet_name in workbook.sheetnames:
+            sheet_to_delete = workbook[sheet_name]
+            workbook.remove(sheet_to_delete)
+            workbook.save(filename)
+        print('Tuxedo sheet removed !!!')
+
+    print('Migration Summary')
+    wb = load_workbook(c_remediation_path)
+    ws = wb['Migration Summary']
+    start_col_1 = 15
+    start_col_2 = 16
+    start_row_1 = 28
+    start_row_2 = 29
+    if O28 != 0:
+        ws.cell(row=start_row_1, column=start_col_1, value=O28)
+    if O29 != 0:
+        ws.cell(row=start_row_2, column=start_col_1, value=O29)
+    if P28 != 0:
+        ws.cell(row=start_row_1, column=start_col_2, value=P28)
+    if P29 != 0:
+        ws.cell(row=start_row_2, column=start_col_2, value=P29)
+
+    O7 = P28 + P29
+    F7 = O28 + O29
+
+    if O7 != 0:
+        ws.cell(row=7, column=15, value=O7)
+    if O6 != 0:
+        ws.cell(row=6, column=15, value=O6)
+    if F7 != 0:
+        ws.cell(row=7, column=6, value=F7)
+    if F6 != 0:
+        ws.cell(row=6, column=6, value=F6)
+
+    wb.save(c_remediation_path)
+    # redis_client.rpush(redis_queue_name, '39/40::Reports are ready')
+    # redis_client.rpush(redis_queue_name, '40/40::CODE ASSESSMENT SUCCESSFUL')
