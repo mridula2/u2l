@@ -7,6 +7,8 @@ import CommonUtils from '../utils/CommonUtils';
 import { useState } from 'react';
 import Colors from '../config/colors';
 import CommonService from '../api/CommonService';
+import AuthenticationUtils from '../utils/AuthenticationUtils';
+import url from '../config/url';
 
 const Documentation = () => {
   const file1 = 'Code Delivery Guidelines-V0.4';
@@ -15,16 +17,34 @@ const Documentation = () => {
   const [mouseEnter2, setMouseEnter2] = useState();
 
   const downloadfile = async (fileName) => {
-    CommonService.getDocumentation(fileName).then(
-      (response) => {
-        CommonUtils.downloadFileAxios(response, fileName);
-        // console.log(fileName + ' downloaded');
-      },
-      (error) => {
-        console.log(error);
+    // CommonService.getDocumentation(fileName).then(
+    //   (response) => {
+    //     CommonUtils.downloadFile(response, fileName);
+    //     // console.log(fileName + ' downloaded');
+    //   },
+    //   (error) => {
+    //     console.log(error);
+    //   }
+    // );
+    const token = AuthenticationUtils.getToken();
+    if (token) {
+      try {
+        const url_backend = url;
+        const response = await fetch(
+          `/documentation/${fileName}`,
+          {
+            method: 'GET',
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        CommonUtils.downloadFile(response, fileName);
+      } catch (error) {
+        console.error(error);
       }
-    );
-  };
+    }
+  }
 
   return (
     <Box direction='row-responsive' responsive={true} flex='shrink'>

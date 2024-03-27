@@ -226,12 +226,17 @@ def testing_task(yMD, hMS, tool_analysis_type, framework_type, file_name, script
         process = subprocess.Popen(command, stdout=subprocess.PIPE)
         output = process.communicate()[0].decode().strip()
         lines = output.split('\n')
+        print(lines)
+        logger.info("Lines : " + str(lines))
         logger.info("TOOL INSTALLATION COMPLETED")
+        logger.info("TOOL INSTALLATION COMPLETED 2")
         redis_client.rpush(redis_queue_name, '2/40::Tool Installation Completed.')
     except Exception as e:
         return jsonify({'error': str(e)})
 
     global PJHOME
+    logger.info("Lines[5] : " + lines[5])
+    print(lines[5])
     PJHOME = lines[5].split(':')[1]
     global APNAME
     APNAME = lines[6].split(':')[1]

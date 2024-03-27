@@ -3,6 +3,7 @@ from utils import validate_email, generate_workbook, sheet_transfer, fetch_store
 from models import *
 import datetime
 import os
+import stat
 import subprocess
 import shutil   
 import pandas as pd
@@ -287,6 +288,8 @@ def upload():
     file_name = file_name + "_" + yMD + "_" + hMS 
     directory = '/usr/u2l/u2l_backend/projects/' + file_name
     os.makedirs(directory)
+    os.chmod(directory, stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO) # Giving all read, write, execute permissions
+    print('directory created')
     file.save(os.path.join(directory, file_name +'.zip'))
 
     file_size_bytes = os.stat(directory +'/'+ file_name + '.zip').st_size
